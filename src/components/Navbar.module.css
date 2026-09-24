@@ -1,0 +1,24 @@
+/* Contenedor de la barra de navegación */
+.navbar {
+  display: flex;
+  gap: 20px;
+  padding: 16px;
+  background-color: #1e293b;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border: 1px solid #334155;
+}
+
+/* Estilo de los enlaces de navegación */
+.navLink {
+  color: #f8fafc;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s ease; /* Transición suave al pasar el cursor */
+}
+
+/* Efecto cuando el usuario pasa el mouse */
+.navLink:hover {
+  color: #38bdf8; /* Azul claro interactivo */
+}

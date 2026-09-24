@@ -1,0 +1,29 @@
+/* Contenedor de la tarjeta */
+.card {
+  background-color: #1e293b; /* Fondo oscuro */
+  border: 1px solid #334155; /* Borde gris */
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Etiqueta del título del KPI */
+.titulo {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+/* El valor numérico */
+.valor {
+  font-size: 1.8rem;
+  margin: 0;
+  color: #f8fafc;
+}
+
+/* Subtítulo informativo */
+.subtitulo {
+  font-size: 0.75rem;
+  color: #64748b;
+}
