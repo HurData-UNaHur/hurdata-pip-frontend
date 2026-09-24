@@ -1,12 +1,25 @@
 
-function App(){
-  return(
-    <div style={{padding: '20px', fontFamily: 'sans-serif'}}>
-      <h1> Unahur Dashboard Académico </h1> 
-      <p> Primeros pasos</p>  
-    </div>
-    // Si se les ocurre otra cosa en h1, mejor.
-  ); 
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+import Navbar from './components/Navbar';
+import Dashboard from './pages/Dashboard';
+import Materias from './pages/Materias';
+import Predicciones from './pages/Predicciones';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px' }}>
+        {/* Barra superior de navegación */}
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/materias" element={<Materias />} />
+          <Route path="/predicciones" element={<Predicciones />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
