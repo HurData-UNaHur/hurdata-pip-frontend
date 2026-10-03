@@ -1,0 +1,38 @@
+.filtersContainer {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    background-color: #1E293B ;  
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #334155;
+    margin-bottom: 24px;
+}
+
+.filterGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.select {
+    background-color: #0f172a;
+    color: #ffffff;
+    border: 1px solid #334155;
+    padding: 8px 12px;
+    border-radius: 6px;
+    outline: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.select:focus {
+    border-color: #6366f1;
+}
