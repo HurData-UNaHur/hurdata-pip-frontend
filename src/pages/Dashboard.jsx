@@ -56,12 +56,12 @@ function Dashboard(){
             </header>
 
             {/* La parte de Componente de Filtros */}
-            <Filters>
+            <Filters
                 materia={materia}
                 setMateria={setMateria}
                 modalidad={modalidad}
                 setModalidad={setModalidad}
-            </Filters>
+            />
 
 
             {/* Una Grid con las tarjetas KPI que se armo antes. */}

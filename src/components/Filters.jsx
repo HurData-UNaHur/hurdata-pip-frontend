@@ -33,12 +33,12 @@ function Filters({materia, setMateria, modalidad, setModalidad}){
 
             {/* La parte de Modalidad */}
             <div className={styles.filterGroup}>
-                <label className={styles.label}>Carrera</label>
+                <label className={styles.label}>Modalidad</label>
                 <select className={styles.select} value={modalidad} onChange={(mo) => setModalidad(mo.target.value)}>
-                    <option value="Todas">Todas las modalidades </option>
-                    <option value="Virtual">Solo Virtual </option>
-                    <option value="Combinada">Solo Combinadas </option>
-                    <option value="Presencial">Solo Presencial </option>
+                    <option value="todas">Todas las modalidades </option>
+                    <option value="VIRTUAL">Solo Virtual </option>
+                    <option value="COMBINADA">Solo Combinadas </option>
+                    <option value="PRESENCIAL">Solo Presencial </option>
                 </select>
             </div>
         </section>
