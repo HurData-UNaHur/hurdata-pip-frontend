@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
-
+import StackedBarChart from '../components/StackedBarChart';
 
 // Mock representativo del SIU Guaraní (HTML original).
 const DATA_MOCK = {
@@ -92,7 +92,11 @@ function Dashboard(){
                     colorBorde="#ef4444"
                 />
             </section>
+            <main style={{ marginTop: '24px' }}>
+                <StackedBarChart comisiones={comisiones} />
+            </main>
         </div>
+        
     );
 }
 
