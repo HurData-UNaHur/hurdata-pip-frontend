@@ -1,4 +1,4 @@
-// src/components/StackedBarChart.jsx
+
 import styles from './StackedBarChart.module.css';
 
 function StackedBarChart({ comisiones }) {
