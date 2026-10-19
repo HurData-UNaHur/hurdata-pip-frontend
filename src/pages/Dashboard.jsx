@@ -2,6 +2,8 @@ import { useState } from 'react';
 import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
 import StackedBarChart from '../components/StackedBarChart';
+import AlertsPanel from '../components/AlertsPanel';
+import ProjectionSlider from '../components/ProjectionSlider';
 
 // Mock representativo del SIU Guaraní (HTML original).
 const DATA_MOCK = {
@@ -92,9 +94,27 @@ function Dashboard(){
                     colorBorde="#ef4444"
                 />
             </section>
-            <main style={{ marginTop: '24px' }}>
+            {/* Grilla principal de 2 columnas */}
+            <main
+                style={{
+                display: 'grid',
+                gridTemplateColumns: '2fr 1fr',
+                gap: '24px',
+                alignItems: 'start',
+                marginTop: '24px'
+            }}
+            >
+            {/* Columna Izquierda: Gráfico de Barras */}
+            <div>
                 <StackedBarChart comisiones={comisiones} />
-            </main>
+            </div>
+
+            {/* Columna Derecha: Alertas y Calculadora */}
+            <div>
+                <AlertsPanel comisiones={comisiones} />
+                <ProjectionSlider totalLibres={totalLibre} />
+            </div>
+        </main>
         </div>
         
     );

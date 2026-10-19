@@ -9,7 +9,7 @@ function Navbar() {
   return (
     <nav className={styles.navbar}>
       <Link to="/" className={styles.navLink}>
-        General
+          General
       </Link>
       <Link to="/materias" className={styles.navLink}>
          Materias
