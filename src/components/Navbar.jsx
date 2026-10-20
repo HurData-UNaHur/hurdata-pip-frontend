@@ -1,26 +1,38 @@
 
-import { Link } from 'react-router-dom';
-
-// Importamos los estilos encapsulados del Navbar
-
+import { NavLink } from 'react-router-dom';
 import styles from './Navbar.module.css';
 
 function Navbar() {
   return (
     <nav className={styles.navbar}>
-      <Link to="/" className={styles.navLink}>
+      <div className={styles.navContainer}>
+        <NavLink
+          to="/"
+          className={({ isActive }) =>
+            isActive ? `${styles.link} ${styles.activeLink}` : styles.link
+          }
+        >
           General
-      </Link>
-      <Link to="/materias" className={styles.navLink}>
-         Materias
-      </Link>
-      <Link to="/predicciones" className={styles.navLink}>
-         Predicciones
-      </Link>
+        </NavLink>
+        <NavLink
+          to="/materias"
+          className={({ isActive }) =>
+            isActive ? `${styles.link} ${styles.activeLink}` : styles.link
+          }
+        >
+          Materias
+        </NavLink>
+        <NavLink
+          to="/predicciones"
+          className={({ isActive }) =>
+            isActive ? `${styles.link} ${styles.activeLink}` : styles.link
+          }
+        >
+          Predicciones
+        </NavLink>
+      </div>
     </nav>
   );
 }
-
-// Que hacemos?? Le agregamos un icono o algo a los nombres?
 
 export default Navbar;
