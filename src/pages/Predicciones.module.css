@@ -11,15 +11,19 @@
   margin-bottom: 4px;
 }
 
+/* Título de la vista Adaptable */
 .title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-primary, #0f172a);
+  transition: color 0.3s ease;
 }
 
+/* Subtítulo adaptable */
 .subtitle {
   font-size: 0.8rem;
-  color: #475569;
+  color: var(--text-secondary, #475569);
+  transition: color 0.3s ease;
 }
 
 .simulatorGrid {
@@ -35,17 +39,20 @@
   }
 }
 
+/* Tarjeta contenedora adaptable */
 .card {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
+  background-color: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 8px;
   padding: 16px;
+  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.05));
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .cardTitle {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text-primary, #0f172a);
   margin-bottom: 12px;
 }
 
@@ -58,18 +65,20 @@
 
 .label {
   font-size: 0.8rem;
-  color: #334155;
+  color: var(--text-secondary, #334155);
   font-weight: 500;
 }
 
+/* Inputs y Selects dinámicos */
 .select, .input {
-  background-color: #f8fafc;
-  border: 1px solid #cbd5e1;
-  color: #0f172a;
+  background-color: var(--bg-subtle, #f8fafc);
+  border: 1px solid var(--border-color, #cbd5e1);
+  color: var(--text-primary, #0f172a);
   padding: 8px 10px;
   border-radius: 6px;
   font-size: 0.82rem;
   outline: none;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 .select:focus, .input:focus {
@@ -83,14 +92,16 @@
   accent-color: #007A33;
 }
 
+/* Caja de resultados adaptable */
 .resultsBox {
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background-color: var(--bg-subtle, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 6px;
   padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .resultItem {
@@ -98,9 +109,9 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.82rem;
-  color: #334155;
+  color: var(--text-secondary, #334155);
   padding-bottom: 6px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
 }
 
 .resultItem:last-child {
@@ -111,7 +122,7 @@
 .resultValue {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-primary, #0f172a);
 }
 
 .highlight {

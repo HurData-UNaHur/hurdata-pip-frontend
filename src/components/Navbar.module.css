@@ -1,14 +1,15 @@
 
 /* Contenedor de la barra de navegación */
 .navbar {
-  background-color: #007A33; /* Verde principal UNaHur */
+  background-color: var(--navbar-bg, #007A33); /* Usa la variable dinámica o el verde UNaHur por defecto */
   padding: 16px 0;
   width: 100%;
   display: flex;
   justify-content: center; /* Centra el bloque en el medio de la pantalla */
   align-items: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  position: relative; /* Permite posicionar el logo a la derecha sin mover los enlaces */
+  position: relative; /* Permite posicionar las acciones a la derecha sin mover los enlaces */
+  transition: background-color 0.3s ease;
 }
 
 /* Contenedor central de los enlaces */
@@ -42,25 +43,53 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Contenedor blanco flotante del logo en el extremo derecho */
-.logoContainer {
+/* Agrupación en el extremo derecho (Botón Dark Mode + Logo) */
+.rightActions {
   position: absolute;
   right: 32px; /* Margen fijo contra el borde derecho */
   top: 50%;
-  transform: translateY(-50%); /* Centra verticalmente el logo respecto a la barra */
-  background-color: #ffffff; /* Fondo blanco para enmarcar el logo de la JPG */
-  padding: 4px 10px; /* Relleno para que no toque los bordes */
-  border-radius: 8px; /* Bordes redondeados prolijos */
+  transform: translateY(-50%); /* Centra verticalmente ambos elementos */
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Espacio entre el botón del sol/luna y el logo */
+}
+
+/* Botón interactivo para cambiar de tema */
+.themeToggleBtn {
+  background: rgba(255, 255, 255, 0.2); /* Fondo semitransparente suave */
+  border: none;
+  border-radius: 50%; /* Botón circular */
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
-/* Imagen del logo con tamaño horizontal cómodo */
+.themeToggleBtn:hover {
+  background: rgba(255, 255, 255, 0.35); /* Brillo al pasar el mouse */
+  transform: scale(1.08); /* Efecto de aumento  */
+}
+
+/* Contenedor blanco flotante del logo */
+.logoContainer {
+  background-color: #ffffff; /* Fondo blanco para enmarcar el logo */
+  padding: 5px; /* Relleno  */
+  border-radius: 10px; /* Esquinas  */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Imagen del  cuadrado de UNaHur */
 .logo {
-  height: 38px; /* Altura contenida */
-  width: 110px; /* Ancho horizontal para que se lea 'Universidad Nacional de Hurlingham' */
+  height: 38px;
+  width: 38px; /* Tamaño proporcional  */
   object-fit: contain;
   display: block;
+  border-radius: 6px;
 }

@@ -11,15 +11,19 @@
   margin-bottom: 4px;
 }
 
+/* Título principal adaptable al tema */
 .title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #0f172a; /* Texto oscuro */
+  color: var(--text-primary, #0f172a); /* Blanco en modo oscuro, oscuro en claro */
+  transition: color 0.3s ease;
 }
 
+/* Subtítulo adaptable al tema */
 .subtitle {
   font-size: 0.8rem;
-  color: #475569; /* Gris oscuro para el subtitulo */
+  color: var(--text-secondary, #475569); /* Gris claro en oscuro, gris medio en claro */
+  transition: color 0.3s ease;
 }
 
 .kpiSection {

@@ -1,10 +1,12 @@
 
+/* Panel contenedor del gráfico */
 .panel {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
+  background-color: var(--bg-card, #ffffff); /* Tarjeta con tema dinámico */
+  border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 10px;
   padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.05));
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .panelTitle {
@@ -13,7 +15,7 @@
   align-items: center;
   font-size: 1.05rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-primary, #0f172a); /* Título en blanco/oscuro según tema */
   margin-bottom: 20px;
   flex-wrap: wrap;
   gap: 12px;
@@ -29,7 +31,7 @@
   align-items: center;
   gap: 6px;
   font-size: 0.78rem;
-  color: #475569;
+  color: var(--text-secondary, #475569);
   font-weight: 600;
 }
 
@@ -53,13 +55,13 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.85rem;
-  color: #1e293b;
+  color: var(--text-primary, #1e293b);
   margin-bottom: 6px;
   font-weight: 600;
 }
 
 .comisionHeader span {
-  color: #475569 !important; 
+  color: var(--text-secondary, #475569) !important; /* Porcentajes en gris claro u oscuro */
 }
 
 .comisionHeader strong {
@@ -70,7 +72,7 @@
 .stackedBar {
   display: flex;
   height: 24px;
-  background-color: #e2e8f0;
+  background-color: var(--bg-subtle, #e2e8f0); /* Canal de la barra  */
   border-radius: 6px;
   overflow: hidden;
 }
