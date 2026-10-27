@@ -1,11 +1,12 @@
 /* Contenedor de la barra de navegación */
 .navbar {
-  background-color: #d8790ce7; /* Fondo oscuro de la barra // Cambiar este, FALTA MEJORAR */
+  background-color: #007A33; /* Verde principal UNaHur */
   padding: 16px 0;
   width: 100%;
   display: flex;
   justify-content: center; /* Centra el bloque en el medio de la pantalla */
   align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .navContainer {
@@ -15,7 +16,7 @@
 }
 
 .link {
-  color: #ffffff; /* Violeta/azul claro para inactivos........ CAMBIADO, FALTA MEJORAR */
+  color: #ffffff; /* Color de las letritas */
   text-decoration: none;
   font-size: 1.25rem;
   font-weight: 700;
@@ -25,14 +26,14 @@
 }
 
 .link:hover {
-  color: #f7b604e7 /* Cambiar este........ CAMBIADO, FALTA MEJORAR*/;
+  color: #dcfce7; /* Verde clarito UNaHur para el hover */
 }
 
 /* Estado activo: Botón blanco destacado */
 .activeLink {
-  background-color: #da821ea1 /*Cambiar este........ CAMBIADO, FALTA MEJORAR*/;
+  background-color: #005624; /* Verde oscuro UNaHur */
   border-radius: 30px;
-  color: #f3eded /* Cambiar este........ CAMBIADO, FALTA MEJORAR*/; 
+  color: #ffffff;
   font-weight: 800;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

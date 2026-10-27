@@ -34,7 +34,7 @@ function StackedBarChart({ comisiones }) {
               <span>
                 <strong>{c.nombre}</strong> ({c.total} alumnos)
               </span>
-              <span style={{ color: '#94a3b8' }}>
+              <span>
                 {pctPromo}% P / {pctReg}% R / {pctLibre}% L
               </span>
             </div>

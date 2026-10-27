@@ -14,12 +14,12 @@
 .title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: #0f172a;
 }
 
 .subtitle {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: #475569;
 }
 
 .simulatorGrid {
@@ -36,8 +36,8 @@
 }
 
 .card {
-  background-color: #1e293b;
-  border: 1px solid #334155;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 16px;
 }
@@ -45,7 +45,7 @@
 .cardTitle {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #f8fafc;
+  color: #0f172a;
   margin-bottom: 12px;
 }
 
@@ -58,14 +58,14 @@
 
 .label {
   font-size: 0.8rem;
-  color: #cbd5e1;
+  color: #334155;
   font-weight: 500;
 }
 
 .select, .input {
-  background-color: #0f172a;
-  border: 1px solid #334155;
-  color: #f8fafc;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
   padding: 8px 10px;
   border-radius: 6px;
   font-size: 0.82rem;
@@ -73,18 +73,19 @@
 }
 
 .select:focus, .input:focus {
-  border-color: #6366f1;
+  border-color: #007A33;
 }
 
 .rangeInput {
   width: 100%;
   margin: 6px 0;
   cursor: pointer;
+  accent-color: #007A33;
 }
 
 .resultsBox {
-  background-color: #0f172a;
-  border: 1px solid #334155;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 6px;
   padding: 12px;
   display: flex;
@@ -97,9 +98,9 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.82rem;
-  color: #94a3b8;
+  color: #334155;
   padding-bottom: 6px;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .resultItem:last-child {
@@ -110,9 +111,9 @@
 .resultValue {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: #0f172a;
 }
 
 .highlight {
-  color: #6366f1;
+  color: #007A33;
 }

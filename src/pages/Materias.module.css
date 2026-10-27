@@ -14,18 +14,17 @@
 .title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: #0f172a;
 }
 
 .subtitle {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: #475569;
 }
 
-/* Tabla comparativa compacta */
 .tableContainer {
-  background-color: #1e293b;
-  border: 1px solid #334155;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 16px;
   overflow-x: auto;
@@ -34,7 +33,7 @@
 .tableTitle {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #f8fafc;
+  color: #0f172a;
   margin-bottom: 12px;
 }
 
@@ -46,17 +45,17 @@
 }
 
 .table th {
-  background-color: #0f172a;
-  color: #94a3b8;
+  background-color: #f1f5f9;
+  color: #1e293b;
   padding: 8px 10px;
-  border-bottom: 1px solid #334155;
-  font-weight: 600;
+  border-bottom: 2px solid #cbd5e1;
+  font-weight: 700;
 }
 
 .table td {
   padding: 8px 10px;
-  border-bottom: 1px solid #334155;
-  color: #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  color: #334155;
 }
 
 .table tr:last-child td {
@@ -64,9 +63,9 @@
 }
 
 .badgeCritico {
-  background-color: rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
-  border: 1px solid #ef4444;
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 0.72rem;
@@ -74,9 +73,9 @@
 }
 
 .badgeNormal {
-  background-color: rgba(16, 185, 129, 0.2);
-  color: #6ee7b7;
-  border: 1px solid #10b981;
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 0.72rem;

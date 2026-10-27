@@ -1,25 +1,30 @@
 /* Contenedor de la tarjeta */
 .card {
-  background-color: #1e293b; /* Fondo oscuro */
-  border: 1px solid #334155; /* Borde gris */
+ background-color: #ffffff; /* Tarjeta blanca */
+  border: 1px solid #e2e8f0; /* Borde gris suave */
+  border-left: 4px solid #007A33; /* Detalle de acento en verde UNaHur */
   border-radius: 10px;
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 /* Etiqueta del título del KPI */
 .titulo {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 600;
 }
 
 /* El valor numérico */
 .valor {
   font-size: 1.8rem;
   margin: 0;
-  color: #f8fafc;
+  color: #007A33; /* Verde destacado UNaHur */
+  font-weight: 700;
 }
 
 /* Subtítulo informativo */

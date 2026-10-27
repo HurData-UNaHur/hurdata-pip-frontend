@@ -14,12 +14,12 @@
 .title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: #0f172a; /* Texto oscuro */
 }
 
 .subtitle {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: #475569; /* Gris oscuro para el subtitulo */
 }
 
 .kpiSection {
