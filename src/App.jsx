@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -33,19 +32,33 @@ function App() {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
+  // Resetea el almacenamiento y el estado cuando no hay datos en la DB
+  const limpiarDatosLocales = () => {
+    setDataDashboard({});
+    setListaMateriasExcel([]);
+    localStorage.removeItem('hurdata_dashboard');
+    localStorage.removeItem('hurdata_materias');
+    setMateriaSeleccionada('ingles');
+  };
+
   // Función reutilizable para procesar y actualizar la información
   const actualizarDatosLocales = (dataBackend) => {
+    if (!dataBackend) {
+      limpiarDatosLocales();
+      return;
+    }
+
     const contenido = dataBackend.resumen || dataBackend.data || dataBackend;
     const { dataDashboard: dashData, listaMaterias: matData } = transformarDatosBackend(contenido);
 
-    if (matData.length > 0) {
+    if (matData && matData.length > 0) {
       setDataDashboard(dashData);
       setListaMateriasExcel(matData);
-
       localStorage.setItem('hurdata_dashboard', JSON.stringify(dashData));
       localStorage.setItem('hurdata_materias', JSON.stringify(matData));
-
       setMateriaSeleccionada(matData[0].id);
+    } else {
+      limpiarDatosLocales();
     }
   };
 
@@ -59,7 +72,11 @@ function App() {
       .then((data) => {
         actualizarDatosLocales(data);
       })
-      .catch((err) => console.error('Error al obtener datos iniciales de SQLite:', err));
+      .catch((err) => {
+        console.error('Sin datos en SQLite o API no disponible:', err);
+        // Al dar error la llamada a la DB vacía, forzamos la limpieza del localStorage
+        limpiarDatosLocales();
+      });
   }, []);
 
   // 2. Callback tras subir un nuevo Excel exitosamente
@@ -72,6 +89,7 @@ function App() {
       actualizarDatosLocales(data);
     } catch (error) {
       console.error('Error al actualizar la vista tras la carga:', error);
+      limpiarDatosLocales();
     }
   };
 

@@ -3,7 +3,7 @@ import styles from './Filters.module.css';
 function Filters({ materia, setMateria, modalidad, setModalidad, listaMaterias = [] }) {
     return (
         <section className={styles.filtersContainer}>
-            {/* La parte de Período */}
+            {/* Período */}
             <div className={styles.filterGroup}>
                 <label className={styles.label}>Período</label>
                 <select className={styles.select} defaultValue="2022-1C">
@@ -12,7 +12,7 @@ function Filters({ materia, setMateria, modalidad, setModalidad, listaMaterias =
                 </select>
             </div>
 
-            {/* La parte de Carrera */}
+            {/* Carrera */}
             <div className={styles.filterGroup}>
                 <label className={styles.label}>Carrera</label>
                 <select className={styles.select} defaultValue="info">
@@ -20,7 +20,7 @@ function Filters({ materia, setMateria, modalidad, setModalidad, listaMaterias =
                 </select>
             </div>
 
-            {/* La parte de Materia */}
+            {/* Materia */}
             <div className={styles.filterGroup}>
                 <label className={styles.label}>Materia</label>
                 <select 
@@ -28,23 +28,15 @@ function Filters({ materia, setMateria, modalidad, setModalidad, listaMaterias =
                     value={materia} 
                     onChange={(m) => setMateria(m.target.value)}
                 >
-                    {listaMaterias && listaMaterias.length > 0 ? (
-                        listaMaterias.map((m) => (
-                            <option key={m.id} value={m.id}>
-                                {m.nombre}
-                            </option>
-                        ))
-                    ) : (
-                        <>
-                            <option value="ingles">Ingles I</option>
-                            <option value="objetos2">Programación de Objetos II</option>
-                            <option value="entornos">Nuevos Entornos y Lenguajes</option>
-                        </>
-                    )}
+                    {listaMaterias.map((m) => (
+                        <option key={m.id} value={m.id}>
+                            {m.nombre}
+                        </option>
+                    ))}
                 </select>
             </div>
 
-            {/* La parte de Modalidad */}
+            {/* Modalidad */}
             <div className={styles.filterGroup}>
                 <label className={styles.label}>Modalidad</label>
                 <select className={styles.select} value={modalidad} onChange={(mo) => setModalidad(mo.target.value)}>
