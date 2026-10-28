@@ -5,12 +5,16 @@ import styles from './Navbar.module.css';
 import logoUnahur from '../assets/unahur.jpeg';
 import UploadModal from './UploadModal';
 
-function Navbar({ theme, toggleTheme }) {
+function Navbar({ theme, toggleTheme, onUploadSuccess }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleUploadSuccess = () => {
-    // Recarga la página para refrescar los datos traídos desde el backend
-    window.location.reload();
+  const handleUploadSuccess = (dataBackend) => {
+    // 1. Pasa los datos recibidos del backend al manejador global en App.jsx
+    if (onUploadSuccess) {
+      onUploadSuccess(dataBackend);
+    }
+    // 2. Cierra el modal sin recargar la página (window.location.reload eliminado)
+    setIsModalOpen(false);
   };
 
   return (

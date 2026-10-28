@@ -1,25 +1,37 @@
+
 import styles from './Materias.module.css';
 import KpiCard from '../components/KpiCard';
 
-// Mock con resumen por materia
-const MATERIAS_MOCK = [
+// Mock estático con resumen por materia (utilizado como fallback)
+const MATERIAS_MOCK_FALLBACK = [
   { id: 'ingles', nombre: 'Inglés I', inscriptos: 218, promo: 95, reg: 28, libre: 89, comisiones: 4 },
   { id: 'objetos2', nombre: 'Programación de Objetos II', inscriptos: 60, promo: 30, reg: 17, libre: 9, comisiones: 2 },
   { id: 'entornos', nombre: 'Nuevos Entornos y Lenguajes', inscriptos: 55, promo: 12, reg: 15, libre: 20, comisiones: 1 },
   { id: 'base_datos', nombre: 'Bases de Datos I', inscriptos: 140, promo: 40, reg: 30, libre: 70, comisiones: 3 },
 ];
 
-function Materias() {
+function Materias({ listaMateriasExcel }) {
+  // Determina la fuente de datos: el Excel parseado o el Mock estático
+  const materiasFuente = (listaMateriasExcel && listaMateriasExcel.length > 0) 
+    ? listaMateriasExcel 
+    : MATERIAS_MOCK_FALLBACK;
+
   // Calculamos la materia con mayor porcentaje de deserción (materia filtro)
-  const materiasProcesadas = MATERIAS_MOCK.map((m) => {
-    const pctLibre = Math.round((m.libre / m.inscriptos) * 100);
-    const pctPromo = Math.round((m.promo / m.inscriptos) * 100);
+  const materiasProcesadas = materiasFuente.map((m) => {
+    const total = m.inscriptos || 1;
+    const pctLibre = Math.round((m.libre / total) * 100);
+    const pctPromo = Math.round((m.promo / total) * 100);
     return { ...m, pctLibre, pctPromo };
   });
 
   // Ordenamos de mayor a menor deserción para detectar cuellos de botella
   const rankingCritico = [...materiasProcesadas].sort((a, b) => b.pctLibre - a.pctLibre);
-  const materiaMasCritica = rankingCritico[0];
+  const materiaMasCritica = rankingCritico[0] || { nombre: 'Sin datos', pctLibre: 0 };
+
+  // Promedio general del porcentaje de libres entre todas las materias
+  const promedioLibres = materiasProcesadas.length > 0
+    ? Math.round(materiasProcesadas.reduce((acc, m) => acc + m.pctLibre, 0) / materiasProcesadas.length)
+    : 0;
 
   return (
     <div className={styles.container}>
@@ -46,14 +58,12 @@ function Materias() {
         />
         <KpiCard
           titulo="TOTAL MATERIAS EVALUADAS"
-          valor={MATERIAS_MOCK.length}
+          valor={materiasFuente.length}
           subtitulo="En el período actual"
         />
         <KpiCard
           titulo="PROMEDIO GENERAL LIBRES"
-          valor={`${Math.round(
-            materiasProcesadas.reduce((acc, m) => acc + m.pctLibre, 0) / materiasProcesadas.length
-          )}%`}
+          valor={`${promedioLibres}%`}
           subtitulo="Tasa media de abandono"
           colorBorde="#3b82f6"
         />

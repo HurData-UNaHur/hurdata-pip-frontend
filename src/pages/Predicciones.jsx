@@ -3,28 +3,39 @@ import { useState } from 'react';
 import styles from './Predicciones.module.css';
 import KpiCard from '../components/KpiCard';
 
-const MATERIAS_DATOS = {
-  ingles: { nombre: 'Inglés I', libresActuales: 89, comisionesActuales: 4 },
-  objetos2: { nombre: 'Programación de Objetos II', libresActuales: 9, comisionesActuales: 2 },
-  entornos: { nombre: 'Nuevos Entornos y Lenguajes', libresActuales: 20, comisionesActuales: 1 },
-  base_datos: { nombre: 'Bases de Datos I', libresActuales: 70, comisionesActuales: 3 }
-};
+// Fallback estático con datos base por materia
+const MATERIAS_DATOS_FALLBACK = [
+  { id: 'ingles', nombre: 'Inglés I', libresActuales: 89, comisionesActuales: 4 },
+  { id: 'objetos2', nombre: 'Programación de Objetos II', libresActuales: 9, comisionesActuales: 2 },
+  { id: 'entornos', nombre: 'Nuevos Entornos y Lenguajes', libresActuales: 20, comisionesActuales: 1 },
+  { id: 'base_datos', nombre: 'Bases de Datos I', libresActuales: 70, comisionesActuales: 3 }
+];
 
-function Predicciones({ materiaSeleccionada, setMateriaSeleccionada }) {
+function Predicciones({ listaMateriasExcel, materiaSeleccionada, setMateriaSeleccionada }) {
   const [tasaRecursado, setTasaRecursado] = useState(65);
   const [cupoPorAula, setCupoPorAula] = useState('35');
 
-  const materiaData = MATERIAS_DATOS[materiaSeleccionada] || MATERIAS_DATOS.ingles;
+  // Selección de origen: Excel parseado o fallback
+  const listaMaterias = (listaMateriasExcel && listaMateriasExcel.length > 0)
+    ? listaMateriasExcel
+    : MATERIAS_DATOS_FALLBACK;
+
+  // Busca los datos de la materia seleccionada
+  const materiaData = listaMaterias.find((m) => m.id === materiaSeleccionada) || listaMaterias[0];
 
   // Evitar divisiones por cero o valores nulos
   const cupoNumerico = Number(cupoPorAula);
   const cupoValido = cupoNumerico > 0 ? cupoNumerico : 1;
 
-  // Cálculos proyectados
-  const recursantesEstimados = Math.round(materiaData.libresActuales * (tasaRecursado / 100));
-  const comisionesNecesarias = Math.ceil(recursantesEstimados / cupoValido);
-  const aulasExtra = Math.max(0, comisionesNecesarias - materiaData.comisionesActuales);
+  const libresActuales = materiaData.libresActuales ?? materiaData.libre ?? 0;
+  const comisionesActuales = materiaData.comisionesActuales ?? materiaData.comisiones ?? 1;
 
+  // Cálculos proyectados
+  const recursantesEstimados = Math.round(libresActuales * (tasaRecursado / 100));
+  const comisionesNecesarias = Math.ceil(recursantesEstimados / cupoValido);
+  const aulasExtra = Math.max(0, comisionesNecesarias - comisionesActuales);
+
+  // Manejador del cupo con validaciones de longitud
   const handleCupoChange = (e) => {
     const val = e.target.value;
     if (val === '') {
@@ -58,7 +69,7 @@ function Predicciones({ materiaSeleccionada, setMateriaSeleccionada }) {
         <KpiCard
           titulo="RECURSANTES ESPERADOS"
           valor={recursantesEstimados}
-          subtitulo={`Sobre ${materiaData.libresActuales} libres actuales`}
+          subtitulo={`Sobre ${libresActuales} libres actuales`}
           colorBorde="#6366f1"
         />
         <KpiCard
@@ -84,13 +95,14 @@ function Predicciones({ materiaSeleccionada, setMateriaSeleccionada }) {
             <label className={styles.label}>Seleccionar Materia</label>
             <select
               className={styles.select}
-              value={materiaSeleccionada}
+              value={materiaSeleccionada || materiaData.id}
               onChange={(e) => setMateriaSeleccionada(e.target.value)}
             >
-              <option value="ingles">Inglés I</option>
-              <option value="objetos2">Programación de Objetos II</option>
-              <option value="entornos">Nuevos Entornos y Lenguajes</option>
-              <option value="base_datos">Bases de Datos I</option>
+              {listaMaterias.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.nombre}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -129,7 +141,7 @@ function Predicciones({ materiaSeleccionada, setMateriaSeleccionada }) {
           <div className={styles.resultsBox}>
             <div className={styles.resultItem}>
               <span>Estudiantes Libres del Período:</span>
-              <span className={styles.resultValue}>{materiaData.libresActuales}</span>
+              <span className={styles.resultValue}>{libresActuales}</span>
             </div>
             <div className={styles.resultItem}>
               <span>Recursantes Estimados ({tasaRecursado}%):</span>
@@ -137,7 +149,7 @@ function Predicciones({ materiaSeleccionada, setMateriaSeleccionada }) {
             </div>
             <div className={styles.resultItem}>
               <span>Comisiones Actuales:</span>
-              <span className={styles.resultValue}>{materiaData.comisionesActuales}</span>
+              <span className={styles.resultValue}>{comisionesActuales}</span>
             </div>
             <div className={styles.resultItem}>
               <span>Comisiones Recomendadas:</span>

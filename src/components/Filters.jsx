@@ -1,10 +1,9 @@
 import styles from './Filters.module.css';
 
-
-function Filters({materia, setMateria, modalidad, setModalidad}){
-    return(
+function Filters({ materia, setMateria, modalidad, setModalidad, listaMaterias = [] }) {
+    return (
         <section className={styles.filtersContainer}>
-            {/* La parte de Período*/}
+            {/* La parte de Período */}
             <div className={styles.filterGroup}>
                 <label className={styles.label}>Período</label>
                 <select className={styles.select} defaultValue="2022-1C">
@@ -13,7 +12,7 @@ function Filters({materia, setMateria, modalidad, setModalidad}){
                 </select>
             </div>
 
-            {/* La parte de Carrera*/}
+            {/* La parte de Carrera */}
             <div className={styles.filterGroup}>
                 <label className={styles.label}>Carrera</label>
                 <select className={styles.select} defaultValue="info">
@@ -21,13 +20,27 @@ function Filters({materia, setMateria, modalidad, setModalidad}){
                 </select>
             </div>
 
-            {/* La parte de Materia*/}
+            {/* La parte de Materia */}
             <div className={styles.filterGroup}>
                 <label className={styles.label}>Materia</label>
-                <select className={styles.select} value={materia} onChange={(m) => setMateria(m.target.value)}>
-                    <option value="ingles">Ingles I </option>
-                    <option value="objetos2">Programación de Objetos II </option>
-                    <option value="entornos">Nuevos Entornos y Lenguajes </option>
+                <select 
+                    className={styles.select} 
+                    value={materia} 
+                    onChange={(m) => setMateria(m.target.value)}
+                >
+                    {listaMaterias && listaMaterias.length > 0 ? (
+                        listaMaterias.map((m) => (
+                            <option key={m.id} value={m.id}>
+                                {m.nombre}
+                            </option>
+                        ))
+                    ) : (
+                        <>
+                            <option value="ingles">Ingles I</option>
+                            <option value="objetos2">Programación de Objetos II</option>
+                            <option value="entornos">Nuevos Entornos y Lenguajes</option>
+                        </>
+                    )}
                 </select>
             </div>
 

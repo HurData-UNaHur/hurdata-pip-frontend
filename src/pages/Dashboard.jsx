@@ -7,7 +7,7 @@ import StackedBarChart from '../components/StackedBarChart';
 import AlertsPanel from '../components/AlertsPanel';
 import ProjectionSlider from '../components/ProjectionSlider';
 
-const DATA_MOCK = {
+const DATA_MOCK_FALLBACK = {
   ingles: [
     { nombre: "(004)-COMISIÓN 1-COMBINADA", modalidad: "COMBINADA", total: 45, promo: 26, reg: 4, desap: 0, libre: 15 },
     { nombre: "(004)-COMISIÓN 15-VIRTUAL", modalidad: "VIRTUAL", total: 60, promo: 22, reg: 5, desap: 2, libre: 31 },
@@ -23,20 +23,32 @@ const DATA_MOCK = {
   ]
 };
 
-function Dashboard() {
-  const [materia, setMateria] = useState('ingles');
+function Dashboard({ dataExcel, listaMateriasExcel }) {
+  const DATA = (dataExcel && Object.keys(dataExcel).length > 0) ? dataExcel : DATA_MOCK_FALLBACK;
+  const listaClavesMaterias = Object.keys(DATA);
+
+  // 1. Estado local para la selección del usuario
+  const [materiaSeleccionada, setMateria] = useState('');
   const [modalidad, setModalidad] = useState('todas');
 
-  let comisiones = DATA_MOCK[materia] || [];
+  // 2. Cálculo derivado: si la clave seleccionada no existe en los datos activos, cae automáticamente a la primera clave disponible
+  const materia = DATA[materiaSeleccionada]
+    ? materiaSeleccionada
+    : (listaClavesMaterias[0] || 'ingles');
+
+  // Filtrado dinámico de comisiones según materia y modalidad
+  let comisiones = DATA[materia] || [];
   if (modalidad !== 'todas') {
     comisiones = comisiones.filter((c) => c.modalidad === modalidad);
   }
 
+  // Métricas agregadas acumuladas
   const totalAlumnos = comisiones.reduce((acc, c) => acc + c.total, 0);
   const totalPromo = comisiones.reduce((acc, c) => acc + c.promo, 0);
   const totalReg = comisiones.reduce((acc, c) => acc + c.reg, 0);
   const totalLibre = comisiones.reduce((acc, c) => acc + c.libre, 0);
 
+  // Porcentajes para KPIs
   const pctPromo = totalAlumnos ? `${Math.round((totalPromo / totalAlumnos) * 100)}%` : '0%';
   const pctReg = totalAlumnos ? `${Math.round((totalReg / totalAlumnos) * 100)}%` : '0%';
   const pctLibre = totalAlumnos ? `${Math.round((totalLibre / totalAlumnos) * 100)}%` : '0%';
@@ -53,6 +65,7 @@ function Dashboard() {
         setMateria={setMateria}
         modalidad={modalidad}
         setModalidad={setModalidad}
+        listaMaterias={listaMateriasExcel}
       />
 
       <section className={styles.kpiSection}>
