@@ -1,14 +1,26 @@
 import styles from './Filters.module.css';
 
-function Filters({ materia, setMateria, modalidad, setModalidad, listaMaterias = [] }) {
+function Filters({ 
+    materia, 
+    setMateria, 
+    modalidad, 
+    setModalidad, 
+    periodo, 
+    setPeriodo, 
+    listaMaterias = [] 
+}) {
     return (
         <section className={styles.filtersContainer}>
             {/* Período */}
             <div className={styles.filterGroup}>
                 <label className={styles.label}>Período</label>
-                <select className={styles.select} defaultValue="2022-1C">
-                    <option value="2022-1C">2022 - Primer Cuatrimestre</option>
-                    <option value="2022-2C">2022 - Segundo Cuatrimestre</option>
+                <select 
+                    className={styles.select} 
+                    value={periodo} 
+                    onChange={(e) => setPeriodo(e.target.value)}
+                >
+                    <option value="PRIMER CUATRIMESTRE">2022 - Primer Cuatrimestre</option>
+                    <option value="SEGUNDO CUATRIMESTRE">2022 - Segundo Cuatrimestre</option>
                 </select>
             </div>
 
@@ -39,7 +51,11 @@ function Filters({ materia, setMateria, modalidad, setModalidad, listaMaterias =
             {/* Modalidad */}
             <div className={styles.filterGroup}>
                 <label className={styles.label}>Modalidad</label>
-                <select className={styles.select} value={modalidad} onChange={(mo) => setModalidad(mo.target.value)}>
+                <select 
+                    className={styles.select} 
+                    value={modalidad} 
+                    onChange={(mo) => setModalidad(mo.target.value)}
+                >
                     <option value="todas">Todas las modalidades </option>
                     <option value="VIRTUAL">Solo Virtual </option>
                     <option value="COMBINADA">Solo Combinadas </option>

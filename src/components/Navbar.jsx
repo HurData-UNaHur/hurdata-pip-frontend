@@ -54,7 +54,7 @@ function Navbar({ theme, toggleTheme, onUploadSuccess }) {
             onClick={() => setIsModalOpen(true)} 
             title="Cargar archivo SIU (.xlsx)"
           >
-            📁 Cargar SIU
+            📁 
           </button>
           <button 
             className={styles.themeToggleBtn} 

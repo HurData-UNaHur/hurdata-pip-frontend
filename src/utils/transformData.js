@@ -1,3 +1,4 @@
+// utils/transformData.js
 
 export function transformarDatosBackend(resumenBackend) {
   if (!resumenBackend || !resumenBackend.actividades) {
@@ -19,10 +20,11 @@ export function transformarDatosBackend(resumenBackend) {
     let totalLibre = 0;
 
     const comisionesProcesadas = (act.comisiones || []).map((com) => {
+      // Helper flexible para buscar estados sin importar mayúsculas o variaciones
       const getEstado = (nombre) => 
-        com.estados?.find((e) => e.estado.toLowerCase() === nombre.toLowerCase())?.total_alumnos || 0;
+        com.estados?.find((e) => e.estado?.toLowerCase() === nombre.toLowerCase())?.total_alumnos || 0;
 
-      const promo = getEstado('Promocionó');
+      const promo = getEstado('Promocionó') || getEstado('Promociono');
       const reg = getEstado('Regular');
       const libre = getEstado('Libre');
       const desap = getEstado('Insuficiente');
@@ -47,7 +49,7 @@ export function transformarDatosBackend(resumenBackend) {
     // 1. Estructura para Dashboard usando la clave normalizada
     dataDashboard[keyMateria] = comisionesProcesadas;
 
-    // 2. Estructura para Selects y componentes
+    // 2. Estructura para Selects y componentes (Materias y Predicciones)
     listaMaterias.push({
       id: keyMateria,
       nombre: act.nombre,

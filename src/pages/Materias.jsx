@@ -1,6 +1,7 @@
-
+import { useState } from 'react';
 import styles from './Materias.module.css';
 import KpiCard from '../components/KpiCard';
+import Filters from '../components/Filters';
 
 // Mock estático con resumen por materia (utilizado como fallback)
 const MATERIAS_MOCK_FALLBACK = [
@@ -10,7 +11,10 @@ const MATERIAS_MOCK_FALLBACK = [
   { id: 'base_datos', nombre: 'Bases de Datos I', inscriptos: 140, promo: 40, reg: 30, libre: 70, comisiones: 3 },
 ];
 
-function Materias({ listaMateriasExcel }) {
+function Materias({ listaMateriasExcel, periodo, setPeriodo }) {
+  const [materia, setMateria] = useState('');
+  const [modalidad, setModalidad] = useState('todas');
+
   // Determina la fuente de datos: el Excel parseado o el Mock estático
   const materiasFuente = (listaMateriasExcel && listaMateriasExcel.length > 0) 
     ? listaMateriasExcel 
@@ -41,6 +45,17 @@ function Materias({ listaMateriasExcel }) {
           Identificación de cuellos de botella académicos y materias con mayor tasa de deserción
         </p>
       </header>
+
+      {/* Filtros para seleccionar el Período globalmente */}
+      <Filters 
+        materia={materia}
+        setMateria={setMateria}
+        modalidad={modalidad}
+        setModalidad={setModalidad}
+        periodo={periodo}
+        setPeriodo={setPeriodo}
+        listaMaterias={materiasFuente}
+      />
 
       {/* Resumen en KPIs */}
       <section

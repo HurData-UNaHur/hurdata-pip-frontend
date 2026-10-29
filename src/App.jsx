@@ -8,6 +8,9 @@ import { transformarDatosBackend } from './utils/transformData';
 
 function App() {
   const [materiaSeleccionada, setMateriaSeleccionada] = useState('ingles');
+  
+  // Estado para controlar el filtro global de Período
+  const [periodoSeleccionado, setPeriodoSeleccionado] = useState('PRIMER CUATRIMESTRE');
 
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('theme') || 'light';
@@ -62,9 +65,9 @@ function App() {
     }
   };
 
-  // 1. Carga automática desde FastAPI al iniciar el navegador
+  // 1. Carga automática desde FastAPI filtrando por período (se ejecuta al iniciar y al cambiar periodoSeleccionado)
   useEffect(() => {
-    fetch('http://localhost:8000/api/datos')
+    fetch(`http://localhost:8000/api/datos?periodo=${encodeURIComponent(periodoSeleccionado)}`)
       .then((res) => {
         if (!res.ok) throw new Error('Error al conectar con la API');
         return res.json();
@@ -77,12 +80,12 @@ function App() {
         // Al dar error la llamada a la DB vacía, forzamos la limpieza del localStorage
         limpiarDatosLocales();
       });
-  }, []);
+  }, [periodoSeleccionado]);
 
   // 2. Callback tras subir un nuevo Excel exitosamente
   const handleUploadSuccess = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/datos');
+      const res = await fetch(`http://localhost:8000/api/datos?periodo=${encodeURIComponent(periodoSeleccionado)}`);
       if (!res.ok) throw new Error('Error al refrescar datos desde la API');
       
       const data = await res.json();
@@ -109,12 +112,20 @@ function App() {
               <Dashboard 
                 dataExcel={dataDashboard} 
                 listaMateriasExcel={listaMateriasExcel} 
+                periodo={periodoSeleccionado}
+                setPeriodo={setPeriodoSeleccionado}
               />
             } 
           />
           <Route 
             path="/materias" 
-            element={<Materias listaMateriasExcel={listaMateriasExcel} />} 
+            element={
+              <Materias 
+                listaMateriasExcel={listaMateriasExcel} 
+                periodo={periodoSeleccionado}
+                setPeriodo={setPeriodoSeleccionado}
+              />
+            } 
           />
           <Route
             path="/predicciones"
@@ -123,6 +134,8 @@ function App() {
                 listaMateriasExcel={listaMateriasExcel}
                 materiaSeleccionada={materiaSeleccionada}
                 setMateriaSeleccionada={setMateriaSeleccionada}
+                periodo={periodoSeleccionado}
+                setPeriodo={setPeriodoSeleccionado}
               />
             }
           />

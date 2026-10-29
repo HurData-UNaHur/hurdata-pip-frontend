@@ -1,17 +1,24 @@
-
 import { useState } from 'react';
 import styles from './Predicciones.module.css';
 import KpiCard from '../components/KpiCard';
+import Filters from '../components/Filters';
 
 // Fallback estático con datos base por materia
 const MATERIAS_DATOS_FALLBACK = [
   { id: 'ingles', nombre: 'Inglés I', libresActuales: 89, comisionesActuales: 4 },
   { id: 'objetos2', nombre: 'Programación de Objetos II', libresActuales: 9, comisionesActuales: 2 },
   { id: 'entornos', nombre: 'Nuevos Entornos y Lenguajes', libresActuales: 20, comisionesActuales: 1 },
-  { id: 'base_datos', nombre: 'Bases de Datos I', libresActuales: 70, comisionesActuales: 3 }
+  { id: 'base_datos', nombre: 'Bases de Datos', libresActuales: 70, comisionesActuales: 3 }
 ];
 
-function Predicciones({ listaMateriasExcel, materiaSeleccionada, setMateriaSeleccionada }) {
+function Predicciones({ 
+  listaMateriasExcel, 
+  materiaSeleccionada, 
+  setMateriaSeleccionada, 
+  periodo, 
+  setPeriodo 
+}) {
+  const [modalidad, setModalidad] = useState('todas');
   const [tasaRecursado, setTasaRecursado] = useState(65);
   const [cupoPorAula, setCupoPorAula] = useState('35');
 
@@ -27,8 +34,8 @@ function Predicciones({ listaMateriasExcel, materiaSeleccionada, setMateriaSelec
   const cupoNumerico = Number(cupoPorAula);
   const cupoValido = cupoNumerico > 0 ? cupoNumerico : 1;
 
-  const libresActuales = materiaData.libresActuales ?? materiaData.libre ?? 0;
-  const comisionesActuales = materiaData.comisionesActuales ?? materiaData.comisiones ?? 1;
+  const libresActuales = materiaData?.libresActuales ?? materiaData?.libre ?? 0;
+  const comisionesActuales = materiaData?.comisionesActuales ?? materiaData?.comisiones ?? 1;
 
   // Cálculos proyectados
   const recursantesEstimados = Math.round(libresActuales * (tasaRecursado / 100));
@@ -57,6 +64,17 @@ function Predicciones({ listaMateriasExcel, materiaSeleccionada, setMateriaSelec
           Proyección de recursantes y cálculo estimado de comisiones necesarias para el próximo período
         </p>
       </header>
+
+      {/* Filtros para seleccionar el Período globalmente */}
+      <Filters 
+        materia={materiaSeleccionada}
+        setMateria={setMateriaSeleccionada}
+        modalidad={modalidad}
+        setModalidad={setModalidad}
+        periodo={periodo}
+        setPeriodo={setPeriodo}
+        listaMaterias={listaMaterias}
+      />
 
       {/* Indicadores rápidos */}
       <section
@@ -95,7 +113,7 @@ function Predicciones({ listaMateriasExcel, materiaSeleccionada, setMateriaSelec
             <label className={styles.label}>Seleccionar Materia</label>
             <select
               className={styles.select}
-              value={materiaSeleccionada || materiaData.id}
+              value={materiaData?.id || ''}
               onChange={(e) => setMateriaSeleccionada(e.target.value)}
             >
               {listaMaterias.map((m) => (
@@ -136,7 +154,7 @@ function Predicciones({ listaMateriasExcel, materiaSeleccionada, setMateriaSelec
 
         {/* Resumen del Estimador */}
         <div className={styles.card}>
-          <h2 className={styles.cardTitle}>Proyección para {materiaData.nombre}</h2>
+          <h2 className={styles.cardTitle}>Proyección para {materiaData?.nombre}</h2>
 
           <div className={styles.resultsBox}>
             <div className={styles.resultItem}>

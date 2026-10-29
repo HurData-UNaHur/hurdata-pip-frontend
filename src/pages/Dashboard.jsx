@@ -30,7 +30,7 @@ const LISTA_MATERIAS_MOCK = [
   { id: 'entornos', nombre: 'Nuevos Entornos y Lenguajes' }
 ];
 
-function Dashboard({ dataExcel, listaMateriasExcel }) {
+function Dashboard({ dataExcel, listaMateriasExcel, periodo, setPeriodo}) {
   const tieneDatos = dataExcel && Object.keys(dataExcel).length > 0;
   const DATA = tieneDatos ? dataExcel : DATA_MOCK_FALLBACK;
   const listaClavesMaterias = Object.keys(DATA);
@@ -73,6 +73,8 @@ function Dashboard({ dataExcel, listaMateriasExcel }) {
         setMateria={setMateria}
         modalidad={modalidad}
         setModalidad={setModalidad}
+        periodo={periodo}
+        setPeriodo={setPeriodo}
         listaMaterias={listaMateriasFiltro}
       />
 
