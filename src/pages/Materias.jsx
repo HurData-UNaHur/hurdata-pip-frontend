@@ -11,7 +11,7 @@ const MATERIAS_MOCK_FALLBACK = [
   { id: 'base_datos', nombre: 'Bases de Datos I', inscriptos: 140, promo: 40, reg: 30, libre: 70, comisiones: 3 },
 ];
 
-function Materias({ listaMateriasExcel, periodo, setPeriodo }) {
+function Materias({ listaMateriasExcel, periodo, setPeriodo, listaPeriodos}) {
   const [materia, setMateria] = useState('');
   const [modalidad, setModalidad] = useState('todas');
 
@@ -55,6 +55,7 @@ function Materias({ listaMateriasExcel, periodo, setPeriodo }) {
         periodo={periodo}
         setPeriodo={setPeriodo}
         listaMaterias={materiasFuente}
+        listaPeriodos={listaPeriodos}
       />
 
       {/* Resumen en KPIs */}

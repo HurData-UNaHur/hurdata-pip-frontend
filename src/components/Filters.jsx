@@ -7,11 +7,12 @@ function Filters({
     setModalidad, 
     periodo, 
     setPeriodo, 
-    listaMaterias = [] 
+    listaMaterias = [],
+    listaPeriodos = [] 
 }) {
     return (
         <section className={styles.filtersContainer}>
-            {/* Período */}
+            {/* Período dinámico cargado desde SQLite */}
             <div className={styles.filterGroup}>
                 <label className={styles.label}>Período</label>
                 <select 
@@ -19,8 +20,15 @@ function Filters({
                     value={periodo} 
                     onChange={(e) => setPeriodo(e.target.value)}
                 >
-                    <option value="PRIMER CUATRIMESTRE">2022 - Primer Cuatrimestre</option>
-                    <option value="SEGUNDO CUATRIMESTRE">2022 - Segundo Cuatrimestre</option>
+                    {listaPeriodos && listaPeriodos.length > 0 ? (
+                        listaPeriodos.map((p) => (
+                            <option key={p.id_periodo || p.label} value={p.label}>
+                                {p.label}
+                            </option>
+                        ))
+                    ) : (
+                        <option value="">Cargando períodos...</option>
+                    )}
                 </select>
             </div>
 

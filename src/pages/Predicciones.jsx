@@ -16,7 +16,8 @@ function Predicciones({
   materiaSeleccionada, 
   setMateriaSeleccionada, 
   periodo, 
-  setPeriodo 
+  setPeriodo,
+  listaPeriodos 
 }) {
   const [modalidad, setModalidad] = useState('todas');
   const [tasaRecursado, setTasaRecursado] = useState(65);
@@ -74,6 +75,7 @@ function Predicciones({
         periodo={periodo}
         setPeriodo={setPeriodo}
         listaMaterias={listaMaterias}
+        listaPeriodos={listaPeriodos}
       />
 
       {/* Indicadores rápidos */}

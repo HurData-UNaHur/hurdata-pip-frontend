@@ -6,11 +6,16 @@ import Materias from './pages/Materias';
 import Predicciones from './pages/Predicciones';
 import { transformarDatosBackend } from './utils/transformData';
 
+// Períodos Mock de respaldo si la base de datos está vacía
+const PERIODOS_MOCK_FALLBACK = [
+  { id_periodo: 'mock1', label: '2022 - PRIMER CUATRIMESTRE' },
+  { id_periodo: 'mock2', label: '2022 - SEGUNDO CUATRIMESTRE' }
+];
+
 function App() {
   const [materiaSeleccionada, setMateriaSeleccionada] = useState('ingles');
-  
-  // Estado para controlar el filtro global de Período
-  const [periodoSeleccionado, setPeriodoSeleccionado] = useState('PRIMER CUATRIMESTRE');
+  const [listaPeriodos, setListaPeriodos] = useState([]);
+  const [periodoSeleccionado, setPeriodoSeleccionado] = useState('');
 
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('theme') || 'light';
@@ -35,7 +40,44 @@ function App() {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
-  // Resetea el almacenamiento y el estado cuando no hay datos en la DB
+  // 1. CARGA INICIAL DE PERÍODOS (Evalúa si la DB tiene datos reales o aplica Mock)
+  useEffect(() => {
+    let cancelado = false;
+
+    const cargarInicial = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/api/periodos');
+        if (!res.ok) throw new Error('Servidor sin respuesta');
+        const data = await res.json();
+
+        if (!cancelado) {
+          if (data && Array.isArray(data.periodos) && data.periodos.length > 0) {
+            // DB CON DATOS REALES: Usar únicamente los períodos subidos desde los Excels
+            setListaPeriodos(data.periodos);
+            setPeriodoSeleccionado(data.periodos[0].label);
+          } else {
+            // DB VACÍA: Cargar Mock de respaldo
+            setListaPeriodos(PERIODOS_MOCK_FALLBACK);
+            setPeriodoSeleccionado(PERIODOS_MOCK_FALLBACK[0].label);
+          }
+        }
+      } catch (error) {
+        console.warn('Servidor offline o sin datos en SQLite, activando Mock de respaldo:', error);
+        if (!cancelado) {
+          setListaPeriodos(PERIODOS_MOCK_FALLBACK);
+          setPeriodoSeleccionado(PERIODOS_MOCK_FALLBACK[0].label);
+        }
+      }
+    };
+
+    cargarInicial();
+
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
+  // Limpieza local
   const limpiarDatosLocales = () => {
     setDataDashboard({});
     setListaMateriasExcel([]);
@@ -44,7 +86,7 @@ function App() {
     setMateriaSeleccionada('ingles');
   };
 
-  // Función reutilizable para procesar y actualizar la información
+  // Procesador de datos
   const actualizarDatosLocales = (dataBackend) => {
     if (!dataBackend) {
       limpiarDatosLocales();
@@ -65,8 +107,10 @@ function App() {
     }
   };
 
-  // 1. Carga automática desde FastAPI filtrando por período (se ejecuta al iniciar y al cambiar periodoSeleccionado)
+  // 2. CARGA DE DATOS AL CAMBIAR EL PERÍODO SELECCIONADO
   useEffect(() => {
+    if (!periodoSeleccionado) return;
+
     fetch(`http://localhost:8000/api/datos?periodo=${encodeURIComponent(periodoSeleccionado)}`)
       .then((res) => {
         if (!res.ok) throw new Error('Error al conectar con la API');
@@ -76,23 +120,32 @@ function App() {
         actualizarDatosLocales(data);
       })
       .catch((err) => {
-        console.error('Sin datos en SQLite o API no disponible:', err);
-        // Al dar error la llamada a la DB vacía, forzamos la limpieza del localStorage
+        console.error('Error al traer datos del período:', err);
         limpiarDatosLocales();
       });
   }, [periodoSeleccionado]);
 
-  // 2. Callback tras subir un nuevo Excel exitosamente
-  const handleUploadSuccess = async () => {
+  // 3. CALLBACK TRAS SUBIR UN ARCHIVO EN EL MODAL (Navbar)
+  const handleUploadSuccess = async (dataBackend) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/datos?periodo=${encodeURIComponent(periodoSeleccionado)}`);
-      if (!res.ok) throw new Error('Error al refrescar datos desde la API');
-      
-      const data = await res.json();
-      actualizarDatosLocales(data);
+      // Reconsultamos la API para refrescar la lista de períodos
+      const res = await fetch('http://localhost:8000/api/periodos');
+      if (res.ok) {
+        const data = await res.json();
+        if (data && Array.isArray(data.periodos) && data.periodos.length > 0) {
+          setListaPeriodos(data.periodos);
+
+          const periodoSubido = dataBackend?.resumen?.periodo || dataBackend?.periodo || dataBackend?.label;
+          if (periodoSubido) {
+            setPeriodoSeleccionado(periodoSubido);
+          } else {
+            setPeriodoSeleccionado(data.periodos[0].label);
+          }
+        }
+      }
+      actualizarDatosLocales(dataBackend);
     } catch (error) {
-      console.error('Error al actualizar la vista tras la carga:', error);
-      limpiarDatosLocales();
+      console.error('Error actualizando tras upload:', error);
     }
   };
 
@@ -114,6 +167,7 @@ function App() {
                 listaMateriasExcel={listaMateriasExcel} 
                 periodo={periodoSeleccionado}
                 setPeriodo={setPeriodoSeleccionado}
+                listaPeriodos={listaPeriodos}
               />
             } 
           />
@@ -124,6 +178,7 @@ function App() {
                 listaMateriasExcel={listaMateriasExcel} 
                 periodo={periodoSeleccionado}
                 setPeriodo={setPeriodoSeleccionado}
+                listaPeriodos={listaPeriodos}
               />
             } 
           />
@@ -136,6 +191,7 @@ function App() {
                 setMateriaSeleccionada={setMateriaSeleccionada}
                 periodo={periodoSeleccionado}
                 setPeriodo={setPeriodoSeleccionado}
+                listaPeriodos={listaPeriodos}
               />
             }
           />
