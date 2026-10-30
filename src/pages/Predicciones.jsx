@@ -5,7 +5,7 @@ import Filters from '../components/Filters';
 
 // Fallback estático con datos base por materia
 const MATERIAS_DATOS_FALLBACK = [
-  { id: 'ingles', nombre: 'Inglés I', libresActuales: 89, comisionesActuales: 4 },
+  { id: 'ingles', nombre: 'Ingles I', libresActuales: 89, comisionesActuales: 4 },
   { id: 'objetos2', nombre: 'Programación de Objetos II', libresActuales: 9, comisionesActuales: 2 },
   { id: 'entornos', nombre: 'Nuevos Entornos y Lenguajes', libresActuales: 20, comisionesActuales: 1 },
   { id: 'base_datos', nombre: 'Bases de Datos', libresActuales: 70, comisionesActuales: 3 }
@@ -17,7 +17,10 @@ function Predicciones({
   setMateriaSeleccionada, 
   periodo, 
   setPeriodo,
-  listaPeriodos 
+  listaPeriodos,
+  carrera,
+  setCarrera,
+  listaCarreras
 }) {
   const [modalidad, setModalidad] = useState('todas');
   const [tasaRecursado, setTasaRecursado] = useState(65);
@@ -27,6 +30,9 @@ function Predicciones({
   const listaMaterias = (listaMateriasExcel && listaMateriasExcel.length > 0)
     ? listaMateriasExcel
     : MATERIAS_DATOS_FALLBACK;
+
+  // Detección idéntica a Dashboard: prioriza la prop carrera, luego listaCarreras, luego fallback
+  const carreraActiva = carrera || (listaCarreras && listaCarreras.length > 0 ? listaCarreras[0].nombre : "Licenciatura en Informática");
 
   // Busca los datos de la materia seleccionada
   const materiaData = listaMaterias.find((m) => m.id === materiaSeleccionada) || listaMaterias[0];
@@ -50,7 +56,6 @@ function Predicciones({
       setCupoPorAula('');
       return;
     }
-    // Límite de 5 dígitos como máximo
     if (val.length > 5) return;
 
     const num = parseInt(val, 10);
@@ -66,7 +71,7 @@ function Predicciones({
         </p>
       </header>
 
-      {/* Filtros para seleccionar el Período globalmente */}
+      {/* Filtros idénticos a Dashboard */}
       <Filters 
         materia={materiaSeleccionada}
         setMateria={setMateriaSeleccionada}
@@ -76,6 +81,9 @@ function Predicciones({
         setPeriodo={setPeriodo}
         listaMaterias={listaMaterias}
         listaPeriodos={listaPeriodos}
+        carrera={carreraActiva}
+        setCarrera={setCarrera}
+        listaCarreras={listaCarreras}
       />
 
       {/* Indicadores rápidos */}

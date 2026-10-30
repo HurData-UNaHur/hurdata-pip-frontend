@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import styles from './Dashboard.module.css';
 import KpiCard from '../components/KpiCard';
@@ -23,19 +22,37 @@ const DATA_MOCK_FALLBACK = {
   ]
 };
 
-// Lista predeterminada para mapear con el mock
 const LISTA_MATERIAS_MOCK = [
   { id: 'ingles', nombre: 'Ingles I' },
   { id: 'objetos2', nombre: 'Programación de Objetos II' },
   { id: 'entornos', nombre: 'Nuevos Entornos y Lenguajes' }
 ];
 
-function Dashboard({ dataExcel, listaMateriasExcel, periodo, setPeriodo, listaPeriodos }) {
+function Dashboard({ 
+  dataExcel, 
+  listaMateriasExcel, 
+  periodo, 
+  setPeriodo, 
+  listaPeriodos, 
+  carrera, 
+  setCarrera, 
+  listaCarreras 
+}) {
   const tieneDatos = dataExcel && Object.keys(dataExcel).length > 0;
+  
+  // 1. SI HAY DATOS EN DB: Usamos dataExcel.
+  // 2. SI NO HAY DATOS EN DB: Caemos en el MOCK de respaldo.
   const DATA = tieneDatos ? dataExcel : DATA_MOCK_FALLBACK;
-  const listaClavesMaterias = Object.keys(DATA);
 
-  // Si no hay datos dinámicos, pasamos la lista de respaldo
+  // Determinar la carrera activa: prioriza la prop `carrera` del estado global de App
+  const carreraActiva = carrera || (tieneDatos
+    ? (dataExcel.nombre_carrera || dataExcel.carrera || "Carrera Genérica")
+    : "Licenciatura en Informática");
+
+  const listaClavesMaterias = Object.keys(DATA).filter(
+    (k) => k !== 'nombre_carrera' && k !== 'carrera' && k !== 'codigo_carrera'
+  );
+
   const listaMateriasFiltro = (listaMateriasExcel && listaMateriasExcel.length > 0)
     ? listaMateriasExcel
     : LISTA_MATERIAS_MOCK;
@@ -77,6 +94,9 @@ function Dashboard({ dataExcel, listaMateriasExcel, periodo, setPeriodo, listaPe
         setPeriodo={setPeriodo}
         listaMaterias={listaMateriasFiltro}
         listaPeriodos={listaPeriodos}
+        carrera={carreraActiva}
+        setCarrera={setCarrera}
+        listaCarreras={listaCarreras}
       />
 
       <section className={styles.kpiSection}>

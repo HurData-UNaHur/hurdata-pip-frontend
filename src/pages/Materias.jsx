@@ -5,13 +5,21 @@ import Filters from '../components/Filters';
 
 // Mock estático con resumen por materia (utilizado como fallback)
 const MATERIAS_MOCK_FALLBACK = [
-  { id: 'ingles', nombre: 'Inglés I', inscriptos: 218, promo: 95, reg: 28, libre: 89, comisiones: 4 },
+  { id: 'ingles', nombre: 'Ingles I', inscriptos: 218, promo: 95, reg: 28, libre: 89, comisiones: 4 },
   { id: 'objetos2', nombre: 'Programación de Objetos II', inscriptos: 60, promo: 30, reg: 17, libre: 9, comisiones: 2 },
   { id: 'entornos', nombre: 'Nuevos Entornos y Lenguajes', inscriptos: 55, promo: 12, reg: 15, libre: 20, comisiones: 1 },
   { id: 'base_datos', nombre: 'Bases de Datos I', inscriptos: 140, promo: 40, reg: 30, libre: 70, comisiones: 3 },
 ];
 
-function Materias({ listaMateriasExcel, periodo, setPeriodo, listaPeriodos}) {
+function Materias({ 
+  listaMateriasExcel, 
+  periodo, 
+  setPeriodo, 
+  listaPeriodos, 
+  carrera, 
+  setCarrera, 
+  listaCarreras 
+}) {
   const [materia, setMateria] = useState('');
   const [modalidad, setModalidad] = useState('todas');
 
@@ -19,6 +27,9 @@ function Materias({ listaMateriasExcel, periodo, setPeriodo, listaPeriodos}) {
   const materiasFuente = (listaMateriasExcel && listaMateriasExcel.length > 0) 
     ? listaMateriasExcel 
     : MATERIAS_MOCK_FALLBACK;
+
+  // Detección idéntica a Dashboard: prioriza la prop carrera, luego listaCarreras, luego fallback
+  const carreraActiva = carrera || (listaCarreras && listaCarreras.length > 0 ? listaCarreras[0].nombre : "Licenciatura en Informática");
 
   // Calculamos la materia con mayor porcentaje de deserción (materia filtro)
   const materiasProcesadas = materiasFuente.map((m) => {
@@ -46,7 +57,7 @@ function Materias({ listaMateriasExcel, periodo, setPeriodo, listaPeriodos}) {
         </p>
       </header>
 
-      {/* Filtros para seleccionar el Período globalmente */}
+      {/* Filtros idénticos a Dashboard */}
       <Filters 
         materia={materia}
         setMateria={setMateria}
@@ -56,6 +67,9 @@ function Materias({ listaMateriasExcel, periodo, setPeriodo, listaPeriodos}) {
         setPeriodo={setPeriodo}
         listaMaterias={materiasFuente}
         listaPeriodos={listaPeriodos}
+        carrera={carreraActiva}
+        setCarrera={setCarrera}
+        listaCarreras={listaCarreras}
       />
 
       {/* Resumen en KPIs */}

@@ -2,11 +2,15 @@
 
 export function transformarDatosBackend(resumenBackend) {
   if (!resumenBackend || !resumenBackend.actividades) {
-    return { dataDashboard: {}, listaMaterias: [] };
+    return { dataDashboard: {}, listaMaterias: [], nombreCarrera: '', carrerasDisponibles: [] };
   }
 
   const dataDashboard = {};
   const listaMaterias = [];
+
+  // Extraer el nombre de la carrera activa y la lista de carreras de este período
+  const nombreCarrera = resumenBackend.nombre_carrera || resumenBackend.carrera || '';
+  const carrerasDisponibles = resumenBackend.carreras_disponibles || [];
 
   resumenBackend.actividades.forEach((act) => {
     // Generar un ID único y normalizado para usar como clave
@@ -64,5 +68,8 @@ export function transformarDatosBackend(resumenBackend) {
     });
   });
 
-  return { dataDashboard, listaMaterias };
+  // Guardamos la carrera dentro del objeto dataDashboard
+  dataDashboard.nombre_carrera = nombreCarrera;
+
+  return { dataDashboard, listaMaterias, nombreCarrera, carrerasDisponibles };
 }

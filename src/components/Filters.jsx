@@ -8,11 +8,19 @@ function Filters({
     periodo, 
     setPeriodo, 
     listaMaterias = [],
-    listaPeriodos = [] 
+    listaPeriodos = [],
+    carrera,
+    setCarrera,
+    listaCarreras = []
 }) {
+    // Si hay lista de carreras enviada desde App/Dashboard la usa, sino arma el fallback dinámico
+    const carrerasAMostrar = listaCarreras.length > 0 
+        ? listaCarreras 
+        : [{ id: 'actual', nombre: carrera || 'Licenciatura en Informática' }];
+
     return (
         <section className={styles.filtersContainer}>
-            {/* Período dinámico cargado desde SQLite */}
+            {/* Período */}
             <div className={styles.filterGroup}>
                 <label className={styles.label}>Período</label>
                 <select 
@@ -32,11 +40,19 @@ function Filters({
                 </select>
             </div>
 
-            {/* Carrera */}
+            {/* Carrera Dinámica */}
             <div className={styles.filterGroup}>
                 <label className={styles.label}>Carrera</label>
-                <select className={styles.select} defaultValue="info">
-                    <option value="info">Licenciatura en Informática </option>
+                <select 
+                    className={styles.select} 
+                    value={carrera || (carrerasAMostrar[0] && carrerasAMostrar[0].nombre)} 
+                    onChange={(e) => setCarrera && setCarrera(e.target.value)}
+                >
+                    {carrerasAMostrar.map((c) => (
+                        <option key={c.id || c.nombre} value={c.nombre}>
+                            {c.nombre}
+                        </option>
+                    ))}
                 </select>
             </div>
 
@@ -64,10 +80,10 @@ function Filters({
                     value={modalidad} 
                     onChange={(mo) => setModalidad(mo.target.value)}
                 >
-                    <option value="todas">Todas las modalidades </option>
-                    <option value="VIRTUAL">Solo Virtual </option>
-                    <option value="COMBINADA">Solo Combinadas </option>
-                    <option value="PRESENCIAL">Solo Presencial </option>
+                    <option value="todas">Todas las modalidades</option>
+                    <option value="VIRTUAL">Solo Virtual</option>
+                    <option value="COMBINADA">Solo Combinadas</option>
+                    <option value="PRESENCIAL">Solo Presencial</option>
                 </select>
             </div>
         </section>
