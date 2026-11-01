@@ -5,7 +5,7 @@ import styles from './Navbar.module.css';
 import logoUnahur from '../assets/unahur.jpeg';
 import UploadModal from './UploadModal';
 
-function Navbar({ theme, toggleTheme, onUploadSuccess }) {
+function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleUploadSuccess = (dataBackend) => {
@@ -73,7 +73,8 @@ function Navbar({ theme, toggleTheme, onUploadSuccess }) {
       <UploadModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
-        onSuccess={handleUploadSuccess} 
+        onSuccess={handleUploadSuccess}
+        onResetSuccess={onResetSuccess}
       />
     </>
   );

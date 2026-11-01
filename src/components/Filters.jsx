@@ -11,12 +11,19 @@ function Filters({
     listaPeriodos = [],
     carrera,
     setCarrera,
-    listaCarreras = []
+    listaCarreras = [],
+    showMateria = true,
+    showModalidad = true
 }) {
-    // Si hay lista de carreras enviada desde App/Dashboard la usa, sino arma el fallback dinámico
-    const carrerasAMostrar = listaCarreras.length > 0 
+    // Si hay lista de carreras la usamos; si no, aseguramos el fallback a la prop activa o Licenciatura en Informática
+    const carrerasAMostrar = (listaCarreras && listaCarreras.length > 0)
         ? listaCarreras 
-        : [{ id: 'actual', nombre: carrera || 'Licenciatura en Informática' }];
+        : [{ id: 'fallback', nombre: 'Licenciatura en Informática' }];
+
+    // Valor seleccionado garantizado: prioriza la prop directa 'carrera' sobre el primer item del arreglo
+    const valorCarreraSeleccionada = carrera 
+        ? carrera 
+        : (carrerasAMostrar[0] ? carrerasAMostrar[0].nombre : 'Licenciatura en Informática');
 
     return (
         <section className={styles.filtersContainer}>
@@ -45,7 +52,7 @@ function Filters({
                 <label className={styles.label}>Carrera</label>
                 <select 
                     className={styles.select} 
-                    value={carrera || (carrerasAMostrar[0] && carrerasAMostrar[0].nombre)} 
+                    value={valorCarreraSeleccionada} 
                     onChange={(e) => setCarrera && setCarrera(e.target.value)}
                 >
                     {carrerasAMostrar.map((c) => (
@@ -57,6 +64,7 @@ function Filters({
             </div>
 
             {/* Materia */}
+            {showMateria && (
             <div className={styles.filterGroup}>
                 <label className={styles.label}>Materia</label>
                 <select 
@@ -71,8 +79,10 @@ function Filters({
                     ))}
                 </select>
             </div>
+            )}
 
             {/* Modalidad */}
+            {showModalidad && (
             <div className={styles.filterGroup}>
                 <label className={styles.label}>Modalidad</label>
                 <select 
@@ -86,6 +96,7 @@ function Filters({
                     <option value="PRESENCIAL">Solo Presencial</option>
                 </select>
             </div>
+            )}
         </section>
     );
 }

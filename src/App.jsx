@@ -34,6 +34,33 @@ function App() {
   });
   const [materiaSeleccionada, setMateriaSeleccionada] = useState('ingles');
 
+  // ── Helpers de datos (Declarados arriba para evitar errores de TDZ / hoisting) ──
+  const limpiarDatosLocales = () => {
+    setDataDashboard({});
+    setListaMateriasExcel([]);
+    localStorage.removeItem('hurdata_dashboard');
+    localStorage.removeItem('hurdata_materias');
+    localStorage.removeItem('hurdata_carrera_activa');
+    setMateriaSeleccionada('ingles');
+  };
+
+  const actualizarDatosLocales = (dataBackend) => {
+    if (!dataBackend) { limpiarDatosLocales(); return; }
+
+    const contenido = dataBackend.resumen || dataBackend.data || dataBackend;
+    const { dataDashboard: dashData, listaMaterias: matData } = transformarDatosBackend(contenido);
+
+    if (matData?.length > 0) {
+      setDataDashboard(dashData);
+      setListaMateriasExcel(matData);
+      localStorage.setItem('hurdata_dashboard', JSON.stringify(dashData));
+      localStorage.setItem('hurdata_materias', JSON.stringify(matData));
+      setMateriaSeleccionada(matData[0].id);
+    } else {
+      limpiarDatosLocales();
+    }
+  };
+
   // ── Tema ──────────────────────────────────────────────────────────────────
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -116,33 +143,6 @@ function App() {
       .catch(() => limpiarDatosLocales());
   }, [periodoSeleccionado, carreraSeleccionada]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Helpers de datos ─────────────────────────────────────────────────────
-  const limpiarDatosLocales = () => {
-    setDataDashboard({});
-    setListaMateriasExcel([]);
-    localStorage.removeItem('hurdata_dashboard');
-    localStorage.removeItem('hurdata_materias');
-    localStorage.removeItem('hurdata_carrera_activa');
-    setMateriaSeleccionada('ingles');
-  };
-
-  const actualizarDatosLocales = (dataBackend) => {
-    if (!dataBackend) { limpiarDatosLocales(); return; }
-
-    const contenido = dataBackend.resumen || dataBackend.data || dataBackend;
-    const { dataDashboard: dashData, listaMaterias: matData } = transformarDatosBackend(contenido);
-
-    if (matData?.length > 0) {
-      setDataDashboard(dashData);
-      setListaMateriasExcel(matData);
-      localStorage.setItem('hurdata_dashboard', JSON.stringify(dashData));
-      localStorage.setItem('hurdata_materias', JSON.stringify(matData));
-      setMateriaSeleccionada(matData[0].id);
-    } else {
-      limpiarDatosLocales();
-    }
-  };
-
   const handleCambiarCarrera = (nuevaCarrera) => {
     setCarreraSeleccionada(nuevaCarrera);
     localStorage.setItem('hurdata_carrera_activa', nuevaCarrera);
@@ -151,30 +151,44 @@ function App() {
   // ── Upload Excel ──────────────────────────────────────────────────────────
   const handleUploadSuccess = async (dataBackend) => {
     try {
+      // 1. Refrescar lista de períodos
       const resPeriodos = await fetch(`${API_URL}/api/periodos`);
-      if (resPeriodos.ok) {
-        const dataP = await resPeriodos.json();
-        if (dataP?.periodos?.length > 0) {
-          setListaPeriodos(dataP.periodos);
-          const periodoSubido = dataBackend?.resumen?.periodo || dataBackend?.periodo;
-          const periodoActivo = periodoSubido || dataP.periodos[0].label;
-          setPeriodoSeleccionado(periodoActivo);
+      if (!resPeriodos.ok) throw new Error('Error al traer períodos');
+      const dataP = await resPeriodos.json();
 
-          const resCarreras = await fetch(`${API_URL}/api/carreras?periodo=${encodeURIComponent(periodoActivo)}`);
-          if (resCarreras.ok) {
-            const dataC = await resCarreras.json();
-            if (dataC?.carreras?.length > 0) setListaCarreras(dataC.carreras);
-          }
-        }
+      const periodoSubido = dataBackend?.resumen?.periodo || dataBackend?.periodo;
+      const periodoActivo = periodoSubido || (dataP?.periodos?.[0]?.label ?? periodoSeleccionado);
+
+      if (dataP?.periodos?.length > 0) setListaPeriodos(dataP.periodos);
+
+      // 2. Refrescar carreras del período subido
+      const resCarreras = await fetch(`${API_URL}/api/carreras?periodo=${encodeURIComponent(periodoActivo)}`);
+      if (resCarreras.ok) {
+        const dataC = await resCarreras.json();
+        if (dataC?.carreras?.length > 0) setListaCarreras(dataC.carreras);
       }
 
+      // 3. Setear carrera activa
       const carreraSubida = dataBackend?.resumen?.nombre_carrera || dataBackend?.nombre_carrera;
+      const carreraActiva = carreraSubida || carreraSeleccionada;
       if (carreraSubida) {
         setCarreraSeleccionada(carreraSubida);
         localStorage.setItem('hurdata_carrera_activa', carreraSubida);
       }
 
-      actualizarDatosLocales(dataBackend);
+      // 4. Traer los datos reales del dashboard desde /api/datos (no del resumen del upload)
+      const url = `${API_URL}/api/datos?periodo=${encodeURIComponent(periodoActivo)}&carrera=${encodeURIComponent(carreraActiva)}`;
+      const resDatos = await fetch(url);
+      if (!resDatos.ok) throw new Error('Error al traer datos');
+      const dataDatos = await resDatos.json();
+
+      // 5. Actualizar estado — si el período cambió, setearlo dispara el useEffect;
+      //    si es el mismo período, actualizamos manualmente con los datos frescos
+      if (periodoActivo !== periodoSeleccionado) {
+        setPeriodoSeleccionado(periodoActivo);
+      }
+      actualizarDatosLocales(dataDatos);
+
     } catch (err) {
       console.error('Error actualizando tras upload:', err);
     }
@@ -202,7 +216,7 @@ function App() {
           periodoFinal  = data.periodos[0].label;
         }
       }
-    } catch (_) { /* sin conexión, usa mock */ }
+    } catch { /* sin conexión, usa mock */ }
 
     try {
       const res = await fetch(`${API_URL}/api/carreras?periodo=${encodeURIComponent(periodoFinal)}`);
@@ -213,7 +227,7 @@ function App() {
           carreraFinal  = data.carreras[0].nombre;
         }
       }
-    } catch (_) { /* sin conexión, usa mock */ }
+    } catch { /* sin conexión, usa mock */ }
 
     // 3. Setear el nuevo estado limpio
     setListaPeriodos(periodosFinal);
@@ -221,11 +235,13 @@ function App() {
     setCarreraSeleccionada(carreraFinal);
     localStorage.setItem('hurdata_carrera_activa', carreraFinal);
 
-    // 4. Setear el período dispara el useEffect de datos, que limpiará el dashboard
-    setPeriodoSeleccionado(periodoFinal);
-
-    // 5. Remount de las vistas para limpiar estados internos (useState locales)
+    // 4. Forzar el cambio de estado del período (vaciándolo primero para asegurar que re-dispare los useEffect de datos)
+    setPeriodoSeleccionado('');
     setResetKey((k) => k + 1);
+
+    setTimeout(() => {
+      setPeriodoSeleccionado(periodoFinal);
+    }, 10);
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -238,7 +254,7 @@ function App() {
         onResetSuccess={handleResetSuccess}
       />
 
-      <main style={{ padding: '24px' }}>
+      <main style={{ padding: 'clamp(12px, 3vw, 24px)' }}>
         <Routes>
           <Route
             path="/"

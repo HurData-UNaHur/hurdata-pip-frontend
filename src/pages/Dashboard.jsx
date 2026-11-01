@@ -4,7 +4,6 @@ import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
 import StackedBarChart from '../components/StackedBarChart';
 import AlertsPanel from '../components/AlertsPanel';
-import ProjectionSlider from '../components/ProjectionSlider';
 
 const DATA_MOCK_FALLBACK = {
   ingles: [
@@ -131,7 +130,6 @@ function Dashboard({
         </div>
         <div className={styles.sidebar}>
           <AlertsPanel comisiones={comisiones} />
-          <ProjectionSlider totalLibres={totalLibre} />
         </div>
       </main>
     </div>

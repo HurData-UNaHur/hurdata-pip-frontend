@@ -70,6 +70,8 @@ function Materias({
         carrera={carreraActiva}
         setCarrera={setCarrera}
         listaCarreras={listaCarreras}
+        showMateria={false}
+        showModalidad={false}
       />
 
       {/* Resumen en KPIs */}

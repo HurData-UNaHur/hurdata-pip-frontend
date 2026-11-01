@@ -9,25 +9,186 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 16px;
 }
 
 .content {
   background: #ffffff;
   padding: 24px;
   border-radius: 8px;
-  max-width: 500px;
-  width: 90%;
+  max-width: 520px;
+  width: 100%;
   color: #333333;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
+/* Una sola fila: [Resetear] [Gestionar] --- [Cancelar] [Procesar] */
 .actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
+  align-items: center;
+  gap: 8px;
   margin-top: 16px;
+  flex-wrap: wrap;
 }
 
+/* Resetear DB — rojo, ancla a la izquierda */
+.btnReset {
+  background-color: #ef4444;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btnReset:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Gestionar períodos — naranja, ocupa el espacio central */
+.btnGestion {
+  background-color: #f97316;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 14px;
+  cursor: pointer;
+  flex: 1;                  /* crece para ocupar el hueco central */
+  text-align: center;
+  white-space: nowrap;
+}
+
+.btnGestion:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Cancelar — gris neutro */
+.btnCancelar {
+  background-color: #e5e7eb;
+  color: #374151;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btnCancelar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Procesar Archivo — verde confirmar */
+.btnProcesar {
+  background-color: #16a34a;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btnProcesar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Sección gestión de períodos ─────────────────────────────────────── */
+.gestionPeriodos {
+  margin-top: 20px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 16px;
+}
+
+.gestionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.gestionTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.gestionVacio {
+  font-size: 0.88rem;
+  color: #6b7280;
+  text-align: center;
+  padding: 12px 0;
+}
+
+/* Botón eliminar seleccionados */
+.btnEliminarSel {
+  background-color: #ef4444;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btnEliminarSel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Tabla de períodos */
+.tablaPeriodos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tablaPeriodos thead tr {
+  background-color: #f3f4f6;
+}
+
+.tablaPeriodos th,
+.tablaPeriodos td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tablaPeriodos th:first-child,
+.tablaPeriodos td:first-child {
+  width: 36px;
+  text-align: center;
+}
+
+.tablaPeriodos td:last-child {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.tablaPeriodos tbody tr {
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.tablaPeriodos tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.filaSeleccionada {
+  background-color: #fef2f2 !important;
+}
+
+/* ── Feedback  */
 .preResumen {
   background: #f4f4f4;
   padding: 12px;
@@ -46,4 +207,20 @@
   margin-top: 16px;
   color: #2e7d32;
   text-align: left;
+}
+
+/* ── Responsive */
+@media (max-width: 480px) {
+  .content {
+    padding: 16px;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btnGestion {
+    flex: unset;
+  }
 }
