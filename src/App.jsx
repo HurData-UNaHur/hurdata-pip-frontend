@@ -6,9 +6,11 @@ import Materias from './pages/Materias';
 import Predicciones from './pages/Predicciones';
 import { transformarDatosBackend } from './utils/transformData';
 
+const API_URL = 'http://localhost:8000';
+
 const PERIODOS_MOCK_FALLBACK = [
   { id_periodo: 'mock1', label: '2022 - PRIMER CUATRIMESTRE' },
-  { id_periodo: 'mock2', label: '2022 - SEGUNDO CUATRIMESTRE' }
+  { id_periodo: 'mock2', label: '2022 - SEGUNDO CUATRIMESTRE' },
 ];
 
 const CARRERAS_MOCK_FALLBACK = [
@@ -16,108 +18,105 @@ const CARRERAS_MOCK_FALLBACK = [
 ];
 
 function App() {
-  const [materiaSeleccionada, setMateriaSeleccionada] = useState('ingles');
-  const [listaPeriodos, setListaPeriodos] = useState([]);
+  const [resetKey, setResetKey]                       = useState(0);
+  const [theme, setTheme]                             = useState(() => localStorage.getItem('theme') || 'light');
+  const [listaPeriodos, setListaPeriodos]             = useState([]);
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState('');
-  
-  // Persistir la carrera seleccionada en localStorage
-  const [carreraSeleccionada, setCarreraSeleccionada] = useState(() => {
-    return localStorage.getItem('hurdata_carrera_activa') || '';
-  });
-  const [listaCarreras, setListaCarreras] = useState([]);
-
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'light';
-  });
-
-  const [dataDashboard, setDataDashboard] = useState(() => {
+  const [listaCarreras, setListaCarreras]             = useState([]);
+  const [carreraSeleccionada, setCarreraSeleccionada] = useState(() => localStorage.getItem('hurdata_carrera_activa') || '');
+  const [dataDashboard, setDataDashboard]             = useState(() => {
     const saved = localStorage.getItem('hurdata_dashboard');
     return saved ? JSON.parse(saved) : {};
   });
-
-  const [listaMateriasExcel, setListaMateriasExcel] = useState(() => {
+  const [listaMateriasExcel, setListaMateriasExcel]   = useState(() => {
     const saved = localStorage.getItem('hurdata_materias');
     return saved ? JSON.parse(saved) : [];
   });
+  const [materiaSeleccionada, setMateriaSeleccionada] = useState('ingles');
 
+  // ── Tema ──────────────────────────────────────────────────────────────────
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
-  };
+  const toggleTheme = () => setTheme((t) => (t === 'light' ? 'dark' : 'light'));
 
-  // 1. Carga inicial de Períodos
+  // ── Carga inicial de períodos ─────────────────────────────────────────────
   useEffect(() => {
     let cancelado = false;
 
-    const cargarInicial = async () => {
-      try {
-        const res = await fetch('http://localhost:8000/api/periodos');
-        if (!res.ok) throw new Error('Servidor sin respuesta');
-        const data = await res.json();
-
-        if (!cancelado) {
-          if (data && Array.isArray(data.periodos) && data.periodos.length > 0) {
-            setListaPeriodos(data.periodos);
-            setPeriodoSeleccionado(data.periodos[0].label);
-          } else {
-            setListaPeriodos(PERIODOS_MOCK_FALLBACK);
-            setPeriodoSeleccionado(PERIODOS_MOCK_FALLBACK[0].label);
-          }
+    fetch(`${API_URL}/api/periodos`)
+      .then((res) => {
+        if (!res.ok) throw new Error('sin respuesta');
+        return res.json();
+      })
+      .then((data) => {
+        if (cancelado) return;
+        if (data?.periodos?.length > 0) {
+          setListaPeriodos(data.periodos);
+          setPeriodoSeleccionado(data.periodos[0].label);
+        } else {
+          setListaPeriodos(PERIODOS_MOCK_FALLBACK);
+          setPeriodoSeleccionado(PERIODOS_MOCK_FALLBACK[0].label);
         }
-      } catch (error) {
-        console.warn('Servidor offline o sin datos en SQLite, activando Mock:', error);
+      })
+      .catch(() => {
         if (!cancelado) {
           setListaPeriodos(PERIODOS_MOCK_FALLBACK);
           setPeriodoSeleccionado(PERIODOS_MOCK_FALLBACK[0].label);
         }
-      }
-    };
+      });
 
-    cargarInicial();
-
-    return () => {
-      cancelado = true;
-    };
+    return () => { cancelado = true; };
   }, []);
 
-  // 2. NUEVO: Carga independiente de la lista de Carreras al cambiar el Período
+  // ── Carreras al cambiar período ───────────────────────────────────────────
   useEffect(() => {
     if (!periodoSeleccionado) return;
 
-    fetch(`http://localhost:8000/api/carreras?periodo=${encodeURIComponent(periodoSeleccionado)}`)
+    fetch(`${API_URL}/api/carreras?periodo=${encodeURIComponent(periodoSeleccionado)}`)
       .then((res) => {
-        if (!res.ok) throw new Error('Error al traer carreras');
+        if (!res.ok) throw new Error('Error carreras');
         return res.json();
       })
       .then((data) => {
-        if (data && Array.isArray(data.carreras) && data.carreras.length > 0) {
+        if (data?.carreras?.length > 0) {
           setListaCarreras(data.carreras);
-
-          const nombresDisponibles = data.carreras.map((c) => c.nombre);
-          // Si la carrera elegida no existe en este período nuevo, seleccionamos la primera
-          if (!carreraSeleccionada || !nombresDisponibles.includes(carreraSeleccionada)) {
-            const nuevaCarrera = data.carreras[0].nombre;
-            setCarreraSeleccionada(nuevaCarrera);
-            localStorage.setItem('hurdata_carrera_activa', nuevaCarrera);
+          const nombres = data.carreras.map((c) => c.nombre);
+          if (!carreraSeleccionada || !nombres.includes(carreraSeleccionada)) {
+            const primera = data.carreras[0].nombre;
+            setCarreraSeleccionada(primera);
+            localStorage.setItem('hurdata_carrera_activa', primera);
           }
         } else {
-          // Si la DB está vacía o es Mock, mostramos ambas carreras de prueba
           setListaCarreras(CARRERAS_MOCK_FALLBACK);
-          if (!carreraSeleccionada) {
-            setCarreraSeleccionada(CARRERAS_MOCK_FALLBACK[0].nombre);
-          }
+          setCarreraSeleccionada(CARRERAS_MOCK_FALLBACK[0].nombre);
+          localStorage.setItem('hurdata_carrera_activa', CARRERAS_MOCK_FALLBACK[0].nombre);
         }
       })
-      .catch((err) => {
-        console.warn('Servidor offline o sin endpoint /api/carreras, usando fallback mock:', err);
+      .catch(() => {
         setListaCarreras(CARRERAS_MOCK_FALLBACK);
       });
-  }, [periodoSeleccionado]);
+  }, [periodoSeleccionado]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ── Datos del dashboard al cambiar período o carrera ─────────────────────
+  useEffect(() => {
+    if (!periodoSeleccionado) return;
+
+    const url = `${API_URL}/api/datos?periodo=${encodeURIComponent(periodoSeleccionado)}` +
+      (carreraSeleccionada ? `&carrera=${encodeURIComponent(carreraSeleccionada)}` : '');
+
+    fetch(url)
+      .then((res) => {
+        if (!res.ok) throw new Error('Error datos');
+        return res.json();
+      })
+      .then((data) => actualizarDatosLocales(data))
+      .catch(() => limpiarDatosLocales());
+  }, [periodoSeleccionado, carreraSeleccionada]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Helpers de datos ─────────────────────────────────────────────────────
   const limpiarDatosLocales = () => {
     setDataDashboard({});
     setListaMateriasExcel([]);
@@ -128,18 +127,12 @@ function App() {
   };
 
   const actualizarDatosLocales = (dataBackend) => {
-    if (!dataBackend) {
-      limpiarDatosLocales();
-      return;
-    }
+    if (!dataBackend) { limpiarDatosLocales(); return; }
 
     const contenido = dataBackend.resumen || dataBackend.data || dataBackend;
-    const { 
-      dataDashboard: dashData, 
-      listaMaterias: matData
-    } = transformarDatosBackend(contenido);
+    const { dataDashboard: dashData, listaMaterias: matData } = transformarDatosBackend(contenido);
 
-    if (matData && matData.length > 0) {
+    if (matData?.length > 0) {
       setDataDashboard(dashData);
       setListaMateriasExcel(matData);
       localStorage.setItem('hurdata_dashboard', JSON.stringify(dashData));
@@ -150,99 +143,109 @@ function App() {
     }
   };
 
-  // Manejador para cambiar de carrera manualmente en la UI
   const handleCambiarCarrera = (nuevaCarrera) => {
     setCarreraSeleccionada(nuevaCarrera);
     localStorage.setItem('hurdata_carrera_activa', nuevaCarrera);
   };
 
-  // 3. Carga de datos de la materia según Período y Carrera
-  useEffect(() => {
-    if (!periodoSeleccionado) return;
-
-    let url = `http://localhost:8000/api/datos?periodo=${encodeURIComponent(periodoSeleccionado)}`;
-    if (carreraSeleccionada) {
-      url += `&carrera=${encodeURIComponent(carreraSeleccionada)}`;
-    }
-
-    fetch(url)
-      .then((res) => {
-        if (!res.ok) throw new Error('Error al conectar con la API');
-        return res.json();
-      })
-      .then((data) => {
-        actualizarDatosLocales(data);
-      })
-      .catch((err) => {
-        console.error('Error al traer datos del período:', err);
-        limpiarDatosLocales();
-      });
-  }, [periodoSeleccionado, carreraSeleccionada]);
-
-  // 4. Callback tras subir un Excel (actualización instantánea sin recargar la página)
+  // ── Upload Excel ──────────────────────────────────────────────────────────
   const handleUploadSuccess = async (dataBackend) => {
     try {
-      // 1. Reconsultamos la lista de períodos
-      const resPeriodos = await fetch('http://localhost:8000/api/periodos');
-      let periodoActivo = periodoSeleccionado;
-
+      const resPeriodos = await fetch(`${API_URL}/api/periodos`);
       if (resPeriodos.ok) {
         const dataP = await resPeriodos.json();
-        if (dataP && Array.isArray(dataP.periodos) && dataP.periodos.length > 0) {
+        if (dataP?.periodos?.length > 0) {
           setListaPeriodos(dataP.periodos);
+          const periodoSubido = dataBackend?.resumen?.periodo || dataBackend?.periodo;
+          const periodoActivo = periodoSubido || dataP.periodos[0].label;
+          setPeriodoSeleccionado(periodoActivo);
 
-          const periodoSubido = dataBackend?.resumen?.periodo || dataBackend?.periodo || dataBackend?.label;
-          if (periodoSubido) {
-            periodoActivo = periodoSubido;
-            setPeriodoSeleccionado(periodoSubido);
-          } else {
-            periodoActivo = dataP.periodos[0].label;
-            setPeriodoSeleccionado(periodoActivo);
+          const resCarreras = await fetch(`${API_URL}/api/carreras?periodo=${encodeURIComponent(periodoActivo)}`);
+          if (resCarreras.ok) {
+            const dataC = await resCarreras.json();
+            if (dataC?.carreras?.length > 0) setListaCarreras(dataC.carreras);
           }
         }
       }
 
-      // 2. Traemos inmediatamente las carreras actualizadas en SQLite para este período
-      if (periodoActivo) {
-        const resCarreras = await fetch(`http://localhost:8000/api/carreras?periodo=${encodeURIComponent(periodoActivo)}`);
-        if (resCarreras.ok) {
-          const dataC = await resCarreras.json();
-          if (dataC && Array.isArray(dataC.carreras) && dataC.carreras.length > 0) {
-            setListaCarreras(dataC.carreras);
-          }
-        }
-      }
-
-      // 3. Fijamos la nueva carrera subida como activa
       const carreraSubida = dataBackend?.resumen?.nombre_carrera || dataBackend?.nombre_carrera;
       if (carreraSubida) {
         setCarreraSeleccionada(carreraSubida);
         localStorage.setItem('hurdata_carrera_activa', carreraSubida);
       }
 
-      // 4. Sincronizamos tableros y materias
       actualizarDatosLocales(dataBackend);
-    } catch (error) {
-      console.error('Error actualizando reactivamente tras upload:', error);
+    } catch (err) {
+      console.error('Error actualizando tras upload:', err);
     }
   };
 
+  // ── Reset DB ──────────────────────────────────────────────────────────────
+  const handleResetSuccess = async () => {
+    // 1. Limpiar estado local y localStorage de inmediato
+    localStorage.clear();
+    localStorage.setItem('theme', theme); // preservar el tema
+    limpiarDatosLocales();
+
+    // 2. Consultar el backend para obtener el estado post-reset
+    let periodosFinal   = PERIODOS_MOCK_FALLBACK;
+    let periodoFinal    = PERIODOS_MOCK_FALLBACK[0].label;
+    let carrerasFinal   = CARRERAS_MOCK_FALLBACK;
+    let carreraFinal    = CARRERAS_MOCK_FALLBACK[0].nombre;
+
+    try {
+      const res = await fetch(`${API_URL}/api/periodos`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.periodos?.length > 0) {
+          periodosFinal = data.periodos;
+          periodoFinal  = data.periodos[0].label;
+        }
+      }
+    } catch (_) { /* sin conexión, usa mock */ }
+
+    try {
+      const res = await fetch(`${API_URL}/api/carreras?periodo=${encodeURIComponent(periodoFinal)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.carreras?.length > 0) {
+          carrerasFinal = data.carreras;
+          carreraFinal  = data.carreras[0].nombre;
+        }
+      }
+    } catch (_) { /* sin conexión, usa mock */ }
+
+    // 3. Setear el nuevo estado limpio
+    setListaPeriodos(periodosFinal);
+    setListaCarreras(carrerasFinal);
+    setCarreraSeleccionada(carreraFinal);
+    localStorage.setItem('hurdata_carrera_activa', carreraFinal);
+
+    // 4. Setear el período dispara el useEffect de datos, que limpiará el dashboard
+    setPeriodoSeleccionado(periodoFinal);
+
+    // 5. Remount de las vistas para limpiar estados internos (useState locales)
+    setResetKey((k) => k + 1);
+  };
+
+  // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <BrowserRouter>
-      <Navbar 
-        theme={theme} 
-        toggleTheme={toggleTheme} 
+    <BrowserRouter key={resetKey}>
+      <Navbar
+        theme={theme}
+        toggleTheme={toggleTheme}
         onUploadSuccess={handleUploadSuccess}
+        onResetSuccess={handleResetSuccess}
       />
 
       <main style={{ padding: '24px' }}>
         <Routes>
-          <Route 
-            path="/" 
+          <Route
+            path="/"
             element={
-              <Dashboard 
-                dataExcel={dataDashboard} 
-                listaMateriasExcel={listaMateriasExcel} 
+              <Dashboard
+                dataExcel={dataDashboard}
+                listaMateriasExcel={listaMateriasExcel}
                 periodo={periodoSeleccionado}
                 setPeriodo={setPeriodoSeleccionado}
                 listaPeriodos={listaPeriodos}
@@ -250,13 +253,13 @@ function App() {
                 setCarrera={handleCambiarCarrera}
                 listaCarreras={listaCarreras}
               />
-            } 
+            }
           />
-          <Route 
-            path="/materias" 
+          <Route
+            path="/materias"
             element={
-              <Materias 
-                listaMateriasExcel={listaMateriasExcel} 
+              <Materias
+                listaMateriasExcel={listaMateriasExcel}
                 periodo={periodoSeleccionado}
                 setPeriodo={setPeriodoSeleccionado}
                 listaPeriodos={listaPeriodos}
@@ -264,7 +267,7 @@ function App() {
                 setCarrera={handleCambiarCarrera}
                 listaCarreras={listaCarreras}
               />
-            } 
+            }
           />
           <Route
             path="/predicciones"
