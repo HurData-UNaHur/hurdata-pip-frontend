@@ -187,6 +187,17 @@ export default function UploadModal({ isOpen, onClose, onSuccess, onResetSuccess
   return (
     <div className={styles.overlay}>
       <div className={styles.content}>
+        {/* Botón X superior derecho */}
+        <button
+          type="button"
+          className={styles.btnCloseIcon}
+          onClick={handleClose}
+          disabled={loading}
+          title="Cerrar"
+        >
+          ✕
+        </button>
+
         <h3>Cargar Acta/Reporte del SIU Guaraní</h3>
         <p>Selecciona el archivo <code>.xlsx</code> para actualizar la base de datos.</p>
 

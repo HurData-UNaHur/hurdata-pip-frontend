@@ -5,6 +5,7 @@
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .panelTitle {
@@ -12,6 +13,7 @@
   font-weight: 700;
   color: #0f172a;
   margin-bottom: 16px;
+  transition: color 0.3s ease;
 }
 
 .alertBox {
@@ -20,6 +22,7 @@
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 12px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .alertBox:last-child {
@@ -31,15 +34,46 @@
   font-weight: 700;
   color: #991b1b;
   margin-bottom: 4px;
+  transition: color 0.3s ease;
 }
 
 .alertDesc {
   font-size: 0.8rem;
   color: #450a0a;
   line-height: 1.4;
+  transition: color 0.3s ease;
 }
 
 .noAlerts {
   font-size: 0.85rem;
   color: #64748b;
+  transition: color 0.3s ease;
+}
+
+/* ── MODO OSCURO ([data-theme='dark']) ─────────────────────────────────── */
+:global([data-theme='dark']) .panel {
+  background-color: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+:global([data-theme='dark']) .panelTitle {
+  color: #f8fafc;
+}
+
+:global([data-theme='dark']) .alertBox {
+  background-color: rgba(127, 29, 29, 0.25); /* Rojo oscuro  */
+  border-color: #991b1b;
+}
+
+:global([data-theme='dark']) .alertTitle {
+  color: #fca5a5;
+}
+
+:global([data-theme='dark']) .alertDesc {
+  color: #fecaca;
+}
+
+:global([data-theme='dark']) .noAlerts {
+  color: #94a3b8;
 }
