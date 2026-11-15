@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import Materias from './pages/Materias';
 import Predicciones from './pages/Predicciones';
+import Login from './pages/Login';
 import { transformarDatosBackend } from './utils/transformData';
 
 const API_URL = 'http://localhost:8000';
@@ -18,8 +19,15 @@ const CARRERAS_MOCK_FALLBACK = [
 ];
 
 function App() {
-  const [resetKey, setResetKey]                       = useState(0);
-  const [theme, setTheme]                             = useState(() => localStorage.getItem('theme') || 'light');
+  const [resetKey, setResetKey] = useState(0);
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+  const [usuario, setUsuario] = useState(() => {
+    const saved = localStorage.getItem('hurdata_usuario');
+    if (!saved) return null;
+    const parsed = JSON.parse(saved);
+    // Solo restaurar si es personal autorizado; si entra como invitado, al refrescar vuelve al Login
+    return parsed?.role === 'autorizado' ? parsed : null;
+  });
   const [listaPeriodos, setListaPeriodos]             = useState([]);
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState('');
   const [listaCarreras, setListaCarreras]             = useState([]);
@@ -33,6 +41,21 @@ function App() {
     return saved ? JSON.parse(saved) : [];
   });
   const [materiaSeleccionada, setMateriaSeleccionada] = useState('ingles');
+
+  // ── Sesión de Usuario ─────────────────────────────────────────────────────
+  const handleLoginSuccess = (datosUsuario) => {
+    setUsuario(datosUsuario);
+    if (datosUsuario.role === 'autorizado') {
+      localStorage.setItem('hurdata_usuario', JSON.stringify(datosUsuario));
+    } else {
+      localStorage.removeItem('hurdata_usuario');
+    }
+  };
+
+  const handleLogout = () => {
+    setUsuario(null);
+    localStorage.removeItem('hurdata_usuario');
+  };
 
   // ── Helpers de datos (Declarados arriba para evitar errores de TDZ / hoisting) ──
   const limpiarDatosLocales = () => {
@@ -199,6 +222,9 @@ function App() {
     // 1. Limpiar estado local y localStorage de inmediato
     localStorage.clear();
     localStorage.setItem('theme', theme); // preservar el tema
+    if (usuario?.role === 'autorizado') {
+      localStorage.setItem('hurdata_usuario', JSON.stringify(usuario)); // preservar la sesión activa solo si es autorizado
+    }
     limpiarDatosLocales();
 
     // 2. Consultar el backend para obtener el estado post-reset
@@ -244,6 +270,17 @@ function App() {
     }, 10);
   };
 
+  // ── Render condicional: Si no hay usuario logueado, mostrar Login ─────────
+  if (!usuario) {
+    return (
+      <Login
+        theme={theme}
+        toggleTheme={toggleTheme}
+        onLoginSuccess={handleLoginSuccess}
+      />
+    );
+  }
+
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <BrowserRouter key={resetKey}>
@@ -252,6 +289,8 @@ function App() {
         toggleTheme={toggleTheme}
         onUploadSuccess={handleUploadSuccess}
         onResetSuccess={handleResetSuccess}
+        usuario={usuario}
+        onLogout={handleLogout}
       />
 
       <main style={{ padding: 'clamp(12px, 3vw, 24px)' }}>

@@ -1,12 +1,13 @@
-
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import styles from './Navbar.module.css';
 import logoUnahur from '../assets/unahur.jpeg';
 import UploadModal from './UploadModal';
 
-function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess }) {
+function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess, usuario, onLogout }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const esAutorizado = usuario?.role === 'autorizado';
 
   const handleUploadSuccess = (dataBackend) => {
     // 1. Pasa los datos recibidos del backend al manejador global en App.jsx
@@ -20,6 +21,9 @@ function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess }) {
   return (
     <>
       <nav className={styles.navbar}>
+        {/* Espaciador izquierdo para mantener los enlaces centrados en escritorio */}
+        <div className={styles.leftSpacer} />
+
         <div className={styles.navContainer}>
           <NavLink
             to="/"
@@ -47,15 +51,24 @@ function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess }) {
           </NavLink>
         </div>
 
-        {/* Acciones a la derecha: Carga de SIU + Toggle de Tema + Logo */}
+        {/* Acciones a la derecha: Usuario + Carga de SIU (solo autorizados) + Toggle de Tema + Salir + Logo */}
         <div className={styles.rightActions}>
-          <button 
-            className={styles.themeToggleBtn} 
-            onClick={() => setIsModalOpen(true)} 
-            title="Cargar archivo SIU (.xlsx)"
-          >
-            📁 
-          </button>
+          {usuario && (
+            <span className={styles.userBadge} title={usuario.cargo}>
+              {esAutorizado ? '🎓' : '👤'} {usuario.nombre}
+            </span>
+          )}
+
+          {esAutorizado && (
+            <button 
+              className={styles.themeToggleBtn} 
+              onClick={() => setIsModalOpen(true)} 
+              title="Cargar o gestionar archivos SIU (.xlsx)"
+            >
+              📁 
+            </button>
+          )}
+
           <button 
             className={styles.themeToggleBtn} 
             onClick={toggleTheme} 
@@ -63,19 +76,32 @@ function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess }) {
           >
             {theme === 'light' ? '🌙' : '☀️'}
           </button>
+
+          {onLogout && (
+            <button
+              className={styles.logoutBtn}
+              onClick={onLogout}
+              title="Cerrar Sesión"
+            >
+              Salir
+            </button>
+          )}
+
           <div className={styles.logoContainer}>
             <img src={logoUnahur} alt="UNaHur" className={styles.logo} />
           </div>
         </div>
       </nav>
 
-      {/* Modal de carga montado de forma independiente */}
-      <UploadModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onSuccess={handleUploadSuccess}
-        onResetSuccess={onResetSuccess}
-      />
+      {/* Modal de carga montado solo para personal autorizado */}
+      {esAutorizado && (
+        <UploadModal 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+          onSuccess={handleUploadSuccess}
+          onResetSuccess={onResetSuccess}
+        />
+      )}
     </>
   );
 }

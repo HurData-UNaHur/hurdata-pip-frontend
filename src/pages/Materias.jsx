@@ -8,7 +8,7 @@ const MATERIAS_MOCK_FALLBACK = [
   { id: 'ingles', nombre: 'Ingles I', inscriptos: 218, promo: 95, reg: 28, libre: 89, comisiones: 4 },
   { id: 'objetos2', nombre: 'Programación de Objetos II', inscriptos: 60, promo: 30, reg: 17, libre: 9, comisiones: 2 },
   { id: 'entornos', nombre: 'Nuevos Entornos y Lenguajes', inscriptos: 55, promo: 12, reg: 15, libre: 20, comisiones: 1 },
-  { id: 'base_datos', nombre: 'Bases de Datos I', inscriptos: 140, promo: 40, reg: 30, libre: 70, comisiones: 3 },
+  { id: 'base_datos', nombre: 'Bases de Datos ', inscriptos: 140, promo: 40, reg: 30, libre: 70, comisiones: 3 },
 ];
 
 function Materias({ 
