@@ -1,0 +1,356 @@
+.pageWrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: #f1f5f9;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+.themeBtn {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.themeBtn:hover {
+  transform: scale(1.08);
+}
+
+.card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.logoWrapper {
+  display: inline-flex;
+  padding: 6px;
+  background-color: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.title {
+  margin: 0 0 6px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* ── Formulario ───────────────────────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.twoCols {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldGroup label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.fieldGroup input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+  background-color: #ffffff;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.fieldGroup input:focus {
+  border-color: #007A33;
+}
+
+/* ── Selector de 3 roles (Directivo / Docente / Nodocente) ────────────── */
+.roleSelector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.roleOption {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 6px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: #f8fafc;
+  color: #334155;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.roleOption:hover {
+  border-color: #007A33;
+}
+
+.roleOptionActive {
+  background-color: #007A33;
+  border-color: #007A33;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* ── Bloque de selección de Directivo ─────────────────────────────────── */
+.directorBox {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.directorBox label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #166534;
+}
+
+.directorBox select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #86efac;
+  background-color: #ffffff;
+  color: #0f172a;
+  font-size: 0.9rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+.directorBox select:focus {
+  border-color: #007A33;
+}
+
+.directorBox small {
+  font-size: 0.78rem;
+  color: #15803d;
+  line-height: 1.4;
+}
+
+.errorMsg {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #dc2626;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 8px 10px;
+  border-radius: 6px;
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.btnVolver {
+  background-color: #e2e8f0;
+  color: #334155;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btnVolver:hover {
+  background-color: #cbd5e1;
+}
+
+.btnSubmit {
+  flex: 1;
+  background-color: #007A33;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btnSubmit:hover {
+  background-color: #005e27;
+}
+
+.btnSubmit:disabled,
+.btnVolver:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Confirmación ─────────────────────────────────────────────────────── */
+.successContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.successBanner {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+/* ── MODO OSCURO ([data-theme='dark']) ─────────────────────────────────── */
+:global([data-theme='dark']) .pageWrapper {
+  background-color: #0f172a;
+}
+
+:global([data-theme='dark']) .themeBtn {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+:global([data-theme='dark']) .card {
+  background-color: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+:global([data-theme='dark']) .title {
+  color: #f8fafc;
+}
+
+:global([data-theme='dark']) .subtitle {
+  color: #94a3b8;
+}
+
+:global([data-theme='dark']) .fieldGroup label {
+  color: #e2e8f0;
+}
+
+:global([data-theme='dark']) .fieldGroup input {
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+:global([data-theme='dark']) .fieldGroup input:focus {
+  border-color: #22c55e;
+}
+
+:global([data-theme='dark']) .roleOption {
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+:global([data-theme='dark']) .roleOption:hover {
+  border-color: #22c55e;
+}
+
+:global([data-theme='dark']) .roleOptionActive {
+  background-color: #007A33;
+  border-color: #22c55e;
+  color: #ffffff;
+}
+
+:global([data-theme='dark']) .directorBox {
+  background-color: rgba(22, 101, 52, 0.25);
+  border-color: #166534;
+}
+
+:global([data-theme='dark']) .directorBox label {
+  color: #bbf7d0;
+}
+
+:global([data-theme='dark']) .directorBox select {
+  background-color: #0f172a;
+  border-color: #166534;
+  color: #f8fafc;
+}
+
+:global([data-theme='dark']) .directorBox select:focus {
+  border-color: #22c55e;
+}
+
+:global([data-theme='dark']) .directorBox small {
+  color: #86efac;
+}
+
+:global([data-theme='dark']) .successBanner {
+  background-color: rgba(22, 101, 52, 0.25);
+  border-color: #166534;
+  color: #bbf7d0;
+}
+
+:global([data-theme='dark']) .errorMsg {
+  background-color: rgba(127, 29, 29, 0.3);
+  border-color: #991b1b;
+  color: #fca5a5;
+}

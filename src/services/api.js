@@ -279,7 +279,78 @@ export const confirmarNuevaPassword = async (usuario, codigo, nuevaPassword) => 
   }
 
   return { ok: true };
+
+  
 };
 
+/*
+ * ============================================================================
+ * REGISTRO CON APROBACIÓN DE DIRECTIVO (CON FALLBACK MOCK TEMPORAL)
+ * ============================================================================
+ */
+export const DIRECTIVOS_APROBADORES_MOCK = [
+  {
+    id: 'dir-1',
+    nombre: 'Directivo de Tecnología e Ingeniería',
+    email: 'ingenieria@unahur.edu.ar',
+  },
+  {
+    id: 'dir-2',
+    nombre: 'Directivo de Salud Comunitaria',
+    email: 'saludcomunitaria@unahur.edu.ar',
+  },
+  {
+    id: 'dir-3',
+    nombre: 'Directivo de Educación',
+    email: 'educacion@unahur.edu.ar',
+  },
+   {
+    id: 'dir-4',
+    nombre: 'Directivo de Biotecnología',
+    email: 'biotecnologia@unahur.edu.ar',
+  },
+];
+
+export const solicitarRegistroUsuario = async ({
+  email,
+  nombre,
+  password,
+  directivoEmail,
+}) => {
+  const payload = {
+    email: email.trim().toLowerCase(),
+    nombre: nombre.trim(),
+    password,
+    directivo_email: directivoEmail,
+  };
+
+  try {
+    const response = await fetch(`${API_URL}/api/registro/solicitar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    if (response.status === 400 || response.status === 409) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(
+        errData.detail || 'Ese correo ya se encuentra registrado o tiene una solicitud pendiente.'
+      );
+    }
+  } catch (error) {
+    if (error.message.includes('registrado')) throw error;
+    // Si aún no está levantado el endpoint en el backend, seguimos al Mock
+  }
+
+  return {
+    ok: true,
+    mock: true,
+    solicitud: payload,
+  };
+};
 
 

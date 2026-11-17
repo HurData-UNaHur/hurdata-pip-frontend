@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { loginUnahur } from '../services/api';
 import RecuperarPassword from './RecuperarPassword';
+import Registro from './Registro';
 import logoUnahur from '../assets/unahur.jpeg';
 import styles from './Login.module.css';
 
 export default function Login({ theme, toggleTheme, onLoginSuccess }) {
-  const [modoAutorizado, setModoAutorizado]       = useState(false);
-  const [mostrarRecuperar, setMostrarRecuperar]   = useState(false);
-  const [showRegistroAviso, setShowRegistroAviso] = useState(false);
-  const [usuario, setUsuario]                     = useState('');
-  const [password, setPassword]                   = useState('');
-  const [loading, setLoading]                     = useState(false);
-  const [error, setError]                         = useState(null);
+  const [modoAutorizado, setModoAutorizado] = useState(false);
+  const [mostrarRecuperar, setMostrarRecuperar] = useState(false);
+  const [mostrarRegistro, setMostrarRegistro] = useState(false);
+  const [usuario, setUsuario] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   if (mostrarRecuperar) {
     return (
@@ -20,6 +21,20 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
         toggleTheme={toggleTheme}
         onVolverLogin={() => {
           setMostrarRecuperar(false);
+          setModoAutorizado(true);
+          setError(null);
+        }}
+      />
+    );
+  }
+
+  if (mostrarRegistro) {
+    return (
+      <Registro
+        theme={theme}
+        toggleTheme={toggleTheme}
+        onVolverLogin={() => {
+          setMostrarRegistro(false);
           setModoAutorizado(true);
           setError(null);
         }}
@@ -93,7 +108,6 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
               className={styles.btnAutorizado}
               onClick={() => {
                 setModoAutorizado(true);
-                setShowRegistroAviso(false);
                 setError(null);
               }}
             >
@@ -130,7 +144,7 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
               <input
                 id="usuario"
                 type="text"
-                placeholder="ejemplo@correoUniversitario"
+                placeholder="ejemplo@unahur.edu.ar"
                 value={usuario}
                 onChange={(e) => setUsuario(e.target.value)}
                 disabled={loading}
@@ -168,7 +182,6 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
                 className={styles.btnVolver}
                 onClick={() => {
                   setModoAutorizado(false);
-                  setShowRegistroAviso(false);
                   setError(null);
                 }}
                 disabled={loading}
@@ -184,24 +197,18 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
               </button>
             </div>
 
-            {/* ── Botón visual de Registro (a conectar con DB a futuro) ── */}
+            {/* ── Botón de Registro ── */}
             <div className={styles.registerPrompt}>
               <span>¿No tenés usuario autorizado?</span>
               <button
                 type="button"
                 className={styles.btnRegisterLink}
-                onClick={() => setShowRegistroAviso((prev) => !prev)}
+                onClick={() => setMostrarRegistro(true)}
                 disabled={loading}
               >
                 Registrarse
               </button>
             </div>
-
-            {showRegistroAviso && (
-              <div className={styles.registerNotice}>
-                📝 El registro de nuevos usuarios (<strong>Docentes, Nodocentes y Directivos</strong>) estará disponible próximamente al vincular la base de datos institucional.
-              </div>
-            )}
 
             {/* ── BLOQUE MOCK DE PRUEBA (Borrar cuando se dé el alta real) ── */}
             <div className={styles.mockBox}>
