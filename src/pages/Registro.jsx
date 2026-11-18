@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import {DIRECTIVOS_APROBADORES_MOCK, solicitarRegistroUsuario} from '../services/api';
+import { useState, useEffect } from 'react';
+import { obtenerDirectivos, solicitarRegistroUsuario } from '../services/api';
 import logoUnahur from '../assets/unahur.jpeg';
 import styles from './Registro.module.css';
 
@@ -15,13 +15,26 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [rol, setRol] = useState('Docente');
-  const [directivoEmail, setDirectivoEmail]= useState(DIRECTIVOS_APROBADORES_MOCK[0].email);
+  const [listaDirectivos, setListaDirectivos] = useState([]);
+  const [directivoEmail, setDirectivoEmail]   = useState('');
 
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
   const [enviado, setEnviado] = useState(false);
 
-  const directivoSeleccionado = DIRECTIVOS_APROBADORES_MOCK.find(
+  useEffect(() => {
+    obtenerDirectivos()
+      .then((dirs) => {
+        setListaDirectivos(dirs);
+        if (dirs.length > 0) setDirectivoEmail((prev) => prev || dirs[0].email);
+      })
+      .catch(() => {
+        setListaDirectivos([]);
+        setError('No se pudieron cargar los directivos.');
+      });
+  }, []);
+
+  const directivoSeleccionado = listaDirectivos.find(
     (d) => d.email === directivoEmail
   );
 
@@ -175,7 +188,7 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
                 onChange={(e) => setDirectivoEmail(e.target.value)}
                 disabled={loading}
               >
-                {DIRECTIVOS_APROBADORES_MOCK.map((dir) => (
+                {listaDirectivos.map((dir) => (
                   <option key={dir.id} value={dir.email}>
                     {dir.nombre} — {dir.email}
                   </option>

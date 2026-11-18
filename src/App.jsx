@@ -7,7 +7,7 @@ import Predicciones from './pages/Predicciones';
 import Login from './pages/Login';
 import { transformarDatosBackend } from './utils/transformData';
 
-const API_URL = 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const PERIODOS_MOCK_FALLBACK = [
   { id_periodo: 'mock1', label: '2022 - PRIMER CUATRIMESTRE' },
@@ -55,6 +55,7 @@ function App() {
   const handleLogout = () => {
     setUsuario(null);
     localStorage.removeItem('hurdata_usuario');
+    localStorage.removeItem('hurdata_token');
   };
 
   // ── Helpers de datos (Declarados arriba para evitar errores de TDZ / hoisting) ──
@@ -220,9 +221,11 @@ function App() {
   // ── Reset DB ──────────────────────────────────────────────────────────────
   const handleResetSuccess = async () => {
     // 1. Limpiar estado local y localStorage de inmediato
+    const tokenActual = localStorage.getItem('hurdata_token');
     localStorage.clear();
     localStorage.setItem('theme', theme); // preservar el tema
     if (usuario?.role === 'autorizado') {
+      if (tokenActual) localStorage.setItem('hurdata_token', tokenActual); // preservar el JWT
       localStorage.setItem('hurdata_usuario', JSON.stringify(usuario)); // preservar la sesión activa solo si es autorizado
     }
     limpiarDatosLocales();

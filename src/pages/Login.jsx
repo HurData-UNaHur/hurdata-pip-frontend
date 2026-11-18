@@ -70,13 +70,6 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
     }
   };
 
-  // Helper rápido para autocompletar en modo prueba (eliminar junto con el Mock)
-  const rellenarDemo = (correo) => {
-    setUsuario(correo);
-    setPassword('123');
-    setError(null);
-  };
-
   return (
     <div className={styles.pageWrapper}>
       {/* Botón flotante para cambiar Modo Día / Modo Oscuro en el Login */}
@@ -210,22 +203,6 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
               </button>
             </div>
 
-            {/* ── BLOQUE MOCK DE PRUEBA (Borrar cuando se dé el alta real) ── */}
-            <div className={styles.mockBox}>
-              <p className={styles.mockTitle}>🧪 Accesos de prueba (Mock temporal):</p>
-              <div className={styles.mockChips}>
-                <button type="button" onClick={() => rellenarDemo('docente@unahur.edu.ar')}>
-                  Docente
-                </button>
-                <button type="button" onClick={() => rellenarDemo('nodocente@unahur.edu.ar')}>
-                  Nodocente
-                </button>
-                <button type="button" onClick={() => rellenarDemo('directivo@unahur.edu.ar')}>
-                  Directivo
-                </button>
-              </div>
-              <small>Clave de prueba para cualquiera: <code>123</code></small>
-            </div>
           </form>
         )}
       </div>
