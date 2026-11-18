@@ -120,7 +120,7 @@
   border-color: #007A33;
 }
 
-/* ── Selector de 3 roles (Directivo / Docente / Nodocente) ────────────── */
+/* ── Selector de 3 roles (Directivo / Docente / No Docente) ────────────── */
 .roleSelector {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

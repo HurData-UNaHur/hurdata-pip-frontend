@@ -6,7 +6,7 @@ import styles from './Registro.module.css';
 const ROLES_OPCIONES = [
   { id: 'Directivo', label: '🏛️ Directivo' },
   { id: 'Docente', label: '🎓 Docente' },
-  { id: 'Nodocente', label: '📋 Nodocente' },
+  { id: 'Nodocente', label: '📋 No Docente' },
 ];
 
 export default function Registro({ theme, toggleTheme, onVolverLogin }) {

@@ -106,7 +106,7 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
             >
               🔐 Personal Autorizado UNAHUR
               <span className={styles.btnSubtext}>
-                Docentes, Nodocentes y Directivos (Sesión persistente)
+                Docentes, No Docentes y Directivos (Sesión persistente)
               </span>
             </button>
 
@@ -129,7 +129,7 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
           /* ── Formulario para Personal Autorizado UNAHUR ── */
           <form onSubmit={handleSubmitAutorizado} className={styles.form}>
             <div className={styles.infoBanner}>
-              Acceso exclusivo para <strong>Docentes, Nodocentes y Directivos</strong> autorizados por la Universidad Nacional de Hurlingham.
+              Acceso exclusivo para <strong>Docentes, No Docentes y Directivos</strong> autorizados por la Universidad Nacional de Hurlingham.
             </div>
 
             <div className={styles.fieldGroup}>
