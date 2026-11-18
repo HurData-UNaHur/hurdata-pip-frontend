@@ -28,6 +28,22 @@ export const esTokenVigente = (token) => {
 };
 
 /*
+ * Permisos que vienen en el JWT (ver backend app/api/permisos.py).
+ * Solo sirven para mostrar u ocultar botones: el backend valida cada acción.
+ */
+export const PERMISOS = {
+  CARGAR: 'datos:cargar',
+  BORRAR: 'datos:borrar',
+  BORRAR_CUALQUIERA: 'datos:borrar_cualquiera',
+  RESETEAR_DB: 'db:resetear',
+  VER_CARGAS: 'cargas:ver',
+  VER_TODAS_LAS_CARGAS: 'cargas:ver_todas',
+};
+
+export const tienePermiso = (usuario, permiso) =>
+  Array.isArray(usuario?.permisos) && usuario.permisos.includes(permiso);
+
+/*
  * Borra la sesión guardada y vuelve al login.
  * Devuelve una promesa que nunca se resuelve para que el código que llamó no siga.
  */
@@ -199,10 +215,11 @@ export const loginUnahur = async (usuario, password) => {
 
   const payload = decodeJwtPayload(access_token);
   const datosUsuario = {
-    nombre:  payload.nombre,
-    cargo:   payload.cargo,
-    role:    payload.role,
-    usuario: payload.sub,
+    nombre:   payload.nombre,
+    cargo:    payload.cargo,
+    role:     payload.role,
+    usuario:  payload.sub,
+    permisos: payload.permisos || [],
   };
   localStorage.setItem('hurdata_token', access_token);
   localStorage.setItem('hurdata_usuario', JSON.stringify(datosUsuario));

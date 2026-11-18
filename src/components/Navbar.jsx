@@ -3,14 +3,15 @@ import { NavLink } from 'react-router-dom';
 import styles from './Navbar.module.css';
 import logoUnahur from '../assets/unahur.jpeg';
 import UploadModal from './UploadModal';
+import { PERMISOS, tienePermiso } from '../services/api';
 
 function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess, usuario, onLogout }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Usuario con login real (no invitado)
-  const esAutorizado = usuario?.role === 'autorizado' || usuario?.role === 'admin';
-  // Solo el admin puede subir y borrar datos (el backend lo exige en /upload y los DELETE)
-  const esAdmin = usuario?.role === 'admin';
+  const esAutorizado = Boolean(usuario) && usuario.role !== 'invitado';
+  // Subir Excel requiere el permiso datos:cargar (el backend lo valida en /upload)
+  const puedeCargar = tienePermiso(usuario, PERMISOS.CARGAR);
 
   const handleUploadSuccess = (dataBackend) => {
     // 1. Pasa los datos recibidos del backend al manejador global en App.jsx
@@ -62,7 +63,7 @@ function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess, usuario, 
             </span>
           )}
 
-          {esAdmin && (
+          {puedeCargar && (
             <button 
               className={styles.themeToggleBtn} 
               onClick={() => setIsModalOpen(true)} 
@@ -96,9 +97,10 @@ function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess, usuario, 
         </div>
       </nav>
 
-      {/* Modal de carga montado solo para el admin */}
-      {esAdmin && (
+      {/* Modal de carga montado solo para usuarios que pueden cargar */}
+      {puedeCargar && (
         <UploadModal 
+          usuario={usuario}
           isOpen={isModalOpen} 
           onClose={() => setIsModalOpen(false)} 
           onSuccess={handleUploadSuccess}

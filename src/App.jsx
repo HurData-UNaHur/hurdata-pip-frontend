@@ -11,7 +11,8 @@ import { esTokenVigente } from './services/api';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 // Roles con sesión real (login contra el backend). El invitado no se persiste.
-const ROLES_CON_SESION = ['autorizado', 'admin'];
+// Una sesión vieja con role 'autorizado' no se restaura: hay que volver a loguearse.
+const ROLES_CON_SESION = ['admin', 'directivo', 'docente', 'no_docente'];
 const tieneSesionPersistente = (u) => ROLES_CON_SESION.includes(u?.role);
 
 function App() {

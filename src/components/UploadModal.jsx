@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react';
-import { uploadSiuExcel, resetDatabase, getPeriodosConCarreras, deletePeriodo } from '../services/api';
+import {
+  uploadSiuExcel, resetDatabase, getPeriodosConCarreras, deletePeriodo, PERMISOS, tienePermiso,
+} from '../services/api';
 import styles from './UploadModal.module.css';
 
-export default function UploadModal({ isOpen, onClose, onSuccess, onResetSuccess }) {
+export default function UploadModal({ usuario, isOpen, onClose, onSuccess, onResetSuccess }) {
+  // Botones según permisos del JWT (el backend vuelve a validar cada acción)
+  const puedeResetear = tienePermiso(usuario, PERMISOS.RESETEAR_DB);
+  const puedeBorrar = tienePermiso(usuario, PERMISOS.BORRAR);
+
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -209,22 +215,26 @@ export default function UploadModal({ isOpen, onClose, onSuccess, onResetSuccess
             disabled={loading}
           />
           <div className={styles.actions}>
-            <button
-              type="button"
-              onClick={handleResetDB}
-              disabled={loading}
-              className={styles.btnReset}
-            >
-              🗑️ Resetear DB
-            </button>
-            <button
-              type="button"
-              onClick={handleToggleGestion}
-              disabled={loading}
-              className={styles.btnGestion}
-            >
-              📋 {showGestion ? 'Ocultar períodos' : 'Gestionar períodos'}
-            </button>
+            {puedeResetear && (
+              <button
+                type="button"
+                onClick={handleResetDB}
+                disabled={loading}
+                className={styles.btnReset}
+              >
+                🗑️ Resetear DB
+              </button>
+            )}
+            {puedeBorrar && (
+              <button
+                type="button"
+                onClick={handleToggleGestion}
+                disabled={loading}
+                className={styles.btnGestion}
+              >
+                📋 {showGestion ? 'Ocultar períodos' : 'Gestionar períodos'}
+              </button>
+            )}
             <button type="button" onClick={handleClose} disabled={loading} className={styles.btnCancelar}>
               Cancelar
             </button>
@@ -235,7 +245,7 @@ export default function UploadModal({ isOpen, onClose, onSuccess, onResetSuccess
         </form>
 
         {/* ── Sección de gestión de períodos ── */}
-        {showGestion && (
+        {puedeBorrar && showGestion && (
           <div className={styles.gestionPeriodos}>
             <div className={styles.gestionHeader}>
               <h4 className={styles.gestionTitle}>Períodos cargados</h4>
