@@ -3,14 +3,6 @@ import styles from './Materias.module.css';
 import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
 
-// Mock estático con resumen por materia (utilizado como fallback)
-const MATERIAS_MOCK_FALLBACK = [
-  { id: 'ingles', nombre: 'Ingles I', inscriptos: 218, promo: 95, reg: 28, libre: 89, comisiones: 4 },
-  { id: 'objetos2', nombre: 'Programación de Objetos II', inscriptos: 60, promo: 30, reg: 17, libre: 9, comisiones: 2 },
-  { id: 'entornos', nombre: 'Nuevos Entornos y Lenguajes', inscriptos: 55, promo: 12, reg: 15, libre: 20, comisiones: 1 },
-  { id: 'base_datos', nombre: 'Bases de Datos ', inscriptos: 140, promo: 40, reg: 30, libre: 70, comisiones: 3 },
-];
-
 function Materias({ 
   listaMateriasExcel, 
   periodo, 
@@ -23,13 +15,11 @@ function Materias({
   const [materia, setMateria] = useState('');
   const [modalidad, setModalidad] = useState('todas');
 
-  // Determina la fuente de datos: el Excel parseado o el Mock estático
-  const materiasFuente = (listaMateriasExcel && listaMateriasExcel.length > 0) 
-    ? listaMateriasExcel 
-    : MATERIAS_MOCK_FALLBACK;
+  // Fuente de datos: lo cargado desde la DB (vacío si no hay datos)
+  const materiasFuente = listaMateriasExcel || [];
 
-  // Detección idéntica a Dashboard: prioriza la prop carrera, luego listaCarreras, luego fallback
-  const carreraActiva = carrera || (listaCarreras && listaCarreras.length > 0 ? listaCarreras[0].nombre : "Licenciatura en Informática");
+  // Prioriza la prop carrera, luego la primera de listaCarreras
+  const carreraActiva = carrera || (listaCarreras?.length > 0 ? listaCarreras[0].nombre : '');
 
   // Calculamos la materia con mayor porcentaje de deserción (materia filtro)
   const materiasProcesadas = materiasFuente.map((m) => {
@@ -116,6 +106,13 @@ function Materias({
             </tr>
           </thead>
           <tbody>
+            {rankingCritico.length === 0 && (
+              <tr>
+                <td colSpan={6} style={{ textAlign: 'center', opacity: 0.7 }}>
+                  No hay datos cargados para el período y la carrera seleccionados.
+                </td>
+              </tr>
+            )}
             {rankingCritico.map((m) => (
               <tr key={m.id}>
                 <td><strong>{m.nombre}</strong></td>

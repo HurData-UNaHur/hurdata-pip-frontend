@@ -15,15 +15,11 @@ function Filters({
     showMateria = true,
     showModalidad = true
 }) {
-    // Si hay lista de carreras la usamos; si no, aseguramos el fallback a la prop activa o Licenciatura en Informática
-    const carrerasAMostrar = (listaCarreras && listaCarreras.length > 0)
-        ? listaCarreras 
-        : [{ id: 'fallback', nombre: 'Licenciatura en Informática' }];
+    // Solo las carreras cargadas en la DB (sin valores por defecto inventados)
+    const carrerasAMostrar = listaCarreras || [];
 
-    // Valor seleccionado garantizado: prioriza la prop directa 'carrera' sobre el primer item del arreglo
-    const valorCarreraSeleccionada = carrera 
-        ? carrera 
-        : (carrerasAMostrar[0] ? carrerasAMostrar[0].nombre : 'Licenciatura en Informática');
+    // Prioriza la prop 'carrera'; si no, la primera de la lista
+    const valorCarreraSeleccionada = carrera || (carrerasAMostrar[0]?.nombre ?? '');
 
     return (
         <section className={styles.filtersContainer}>
@@ -42,7 +38,7 @@ function Filters({
                             </option>
                         ))
                     ) : (
-                        <option value="">Cargando períodos...</option>
+                        <option value="">Sin períodos cargados</option>
                     )}
                 </select>
             </div>
@@ -55,6 +51,7 @@ function Filters({
                     value={valorCarreraSeleccionada} 
                     onChange={(e) => setCarrera && setCarrera(e.target.value)}
                 >
+                    {carrerasAMostrar.length === 0 && <option value="">Sin carreras cargadas</option>}
                     {carrerasAMostrar.map((c) => (
                         <option key={c.id || c.nombre} value={c.nombre}>
                             {c.nombre}
@@ -72,6 +69,7 @@ function Filters({
                     value={materia} 
                     onChange={(m) => setMateria(m.target.value)}
                 >
+                    {listaMaterias.length === 0 && <option value="">Sin materias cargadas</option>}
                     {listaMaterias.map((m) => (
                         <option key={m.id} value={m.id}>
                             {m.nombre}

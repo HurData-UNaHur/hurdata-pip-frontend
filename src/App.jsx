@@ -6,17 +6,13 @@ import Materias from './pages/Materias';
 import Predicciones from './pages/Predicciones';
 import Login from './pages/Login';
 import { transformarDatosBackend } from './utils/transformData';
+import { esTokenVigente } from './services/api';
 
-const API_URL = 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-const PERIODOS_MOCK_FALLBACK = [
-  { id_periodo: 'mock1', label: '2022 - PRIMER CUATRIMESTRE' },
-  { id_periodo: 'mock2', label: '2022 - SEGUNDO CUATRIMESTRE' },
-];
-
-const CARRERAS_MOCK_FALLBACK = [
-  { id: '1', nombre: 'Licenciatura en Informática' },
-];
+// Roles con sesión real (login contra el backend). El invitado no se persiste.
+const ROLES_CON_SESION = ['autorizado', 'admin'];
+const tieneSesionPersistente = (u) => ROLES_CON_SESION.includes(u?.role);
 
 function App() {
   const [resetKey, setResetKey] = useState(0);
@@ -24,9 +20,16 @@ function App() {
   const [usuario, setUsuario] = useState(() => {
     const saved = localStorage.getItem('hurdata_usuario');
     if (!saved) return null;
-    const parsed = JSON.parse(saved);
-    // Solo restaurar si es personal autorizado; si entra como invitado, al refrescar vuelve al Login
-    return parsed?.role === 'autorizado' ? parsed : null;
+    let parsed = null;
+    try { parsed = JSON.parse(saved); } catch { /* dato corrupto */ }
+    // Solo restaurar usuarios con login real y con el JWT todavía vigente.
+    // Si el token expiró (8 h) o falta, se limpia la sesión y vuelve al Login.
+    if (tieneSesionPersistente(parsed) && esTokenVigente(localStorage.getItem('hurdata_token'))) {
+      return parsed;
+    }
+    localStorage.removeItem('hurdata_usuario');
+    localStorage.removeItem('hurdata_token');
+    return null;
   });
   const [listaPeriodos, setListaPeriodos]             = useState([]);
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState('');
@@ -40,12 +43,12 @@ function App() {
     const saved = localStorage.getItem('hurdata_materias');
     return saved ? JSON.parse(saved) : [];
   });
-  const [materiaSeleccionada, setMateriaSeleccionada] = useState('ingles');
+  const [materiaSeleccionada, setMateriaSeleccionada] = useState('');
 
   // ── Sesión de Usuario ─────────────────────────────────────────────────────
   const handleLoginSuccess = (datosUsuario) => {
     setUsuario(datosUsuario);
-    if (datosUsuario.role === 'autorizado') {
+    if (tieneSesionPersistente(datosUsuario)) {
       localStorage.setItem('hurdata_usuario', JSON.stringify(datosUsuario));
     } else {
       localStorage.removeItem('hurdata_usuario');
@@ -55,6 +58,7 @@ function App() {
   const handleLogout = () => {
     setUsuario(null);
     localStorage.removeItem('hurdata_usuario');
+    localStorage.removeItem('hurdata_token');
   };
 
   // ── Helpers de datos (Declarados arriba para evitar errores de TDZ / hoisting) ──
@@ -64,7 +68,16 @@ function App() {
     localStorage.removeItem('hurdata_dashboard');
     localStorage.removeItem('hurdata_materias');
     localStorage.removeItem('hurdata_carrera_activa');
-    setMateriaSeleccionada('ingles');
+    setMateriaSeleccionada('');
+  };
+
+  // Sin períodos en la DB: no hay nada que mostrar (ni datos cacheados en localStorage)
+  const quedarSinDatos = () => {
+    setListaPeriodos([]);
+    setPeriodoSeleccionado('');
+    setListaCarreras([]);
+    setCarreraSeleccionada('');
+    limpiarDatosLocales();
   };
 
   const actualizarDatosLocales = (dataBackend) => {
@@ -107,19 +120,15 @@ function App() {
           setListaPeriodos(data.periodos);
           setPeriodoSeleccionado(data.periodos[0].label);
         } else {
-          setListaPeriodos(PERIODOS_MOCK_FALLBACK);
-          setPeriodoSeleccionado(PERIODOS_MOCK_FALLBACK[0].label);
+          quedarSinDatos();
         }
       })
       .catch(() => {
-        if (!cancelado) {
-          setListaPeriodos(PERIODOS_MOCK_FALLBACK);
-          setPeriodoSeleccionado(PERIODOS_MOCK_FALLBACK[0].label);
-        }
+        if (!cancelado) quedarSinDatos();
       });
 
     return () => { cancelado = true; };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Carreras al cambiar período ───────────────────────────────────────────
   useEffect(() => {
@@ -140,13 +149,15 @@ function App() {
             localStorage.setItem('hurdata_carrera_activa', primera);
           }
         } else {
-          setListaCarreras(CARRERAS_MOCK_FALLBACK);
-          setCarreraSeleccionada(CARRERAS_MOCK_FALLBACK[0].nombre);
-          localStorage.setItem('hurdata_carrera_activa', CARRERAS_MOCK_FALLBACK[0].nombre);
+          setListaCarreras([]);
+          setCarreraSeleccionada('');
+          localStorage.removeItem('hurdata_carrera_activa');
         }
       })
       .catch(() => {
-        setListaCarreras(CARRERAS_MOCK_FALLBACK);
+        setListaCarreras([]);
+        setCarreraSeleccionada('');
+        localStorage.removeItem('hurdata_carrera_activa');
       });
   }, [periodoSeleccionado]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -220,18 +231,20 @@ function App() {
   // ── Reset DB ──────────────────────────────────────────────────────────────
   const handleResetSuccess = async () => {
     // 1. Limpiar estado local y localStorage de inmediato
+    const tokenActual = localStorage.getItem('hurdata_token');
     localStorage.clear();
     localStorage.setItem('theme', theme); // preservar el tema
-    if (usuario?.role === 'autorizado') {
+    if (tieneSesionPersistente(usuario)) {
+      if (tokenActual) localStorage.setItem('hurdata_token', tokenActual); // preservar el JWT
       localStorage.setItem('hurdata_usuario', JSON.stringify(usuario)); // preservar la sesión activa solo si es autorizado
     }
     limpiarDatosLocales();
 
     // 2. Consultar el backend para obtener el estado post-reset
-    let periodosFinal   = PERIODOS_MOCK_FALLBACK;
-    let periodoFinal    = PERIODOS_MOCK_FALLBACK[0].label;
-    let carrerasFinal   = CARRERAS_MOCK_FALLBACK;
-    let carreraFinal    = CARRERAS_MOCK_FALLBACK[0].nombre;
+    let periodosFinal   = [];
+    let periodoFinal    = '';
+    let carrerasFinal   = [];
+    let carreraFinal    = '';
 
     try {
       const res = await fetch(`${API_URL}/api/periodos`);
@@ -242,9 +255,9 @@ function App() {
           periodoFinal  = data.periodos[0].label;
         }
       }
-    } catch { /* sin conexión, usa mock */ }
+    } catch { /* sin conexión: queda vacío */ }
 
-    try {
+    if (periodoFinal) try {
       const res = await fetch(`${API_URL}/api/carreras?periodo=${encodeURIComponent(periodoFinal)}`);
       if (res.ok) {
         const data = await res.json();
@@ -253,13 +266,13 @@ function App() {
           carreraFinal  = data.carreras[0].nombre;
         }
       }
-    } catch { /* sin conexión, usa mock */ }
+    } catch { /* sin conexión: queda vacío */ }
 
     // 3. Setear el nuevo estado limpio
     setListaPeriodos(periodosFinal);
     setListaCarreras(carrerasFinal);
     setCarreraSeleccionada(carreraFinal);
-    localStorage.setItem('hurdata_carrera_activa', carreraFinal);
+    if (carreraFinal) localStorage.setItem('hurdata_carrera_activa', carreraFinal);
 
     // 4. Forzar el cambio de estado del período (vaciándolo primero para asegurar que re-dispare los useEffect de datos)
     setPeriodoSeleccionado('');

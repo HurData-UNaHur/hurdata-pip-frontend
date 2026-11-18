@@ -3,14 +3,6 @@ import styles from './Predicciones.module.css';
 import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
 
-// Fallback estático con datos base por materia
-const MATERIAS_DATOS_FALLBACK = [
-  { id: 'ingles', nombre: 'Ingles I', libresActuales: 89, comisionesActuales: 4 },
-  { id: 'objetos2', nombre: 'Programación de Objetos II', libresActuales: 9, comisionesActuales: 2 },
-  { id: 'entornos', nombre: 'Nuevos Entornos y Lenguajes', libresActuales: 20, comisionesActuales: 1 },
-  { id: 'base_datos', nombre: 'Bases de Datos', libresActuales: 70, comisionesActuales: 3 }
-];
-
 function Predicciones({ 
   listaMateriasExcel, 
   materiaSeleccionada, 
@@ -26,13 +18,11 @@ function Predicciones({
   const [tasaRecursado, setTasaRecursado] = useState(65);
   const [cupoPorAula, setCupoPorAula] = useState('35');
 
-  // Selección de origen: Excel parseado o fallback
-  const listaMaterias = (listaMateriasExcel && listaMateriasExcel.length > 0)
-    ? listaMateriasExcel
-    : MATERIAS_DATOS_FALLBACK;
+  // Fuente de datos: lo cargado desde la DB (vacío si no hay datos)
+  const listaMaterias = listaMateriasExcel || [];
 
-  // Detección idéntica a Dashboard: prioriza la prop carrera, luego listaCarreras, luego fallback
-  const carreraActiva = carrera || (listaCarreras && listaCarreras.length > 0 ? listaCarreras[0].nombre : "Licenciatura en Informática");
+  // Prioriza la prop carrera, luego la primera de listaCarreras
+  const carreraActiva = carrera || (listaCarreras?.length > 0 ? listaCarreras[0].nombre : '');
 
   // Busca los datos de la materia seleccionada
   const materiaData = listaMaterias.find((m) => m.id === materiaSeleccionada) || listaMaterias[0];
@@ -42,7 +32,7 @@ function Predicciones({
   const cupoValido = cupoNumerico > 0 ? cupoNumerico : 1;
 
   const libresActuales = materiaData?.libresActuales ?? materiaData?.libre ?? 0;
-  const comisionesActuales = materiaData?.comisionesActuales ?? materiaData?.comisiones ?? 1;
+  const comisionesActuales = materiaData?.comisionesActuales ?? materiaData?.comisiones ?? 0;
 
   // Cálculos proyectados
   const recursantesEstimados = Math.round(libresActuales * (tasaRecursado / 100));
@@ -126,6 +116,7 @@ function Predicciones({
               value={materiaData?.id || ''}
               onChange={(e) => setMateriaSeleccionada(e.target.value)}
             >
+              {listaMaterias.length === 0 && <option value="">Sin materias cargadas</option>}
               {listaMaterias.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.nombre}
@@ -164,7 +155,9 @@ function Predicciones({
 
         {/* Resumen del Estimador */}
         <div className={styles.card}>
-          <h2 className={styles.cardTitle}>Proyección para {materiaData?.nombre}</h2>
+          <h2 className={styles.cardTitle}>
+            {materiaData ? `Proyección para ${materiaData.nombre}` : 'Sin datos cargados'}
+          </h2>
 
           <div className={styles.resultsBox}>
             <div className={styles.resultItem}>
