@@ -1,4 +1,3 @@
-
 import styles from './StackedBarChart.module.css';
 
 function StackedBarChart({ comisiones }) {
@@ -8,7 +7,7 @@ function StackedBarChart({ comisiones }) {
         <span>Rendimiento por Comisión</span>
         <div className={styles.legend}>
           <span className={styles.legendItem}>
-            <i className={styles.dot} style={{ background: '#10b981' }}></i> Promocianados
+            <i className={styles.dot} style={{ background: '#10b981' }}></i> Promocionados
           </span>
           <span className={styles.legendItem}>
             <i className={styles.dot} style={{ background: '#3b82f6' }}></i> Regular
@@ -29,10 +28,16 @@ function StackedBarChart({ comisiones }) {
       )}
 
       {comisiones.map((c, index) => {
-        const pctPromo = ((c.promo / c.total) * 100).toFixed(1); // Cantidad de decimales: 1
-        const pctReg = ((c.reg / c.total) * 100).toFixed(1);
-        const pctDesap = ((c.desap / c.total) * 100).toFixed(1);
-        const pctLibre = ((c.libre / c.total) * 100).toFixed(1);
+        const total = c.total || 1; // Evitar división por cero si una comisión viene vacía
+        const numPromo = (c.promo / total) * 100;
+        const numReg = (c.reg / total) * 100;
+        const numDesap = (c.desap / total) * 100;
+        const numLibre = (c.libre / total) * 100;
+
+        const pctPromo = numPromo.toFixed(1); // Cantidad de decimales: 1
+        const pctReg = numReg.toFixed(1);
+        const pctDesap = numDesap.toFixed(1);
+        const pctLibre = numLibre.toFixed(1);
 
         return (
           <div key={index} className={styles.comisionItem}>
@@ -41,37 +46,37 @@ function StackedBarChart({ comisiones }) {
                 <strong>{c.nombre}</strong> ({c.total} alumnos)
               </span>
               <span>
-                {pctPromo}% P / {pctReg}% R / {pctLibre}% L
+                {pctPromo}% P / {pctReg}% R / {pctDesap}% D / {pctLibre}% L
               </span>
             </div>
             <div className={styles.stackedBar}>
               <div
                 className={styles.barSeg}
-                style={{ width: `${pctPromo}%`, background: '#10b981' }}
-                title={`Promo: ${c.promo}`}
+                style={{ width: `${numPromo}%`, background: '#10b981' }}
+                title={`Promo: ${c.promo} (${pctPromo}%)`}
               >
-                {pctPromo > 10 ? `${pctPromo}%` : ''}
+                {numPromo > 10 ? `${pctPromo}%` : ''}
               </div>
               <div
                 className={styles.barSeg}
-                style={{ width: `${pctReg}%`, background: '#3b82f6' }}
-                title={`Regulares: ${c.reg}`}
+                style={{ width: `${numReg}%`, background: '#3b82f6' }}
+                title={`Regulares: ${c.reg} (${pctReg}%)`}
               >
-                {pctReg > 10 ? `${pctReg}%` : ''}
+                {numReg > 10 ? `${pctReg}%` : ''}
               </div>
               <div
                 className={styles.barSeg}
-                style={{ width: `${pctDesap}%`, background: '#f59e0b' }}
-                title={`Desaprobados: ${c.desap}`}
+                style={{ width: `${numDesap}%`, background: '#f59e0b' }}
+                title={`Desaprobados / Sin Condición: ${c.desap} (${pctDesap}%)`}
               >
-                {pctDesap > 10 ? `${pctDesap}%` : ''}
+                {numDesap > 10 ? `${pctDesap}%` : ''}
               </div>
               <div
                 className={styles.barSeg}
-                style={{ width: `${pctLibre}%`, background: '#ef4444' }}
-                title={`Libres: ${c.libre}`}
+                style={{ width: `${numLibre}%`, background: '#ef4444' }}
+                title={`Libres: ${c.libre} (${pctLibre}%)`}
               >
-                {pctLibre > 10 ? `${pctLibre}%` : ''}
+                {numLibre > 10 ? `${pctLibre}%` : ''}
               </div>
             </div>
           </div>

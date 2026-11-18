@@ -31,8 +31,9 @@ export function transformarDatosBackend(resumenBackend) {
       const promo = getEstado('Promocionó') || getEstado('Promociono');
       const reg = getEstado('Regular');
       const libre = getEstado('Libre');
-      const desap = getEstado('Insuficiente');
-      const total = promo + reg + libre + desap + getEstado('Sin Condición');
+      // Agrupamos Insuficiente y Sin Condición para que la barra complete el 100%
+      const desap = getEstado('Insuficiente') + getEstado('Sin Condición');
+      const total = promo + reg + libre + desap;
 
       totalInscriptos += total;
       totalPromo += promo;
