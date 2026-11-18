@@ -149,9 +149,12 @@ export const getPeriodos = async () => {
  */
 export const getPeriodosConCarreras = async () => {
   try {
-    const response = await fetch(`${API_URL}/api/periodos-carreras`);
-    if (!response.ok) throw new Error(`Error al obtener períodos con carreras: ${response.status}`);
-    return await response.json();
+    // Requiere login: devuelve también cargado_por y puede_borrar por fila
+    return await fetchProtegido(
+      `${API_URL}/api/periodos-carreras`,
+      { method: 'GET' },
+      'Error al obtener los períodos cargados.'
+    );
   } catch (error) {
     console.error("Error en getPeriodosConCarreras:", error);
     throw error;

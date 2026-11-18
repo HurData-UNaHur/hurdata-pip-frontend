@@ -136,11 +136,15 @@ export default function UploadModal({ usuario, isOpen, onClose, onSuccess, onRes
     );
   };
 
+  // Solo se pueden seleccionar las cargas que el usuario puede borrar
+  // (propias, o cualquiera si es directivo/admin). El backend lo vuelve a validar.
+  const periodosBorrables = periodos.filter((p) => p.puede_borrar);
+
   const toggleTodos = () => {
-    if (seleccionados.length === periodos.length) {
+    if (seleccionados.length === periodosBorrables.length) {
       setSeleccionados([]);
     } else {
-      setSeleccionados(periodos.map(claveItem));
+      setSeleccionados(periodosBorrables.map(claveItem));
     }
   };
 
@@ -184,7 +188,7 @@ export default function UploadModal({ usuario, isOpen, onClose, onSuccess, onRes
     }
   };
 
-  const todosMarcados = periodos.length > 0 && seleccionados.length === periodos.length;
+  const todosMarcados = periodosBorrables.length > 0 && seleccionados.length === periodosBorrables.length;
   const algunoMarcado = seleccionados.length > 0;
 
   // Return condicional SIEMPRE al final, después de todos los hooks
@@ -274,21 +278,26 @@ export default function UploadModal({ usuario, isOpen, onClose, onSuccess, onRes
                         type="checkbox"
                         checked={todosMarcados}
                         onChange={toggleTodos}
-                        title="Seleccionar todos"
+                        disabled={periodosBorrables.length === 0}
+                        title="Seleccionar todos los que podés borrar"
                       />
                     </th>
                     <th>Período</th>
                     <th>Carrera</th>
+                    <th>Cargado por</th>
                   </tr>
                 </thead>
                 <tbody>
                   {periodos.map((p) => {
                     const clave = claveItem(p);
+                    const borrable = p.puede_borrar;
                     return (
                       <tr
                         key={clave}
                         className={seleccionados.includes(clave) ? styles.filaSeleccionada : ''}
-                        onClick={() => toggleSeleccion(clave)}
+                        onClick={() => borrable && toggleSeleccion(clave)}
+                        style={borrable ? undefined : { opacity: 0.6, cursor: 'not-allowed' }}
+                        title={borrable ? undefined : 'Solo quien lo cargó, un directivo o el admin pueden borrarlo'}
                       >
                         <td>
                           <input
@@ -296,10 +305,12 @@ export default function UploadModal({ usuario, isOpen, onClose, onSuccess, onRes
                             checked={seleccionados.includes(clave)}
                             onChange={() => toggleSeleccion(clave)}
                             onClick={(e) => e.stopPropagation()}
+                            disabled={!borrable}
                           />
                         </td>
                         <td>{p.label}</td>
                         <td>{p.nombre_carrera}</td>
+                        <td>{p.cargado_por || '—'}</td>
                       </tr>
                     );
                   })}
