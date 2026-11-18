@@ -12,6 +12,8 @@ function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess, usuario, 
   const esAutorizado = Boolean(usuario) && usuario.role !== 'invitado';
   // Subir Excel requiere el permiso datos:cargar (el backend lo valida en /upload)
   const puedeCargar = tienePermiso(usuario, PERMISOS.CARGAR);
+  // Historial de cargas: Admin y Directivo (todas), Docente (las suyas)
+  const puedeVerCargas = tienePermiso(usuario, PERMISOS.VER_CARGAS);
 
   const handleUploadSuccess = (dataBackend) => {
     // 1. Pasa los datos recibidos del backend al manejador global en App.jsx
@@ -53,6 +55,16 @@ function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess, usuario, 
           >
             Predicciones
           </NavLink>
+          {puedeVerCargas && (
+            <NavLink
+              to="/cargas"
+              className={({ isActive }) =>
+                isActive ? `${styles.link} ${styles.activeLink}` : styles.link
+              }
+            >
+              Cargas
+            </NavLink>
+          )}
         </div>
 
         {/* Acciones a la derecha: Usuario + Carga de SIU (solo autorizados) + Toggle de Tema + Salir + Logo */}

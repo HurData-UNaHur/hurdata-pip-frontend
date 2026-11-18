@@ -4,9 +4,10 @@ import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import Materias from './pages/Materias';
 import Predicciones from './pages/Predicciones';
+import Cargas from './pages/Cargas';
 import Login from './pages/Login';
 import { transformarDatosBackend } from './utils/transformData';
-import { esTokenVigente } from './services/api';
+import { esTokenVigente, PERMISOS, tienePermiso } from './services/api';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -354,6 +355,9 @@ function App() {
               />
             }
           />
+          {tienePermiso(usuario, PERMISOS.VER_CARGAS) && (
+            <Route path="/cargas" element={<Cargas />} />
+          )}
         </Routes>
       </main>
     </BrowserRouter>

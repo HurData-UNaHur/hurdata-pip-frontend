@@ -162,6 +162,18 @@ export const getPeriodosConCarreras = async () => {
 };
 
 /*
+ * Historial de Excel cargados (requiere el permiso cargas:ver).
+ * Admin y Directivo reciben todas las cargas; el Docente solo las suyas.
+ * @param {string|null} estado  'activa' | 'reemplazada' | 'borrada'; null = todas
+ */
+export const getCargas = async (estado = null) => {
+  const url = estado
+    ? `${API_URL}/api/cargas?estado=${encodeURIComponent(estado)}`
+    : `${API_URL}/api/cargas`;
+  return fetchProtegido(url, { method: 'GET' }, 'Error al obtener el historial de cargas.');
+};
+
+/*
  * Elimina un período, opcionalmente filtrado por carrera.
  * @param {number} idPeriodo  ID del período a eliminar
  * @param {number|null} idCarrera  Si se pasa, borra solo esa carrera en ese período.
