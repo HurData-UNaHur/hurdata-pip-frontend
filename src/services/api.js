@@ -2,6 +2,64 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 /*
+ * ============================================================================
+ * SESIÓN Y REQUESTS PROTEGIDOS
+ * ============================================================================
+ */
+
+function decodeJwtPayload(token) {
+  const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
+/*
+ * Devuelve true si el token existe, se puede decodificar y no expiró.
+ * El campo 'exp' del JWT está en segundos desde epoch.
+ */
+export const esTokenVigente = (token) => {
+  if (!token) return false;
+  try {
+    const { exp } = decodeJwtPayload(token);
+    return typeof exp === 'number' && exp * 1000 > Date.now();
+  } catch {
+    return false;
+  }
+};
+
+/*
+ * Borra la sesión guardada y vuelve al login.
+ * Devuelve una promesa que nunca se resuelve para que el código que llamó no siga.
+ */
+const cerrarSesionYRedirigir = () => {
+  localStorage.removeItem('hurdata_token');
+  localStorage.removeItem('hurdata_usuario');
+  window.location.href = '/';
+  return new Promise(() => {});
+};
+
+/*
+ * fetch para endpoints protegidos: agrega el Bearer token y, si el backend
+ * responde 401 (token ausente, inválido o expirado), cierra la sesión.
+ * Si el backend responde con error, lanza Error con el 'detail' o mensajeError.
+ */
+const fetchProtegido = async (url, options, mensajeError) => {
+  const token = localStorage.getItem('hurdata_token');
+  if (!esTokenVigente(token)) return cerrarSesionYRedirigir();
+
+  const response = await fetch(url, {
+    ...options,
+    headers: { ...(options.headers || {}), Authorization: `Bearer ${token}` },
+  });
+
+  if (response.status === 401) return cerrarSesionYRedirigir();
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.detail || mensajeError);
+  return data;
+};
+
+/*
  * Consulta el estado del backend y la lista de tablas en la DB SQLite.
  */
 export const checkHealth = async () => {
@@ -24,27 +82,13 @@ export const checkHealth = async () => {
 export const uploadSiuExcel = async (file) => {
   const formData = new FormData();
   formData.append('archivo', file);
-  const token = localStorage.getItem('hurdata_token');
 
   try {
-    const response = await fetch(`${API_URL}/upload`, {
-      method: 'POST',
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: formData,
-    });
-
-    if (response.status === 401) {
-      localStorage.removeItem('hurdata_token');
-      localStorage.removeItem('hurdata_usuario');
-      window.location.href = '/';
-      return new Promise(() => {}); // la página redirige al login; no continuar
-    }
-
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.detail || 'Error al procesar el archivo Excel.');
-    return data;
+    return await fetchProtegido(
+      `${API_URL}/upload`,
+      { method: 'POST', body: formData },
+      'Error al procesar el archivo Excel.'
+    );
   } catch (error) {
     console.error("Error en uploadSiuExcel:", error);
     throw error;
@@ -55,25 +99,12 @@ export const uploadSiuExcel = async (file) => {
  * Llama al endpoint DELETE de la API para ejecutar resetear_base_datos() en el servidor.
  */
 export const resetDatabase = async () => {
-  const token = localStorage.getItem('hurdata_token');
   try {
-    const response = await fetch(`${API_URL}/api/limpiar-db`, {
-      method: 'DELETE',
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-    });
-
-    if (response.status === 401) {
-      localStorage.removeItem('hurdata_token');
-      localStorage.removeItem('hurdata_usuario');
-      window.location.href = '/';
-      return new Promise(() => {}); // la página redirige al login; no continuar
-    }
-
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.detail || 'Error al reiniciar la base de datos.');
-    return data;
+    return await fetchProtegido(
+      `${API_URL}/api/limpiar-db`,
+      { method: 'DELETE' },
+      'Error al reiniciar la base de datos.'
+    );
   } catch (error) {
     console.error("Error en resetDatabase:", error);
     throw error;
@@ -118,29 +149,12 @@ export const getPeriodosConCarreras = async () => {
  *                                 Si se omite, borra el período completo.
  */
 export const deletePeriodo = async (idPeriodo, idCarrera = null) => {
-  const token = localStorage.getItem('hurdata_token');
   try {
     const url = idCarrera
       ? `${API_URL}/api/periodos/${idPeriodo}?id_carrera=${idCarrera}`
       : `${API_URL}/api/periodos/${idPeriodo}`;
 
-    const response = await fetch(url, {
-      method: 'DELETE',
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-    });
-
-    if (response.status === 401) {
-      localStorage.removeItem('hurdata_token');
-      localStorage.removeItem('hurdata_usuario');
-      window.location.href = '/';
-      return new Promise(() => {}); // la página redirige al login; no continuar
-    }
-
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.detail || 'Error al eliminar el período.');
-    return data;
+    return await fetchProtegido(url, { method: 'DELETE' }, 'Error al eliminar el período.');
   } catch (error) {
     console.error("Error en deletePeriodo:", error);
     throw error;
@@ -153,12 +167,6 @@ export const deletePeriodo = async (idPeriodo, idCarrera = null) => {
  * AUTENTICACIÓN JWT
  * ============================================================================
  */
-
-function decodeJwtPayload(token) {
-  const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-  return JSON.parse(new TextDecoder().decode(bytes));
-}
 
 /*
  * Autentica al personal autorizado de UNAHUR contra el backend real.

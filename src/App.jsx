@@ -6,8 +6,13 @@ import Materias from './pages/Materias';
 import Predicciones from './pages/Predicciones';
 import Login from './pages/Login';
 import { transformarDatosBackend } from './utils/transformData';
+import { esTokenVigente } from './services/api';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+// Roles con sesión real (login contra el backend). El invitado no se persiste.
+const ROLES_CON_SESION = ['autorizado', 'admin'];
+const tieneSesionPersistente = (u) => ROLES_CON_SESION.includes(u?.role);
 
 const PERIODOS_MOCK_FALLBACK = [
   { id_periodo: 'mock1', label: '2022 - PRIMER CUATRIMESTRE' },
@@ -24,9 +29,16 @@ function App() {
   const [usuario, setUsuario] = useState(() => {
     const saved = localStorage.getItem('hurdata_usuario');
     if (!saved) return null;
-    const parsed = JSON.parse(saved);
-    // Solo restaurar si es personal autorizado; si entra como invitado, al refrescar vuelve al Login
-    return parsed?.role === 'autorizado' ? parsed : null;
+    let parsed = null;
+    try { parsed = JSON.parse(saved); } catch { /* dato corrupto */ }
+    // Solo restaurar usuarios con login real y con el JWT todavía vigente.
+    // Si el token expiró (8 h) o falta, se limpia la sesión y vuelve al Login.
+    if (tieneSesionPersistente(parsed) && esTokenVigente(localStorage.getItem('hurdata_token'))) {
+      return parsed;
+    }
+    localStorage.removeItem('hurdata_usuario');
+    localStorage.removeItem('hurdata_token');
+    return null;
   });
   const [listaPeriodos, setListaPeriodos]             = useState([]);
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState('');
@@ -45,7 +57,7 @@ function App() {
   // ── Sesión de Usuario ─────────────────────────────────────────────────────
   const handleLoginSuccess = (datosUsuario) => {
     setUsuario(datosUsuario);
-    if (datosUsuario.role === 'autorizado') {
+    if (tieneSesionPersistente(datosUsuario)) {
       localStorage.setItem('hurdata_usuario', JSON.stringify(datosUsuario));
     } else {
       localStorage.removeItem('hurdata_usuario');
@@ -224,7 +236,7 @@ function App() {
     const tokenActual = localStorage.getItem('hurdata_token');
     localStorage.clear();
     localStorage.setItem('theme', theme); // preservar el tema
-    if (usuario?.role === 'autorizado') {
+    if (tieneSesionPersistente(usuario)) {
       if (tokenActual) localStorage.setItem('hurdata_token', tokenActual); // preservar el JWT
       localStorage.setItem('hurdata_usuario', JSON.stringify(usuario)); // preservar la sesión activa solo si es autorizado
     }

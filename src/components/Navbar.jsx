@@ -7,7 +7,10 @@ import UploadModal from './UploadModal';
 function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess, usuario, onLogout }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const esAutorizado = usuario?.role === 'autorizado';
+  // Usuario con login real (no invitado)
+  const esAutorizado = usuario?.role === 'autorizado' || usuario?.role === 'admin';
+  // Solo el admin puede subir y borrar datos (el backend lo exige en /upload y los DELETE)
+  const esAdmin = usuario?.role === 'admin';
 
   const handleUploadSuccess = (dataBackend) => {
     // 1. Pasa los datos recibidos del backend al manejador global en App.jsx
@@ -59,7 +62,7 @@ function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess, usuario, 
             </span>
           )}
 
-          {esAutorizado && (
+          {esAdmin && (
             <button 
               className={styles.themeToggleBtn} 
               onClick={() => setIsModalOpen(true)} 
@@ -93,8 +96,8 @@ function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess, usuario, 
         </div>
       </nav>
 
-      {/* Modal de carga montado solo para personal autorizado */}
-      {esAutorizado && (
+      {/* Modal de carga montado solo para el admin */}
+      {esAdmin && (
         <UploadModal 
           isOpen={isModalOpen} 
           onClose={() => setIsModalOpen(false)} 
