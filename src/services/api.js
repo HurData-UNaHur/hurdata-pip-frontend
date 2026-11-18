@@ -28,6 +28,22 @@ export const esTokenVigente = (token) => {
 };
 
 /*
+ * Permisos que vienen en el JWT (ver backend app/api/permisos.py).
+ * Solo sirven para mostrar u ocultar botones: el backend valida cada acción.
+ */
+export const PERMISOS = {
+  CARGAR: 'datos:cargar',
+  BORRAR: 'datos:borrar',
+  BORRAR_CUALQUIERA: 'datos:borrar_cualquiera',
+  RESETEAR_DB: 'db:resetear',
+  VER_CARGAS: 'cargas:ver',
+  VER_TODAS_LAS_CARGAS: 'cargas:ver_todas',
+};
+
+export const tienePermiso = (usuario, permiso) =>
+  Array.isArray(usuario?.permisos) && usuario.permisos.includes(permiso);
+
+/*
  * Borra la sesión guardada y vuelve al login.
  * Devuelve una promesa que nunca se resuelve para que el código que llamó no siga.
  */
@@ -133,13 +149,28 @@ export const getPeriodos = async () => {
  */
 export const getPeriodosConCarreras = async () => {
   try {
-    const response = await fetch(`${API_URL}/api/periodos-carreras`);
-    if (!response.ok) throw new Error(`Error al obtener períodos con carreras: ${response.status}`);
-    return await response.json();
+    // Requiere login: devuelve también cargado_por y puede_borrar por fila
+    return await fetchProtegido(
+      `${API_URL}/api/periodos-carreras`,
+      { method: 'GET' },
+      'Error al obtener los períodos cargados.'
+    );
   } catch (error) {
     console.error("Error en getPeriodosConCarreras:", error);
     throw error;
   }
+};
+
+/*
+ * Historial de Excel cargados (requiere el permiso cargas:ver).
+ * Admin y Directivo reciben todas las cargas; el Docente solo las suyas.
+ * @param {string|null} estado  'activa' | 'reemplazada' | 'borrada'; null = todas
+ */
+export const getCargas = async (estado = null) => {
+  const url = estado
+    ? `${API_URL}/api/cargas?estado=${encodeURIComponent(estado)}`
+    : `${API_URL}/api/cargas`;
+  return fetchProtegido(url, { method: 'GET' }, 'Error al obtener el historial de cargas.');
 };
 
 /*
@@ -199,10 +230,11 @@ export const loginUnahur = async (usuario, password) => {
 
   const payload = decodeJwtPayload(access_token);
   const datosUsuario = {
-    nombre:  payload.nombre,
-    cargo:   payload.cargo,
-    role:    payload.role,
-    usuario: payload.sub,
+    nombre:   payload.nombre,
+    cargo:    payload.cargo,
+    role:     payload.role,
+    usuario:  payload.sub,
+    permisos: payload.permisos || [],
   };
   localStorage.setItem('hurdata_token', access_token);
   localStorage.setItem('hurdata_usuario', JSON.stringify(datosUsuario));

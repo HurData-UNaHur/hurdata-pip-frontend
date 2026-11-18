@@ -1,0 +1,130 @@
+/* Misma base visual que Materias.module.css */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 4px;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  transition: color 0.3s ease;
+}
+
+.subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #475569);
+  transition: color 0.3s ease;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.toolbar label {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #475569);
+}
+
+.select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  background-color: var(--bg-card, #ffffff);
+  color: var(--text-primary, #0f172a);
+  font-size: 0.82rem;
+}
+
+.tableContainer {
+  background-color: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;              /* scroll horizontal en móvil */
+  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.05));
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.82rem;
+  min-width: 820px;              /* muchas columnas: scroll en pantallas chicas */
+}
+
+.table th {
+  background-color: var(--bg-subtle, #f1f5f9);
+  color: var(--text-primary, #1e293b);
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--border-color, #cbd5e1);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  color: var(--text-secondary, #334155);
+  vertical-align: top;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.vacio {
+  text-align: center;
+  opacity: 0.7;
+}
+
+.detalle {
+  display: block;
+  font-size: 0.72rem;
+  opacity: 0.75;
+}
+
+.badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid;
+}
+
+.badgeActiva {
+  composes: badge;
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.badgeReemplazada {
+  composes: badge;
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.badgeBorrada {
+  composes: badge;
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.error {
+  color: #ef4444;
+  font-size: 0.85rem;
+}

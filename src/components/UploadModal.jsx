@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react';
-import { uploadSiuExcel, resetDatabase, getPeriodosConCarreras, deletePeriodo } from '../services/api';
+import {
+  uploadSiuExcel, resetDatabase, getPeriodosConCarreras, deletePeriodo, PERMISOS, tienePermiso,
+} from '../services/api';
 import styles from './UploadModal.module.css';
 
-export default function UploadModal({ isOpen, onClose, onSuccess, onResetSuccess }) {
+export default function UploadModal({ usuario, isOpen, onClose, onSuccess, onResetSuccess }) {
+  // Botones según permisos del JWT (el backend vuelve a validar cada acción)
+  const puedeResetear = tienePermiso(usuario, PERMISOS.RESETEAR_DB);
+  const puedeBorrar = tienePermiso(usuario, PERMISOS.BORRAR);
+
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -130,11 +136,15 @@ export default function UploadModal({ isOpen, onClose, onSuccess, onResetSuccess
     );
   };
 
+  // Solo se pueden seleccionar las cargas que el usuario puede borrar
+  // (propias, o cualquiera si es directivo/admin). El backend lo vuelve a validar.
+  const periodosBorrables = periodos.filter((p) => p.puede_borrar);
+
   const toggleTodos = () => {
-    if (seleccionados.length === periodos.length) {
+    if (seleccionados.length === periodosBorrables.length) {
       setSeleccionados([]);
     } else {
-      setSeleccionados(periodos.map(claveItem));
+      setSeleccionados(periodosBorrables.map(claveItem));
     }
   };
 
@@ -178,7 +188,7 @@ export default function UploadModal({ isOpen, onClose, onSuccess, onResetSuccess
     }
   };
 
-  const todosMarcados = periodos.length > 0 && seleccionados.length === periodos.length;
+  const todosMarcados = periodosBorrables.length > 0 && seleccionados.length === periodosBorrables.length;
   const algunoMarcado = seleccionados.length > 0;
 
   // Return condicional SIEMPRE al final, después de todos los hooks
@@ -209,22 +219,26 @@ export default function UploadModal({ isOpen, onClose, onSuccess, onResetSuccess
             disabled={loading}
           />
           <div className={styles.actions}>
-            <button
-              type="button"
-              onClick={handleResetDB}
-              disabled={loading}
-              className={styles.btnReset}
-            >
-              🗑️ Resetear DB
-            </button>
-            <button
-              type="button"
-              onClick={handleToggleGestion}
-              disabled={loading}
-              className={styles.btnGestion}
-            >
-              📋 {showGestion ? 'Ocultar períodos' : 'Gestionar períodos'}
-            </button>
+            {puedeResetear && (
+              <button
+                type="button"
+                onClick={handleResetDB}
+                disabled={loading}
+                className={styles.btnReset}
+              >
+                🗑️ Resetear DB
+              </button>
+            )}
+            {puedeBorrar && (
+              <button
+                type="button"
+                onClick={handleToggleGestion}
+                disabled={loading}
+                className={styles.btnGestion}
+              >
+                📋 {showGestion ? 'Ocultar períodos' : 'Gestionar períodos'}
+              </button>
+            )}
             <button type="button" onClick={handleClose} disabled={loading} className={styles.btnCancelar}>
               Cancelar
             </button>
@@ -235,7 +249,7 @@ export default function UploadModal({ isOpen, onClose, onSuccess, onResetSuccess
         </form>
 
         {/* ── Sección de gestión de períodos ── */}
-        {showGestion && (
+        {puedeBorrar && showGestion && (
           <div className={styles.gestionPeriodos}>
             <div className={styles.gestionHeader}>
               <h4 className={styles.gestionTitle}>Períodos cargados</h4>
@@ -264,21 +278,26 @@ export default function UploadModal({ isOpen, onClose, onSuccess, onResetSuccess
                         type="checkbox"
                         checked={todosMarcados}
                         onChange={toggleTodos}
-                        title="Seleccionar todos"
+                        disabled={periodosBorrables.length === 0}
+                        title="Seleccionar todos los que podés borrar"
                       />
                     </th>
                     <th>Período</th>
                     <th>Carrera</th>
+                    <th>Cargado por</th>
                   </tr>
                 </thead>
                 <tbody>
                   {periodos.map((p) => {
                     const clave = claveItem(p);
+                    const borrable = p.puede_borrar;
                     return (
                       <tr
                         key={clave}
                         className={seleccionados.includes(clave) ? styles.filaSeleccionada : ''}
-                        onClick={() => toggleSeleccion(clave)}
+                        onClick={() => borrable && toggleSeleccion(clave)}
+                        style={borrable ? undefined : { opacity: 0.6, cursor: 'not-allowed' }}
+                        title={borrable ? undefined : 'Solo quien lo cargó, un directivo o el admin pueden borrarlo'}
                       >
                         <td>
                           <input
@@ -286,10 +305,12 @@ export default function UploadModal({ isOpen, onClose, onSuccess, onResetSuccess
                             checked={seleccionados.includes(clave)}
                             onChange={() => toggleSeleccion(clave)}
                             onClick={(e) => e.stopPropagation()}
+                            disabled={!borrable}
                           />
                         </td>
                         <td>{p.label}</td>
                         <td>{p.nombre_carrera}</td>
+                        <td>{p.cargado_por || '—'}</td>
                       </tr>
                     );
                   })}
