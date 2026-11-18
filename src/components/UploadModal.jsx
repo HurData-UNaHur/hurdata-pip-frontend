@@ -103,7 +103,7 @@ export default function UploadModal({ isOpen, onClose, onSuccess, onResetSuccess
 
   const handleResetDB = async () => {
     const confirmado = window.confirm(
-      '⚠️ ¿Estás seguro de que deseas eliminar TODOS los datos cargados? La base volverá a su estado inicial (Mock).'
+      '⚠️ ¿Estás seguro de que deseas eliminar TODOS los datos cargados? La base quedará vacía.'
     );
     if (!confirmado) return;
 

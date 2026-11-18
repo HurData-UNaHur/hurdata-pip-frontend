@@ -5,28 +5,6 @@ import Filters from '../components/Filters';
 import StackedBarChart from '../components/StackedBarChart';
 import AlertsPanel from '../components/AlertsPanel';
 
-const DATA_MOCK_FALLBACK = {
-  ingles: [
-    { nombre: "(004)-COMISIÓN 1-COMBINADA", modalidad: "COMBINADA", total: 45, promo: 26, reg: 4, desap: 0, libre: 15 },
-    { nombre: "(004)-COMISIÓN 15-VIRTUAL", modalidad: "VIRTUAL", total: 60, promo: 22, reg: 5, desap: 2, libre: 31 },
-    { nombre: "(004)-COMISIÓN 20-VIRTUAL", modalidad: "VIRTUAL", total: 73, promo: 22, reg: 11, desap: 3, libre: 37 },
-    { nombre: "(004)-COMISIÓN 7-PRESENCIAL", modalidad: "PRESENCIAL", total: 40, promo: 25, reg: 8, desap: 1, libre: 6 }
-  ],
-  objetos2: [
-    { nombre: "(001)-COMISIÓN 1-COMBINADA", modalidad: "COMBINADA", total: 32, promo: 14, reg: 10, desap: 3, libre: 5 },
-    { nombre: "(001)-COMISIÓN 2-PRESENCIAL", modalidad: "PRESENCIAL", total: 28, promo: 16, reg: 7, desap: 1, libre: 4 }
-  ],
-  entornos: [
-    { nombre: "(008)-COMISIÓN 1-VIRTUAL", modalidad: "VIRTUAL", total: 55, promo: 12, reg: 15, desap: 8, libre: 20 }
-  ]
-};
-
-const LISTA_MATERIAS_MOCK = [
-  { id: 'ingles', nombre: 'Ingles I' },
-  { id: 'objetos2', nombre: 'Programación de Objetos II' },
-  { id: 'entornos', nombre: 'Nuevos Entornos y Lenguajes' }
-];
-
 function Dashboard({ 
   dataExcel, 
   listaMateriasExcel, 
@@ -37,31 +15,24 @@ function Dashboard({
   setCarrera, 
   listaCarreras 
 }) {
-  const tieneDatos = dataExcel && Object.keys(dataExcel).length > 0;
-  
-  // 1. SI HAY DATOS EN DB: Usamos dataExcel.
-  // 2. SI NO HAY DATOS EN DB: Caemos en el MOCK de respaldo.
-  const DATA = tieneDatos ? dataExcel : DATA_MOCK_FALLBACK;
+  // Sin datos cargados en la DB, todo queda vacío (sin mocks)
+  const DATA = dataExcel || {};
 
-  // Determinar la carrera activa: prioriza la prop `carrera` del estado global de App
-  const carreraActiva = carrera || (tieneDatos
-    ? (dataExcel.nombre_carrera || dataExcel.carrera || "Carrera Genérica")
-    : "Licenciatura en Informática");
+  // Carrera activa: prioriza la prop `carrera` del estado global de App
+  const carreraActiva = carrera || DATA.nombre_carrera || DATA.carrera || '';
 
   const listaClavesMaterias = Object.keys(DATA).filter(
     (k) => k !== 'nombre_carrera' && k !== 'carrera' && k !== 'codigo_carrera'
   );
 
-  const listaMateriasFiltro = (listaMateriasExcel && listaMateriasExcel.length > 0)
-    ? listaMateriasExcel
-    : LISTA_MATERIAS_MOCK;
+  const listaMateriasFiltro = listaMateriasExcel || [];
 
   const [materiaSeleccionada, setMateria] = useState('');
   const [modalidad, setModalidad] = useState('todas');
 
   const materia = DATA[materiaSeleccionada]
     ? materiaSeleccionada
-    : (listaClavesMaterias[0] || 'ingles');
+    : (listaClavesMaterias[0] || '');
 
   let comisiones = DATA[materia] || [];
   if (modalidad !== 'todas') {

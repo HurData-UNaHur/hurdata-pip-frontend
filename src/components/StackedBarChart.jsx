@@ -22,6 +22,12 @@ function StackedBarChart({ comisiones }) {
         </div>
       </div>
 
+      {comisiones.length === 0 && (
+        <p style={{ textAlign: 'center', opacity: 0.7, margin: '16px 0' }}>
+          No hay datos cargados para los filtros seleccionados.
+        </p>
+      )}
+
       {comisiones.map((c, index) => {
         const pctPromo = ((c.promo / c.total) * 100).toFixed(1); // Cantidad de decimales: 1
         const pctReg = ((c.reg / c.total) * 100).toFixed(1);

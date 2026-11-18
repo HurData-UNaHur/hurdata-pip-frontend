@@ -14,15 +14,6 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const ROLES_CON_SESION = ['autorizado', 'admin'];
 const tieneSesionPersistente = (u) => ROLES_CON_SESION.includes(u?.role);
 
-const PERIODOS_MOCK_FALLBACK = [
-  { id_periodo: 'mock1', label: '2022 - PRIMER CUATRIMESTRE' },
-  { id_periodo: 'mock2', label: '2022 - SEGUNDO CUATRIMESTRE' },
-];
-
-const CARRERAS_MOCK_FALLBACK = [
-  { id: '1', nombre: 'Licenciatura en Informática' },
-];
-
 function App() {
   const [resetKey, setResetKey] = useState(0);
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
@@ -52,7 +43,7 @@ function App() {
     const saved = localStorage.getItem('hurdata_materias');
     return saved ? JSON.parse(saved) : [];
   });
-  const [materiaSeleccionada, setMateriaSeleccionada] = useState('ingles');
+  const [materiaSeleccionada, setMateriaSeleccionada] = useState('');
 
   // ── Sesión de Usuario ─────────────────────────────────────────────────────
   const handleLoginSuccess = (datosUsuario) => {
@@ -77,7 +68,16 @@ function App() {
     localStorage.removeItem('hurdata_dashboard');
     localStorage.removeItem('hurdata_materias');
     localStorage.removeItem('hurdata_carrera_activa');
-    setMateriaSeleccionada('ingles');
+    setMateriaSeleccionada('');
+  };
+
+  // Sin períodos en la DB: no hay nada que mostrar (ni datos cacheados en localStorage)
+  const quedarSinDatos = () => {
+    setListaPeriodos([]);
+    setPeriodoSeleccionado('');
+    setListaCarreras([]);
+    setCarreraSeleccionada('');
+    limpiarDatosLocales();
   };
 
   const actualizarDatosLocales = (dataBackend) => {
@@ -120,19 +120,15 @@ function App() {
           setListaPeriodos(data.periodos);
           setPeriodoSeleccionado(data.periodos[0].label);
         } else {
-          setListaPeriodos(PERIODOS_MOCK_FALLBACK);
-          setPeriodoSeleccionado(PERIODOS_MOCK_FALLBACK[0].label);
+          quedarSinDatos();
         }
       })
       .catch(() => {
-        if (!cancelado) {
-          setListaPeriodos(PERIODOS_MOCK_FALLBACK);
-          setPeriodoSeleccionado(PERIODOS_MOCK_FALLBACK[0].label);
-        }
+        if (!cancelado) quedarSinDatos();
       });
 
     return () => { cancelado = true; };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Carreras al cambiar período ───────────────────────────────────────────
   useEffect(() => {
@@ -153,13 +149,15 @@ function App() {
             localStorage.setItem('hurdata_carrera_activa', primera);
           }
         } else {
-          setListaCarreras(CARRERAS_MOCK_FALLBACK);
-          setCarreraSeleccionada(CARRERAS_MOCK_FALLBACK[0].nombre);
-          localStorage.setItem('hurdata_carrera_activa', CARRERAS_MOCK_FALLBACK[0].nombre);
+          setListaCarreras([]);
+          setCarreraSeleccionada('');
+          localStorage.removeItem('hurdata_carrera_activa');
         }
       })
       .catch(() => {
-        setListaCarreras(CARRERAS_MOCK_FALLBACK);
+        setListaCarreras([]);
+        setCarreraSeleccionada('');
+        localStorage.removeItem('hurdata_carrera_activa');
       });
   }, [periodoSeleccionado]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -243,10 +241,10 @@ function App() {
     limpiarDatosLocales();
 
     // 2. Consultar el backend para obtener el estado post-reset
-    let periodosFinal   = PERIODOS_MOCK_FALLBACK;
-    let periodoFinal    = PERIODOS_MOCK_FALLBACK[0].label;
-    let carrerasFinal   = CARRERAS_MOCK_FALLBACK;
-    let carreraFinal    = CARRERAS_MOCK_FALLBACK[0].nombre;
+    let periodosFinal   = [];
+    let periodoFinal    = '';
+    let carrerasFinal   = [];
+    let carreraFinal    = '';
 
     try {
       const res = await fetch(`${API_URL}/api/periodos`);
@@ -257,9 +255,9 @@ function App() {
           periodoFinal  = data.periodos[0].label;
         }
       }
-    } catch { /* sin conexión, usa mock */ }
+    } catch { /* sin conexión: queda vacío */ }
 
-    try {
+    if (periodoFinal) try {
       const res = await fetch(`${API_URL}/api/carreras?periodo=${encodeURIComponent(periodoFinal)}`);
       if (res.ok) {
         const data = await res.json();
@@ -268,13 +266,13 @@ function App() {
           carreraFinal  = data.carreras[0].nombre;
         }
       }
-    } catch { /* sin conexión, usa mock */ }
+    } catch { /* sin conexión: queda vacío */ }
 
     // 3. Setear el nuevo estado limpio
     setListaPeriodos(periodosFinal);
     setListaCarreras(carrerasFinal);
     setCarreraSeleccionada(carreraFinal);
-    localStorage.setItem('hurdata_carrera_activa', carreraFinal);
+    if (carreraFinal) localStorage.setItem('hurdata_carrera_activa', carreraFinal);
 
     // 4. Forzar el cambio de estado del período (vaciándolo primero para asegurar que re-dispare los useEffect de datos)
     setPeriodoSeleccionado('');
