@@ -48,6 +48,12 @@ function Dashboard({
   const pctReg = totalAlumnos ? `${Math.round((totalReg / totalAlumnos) * 100)}%` : '0%';
   const pctLibre = totalAlumnos ? `${Math.round((totalLibre / totalAlumnos) * 100)}%` : '0%';
 
+  // Igualar altura solo cuando la cantidad de comisiones y alertas es igual (ej. 1 y 1, 2 y 2)
+  const cantidadAlertas = comisiones.filter(
+    (c) => (c.libre / (c.total || 1)) * 100 >= 40
+  ).length;
+  const igualarAltura = comisiones.length > 0 && comisiones.length === cantidadAlertas;
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -95,7 +101,7 @@ function Dashboard({
         />
       </section>
 
-      <main className={styles.mainGrid}>
+      <main className={`${styles.mainGrid} ${igualarAltura ? styles.mainGridEqual : ''}`}>
         <div>
           <StackedBarChart comisiones={comisiones} />
         </div>

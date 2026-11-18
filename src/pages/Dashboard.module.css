@@ -36,6 +36,11 @@
   align-items: start;
 }
 
+/* Se activa solo cuando cantidad de comisiones === cantidad de alertas */
+.mainGridEqual {
+  align-items: stretch;
+}
+
 .sidebar {
   display: flex;
   flex-direction: column;

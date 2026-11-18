@@ -102,7 +102,7 @@ function Materias({
               <th>Inscriptos</th>
               <th>Promoción (%)</th>
               <th>Libres / Abandono (%)</th>
-              <th>Estado</th>
+              <th>Indicador de cursada</th>
             </tr>
           </thead>
           <tbody>
@@ -121,10 +121,12 @@ function Materias({
                 <td style={{ color: '#10b981' }}>{m.pctPromo}% ({m.promo})</td>
                 <td style={{ color: '#ef4444' }}>{m.pctLibre}% ({m.libre})</td>
                 <td>
-                  {m.pctLibre >= 35 ? (
-                    <span className={styles.badgeCritico}>Materia Filtro</span>
+                  {m.pctLibre >= 70 ? (
+                    <span className={styles.badgeCritico}>Riesgo alto</span>
+                  ) : m.pctLibre >= 45 ? (
+                    <span className={styles.badgeAtencion}>Atención</span>
                   ) : (
-                    <span className={styles.badgeNormal}>Normal</span>
+                    <span className={styles.badgeNormal}>Estable</span>
                   )}
                 </td>
               </tr>
