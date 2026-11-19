@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  BookOpen, Calculator, ChartLine, ChevronDown, GraduationCap, House, LogOut, Menu, Upload, User, X,
+  BookOpen, Calculator, ChartLine, ChevronLeft, ChevronRight, GraduationCap, House, LogOut, Menu, Upload, User, X,
 } from 'lucide-react';
 import styles from './AppShell.module.css';
 import logo from '../assets/logo-hurlingham.png';
@@ -10,13 +10,21 @@ import IconoTema from './IconoTema';
 import { PERMISOS, tienePermiso } from '../services/api';
 
 /*
- * Marco de la aplicación: cabecera con logo y menú de usuario, barra lateral con las secciones
- * y el contenido (children) a la derecha. En pantallas chicas la barra lateral es un menú deslizable.
+ * Marco de la aplicación: cabecera con el logo, barra lateral con las secciones (y, al pie,
+ * el usuario, el tema y cerrar sesión), contenido y footer. En pantallas chicas la barra lateral
+ * es un menú deslizable; en escritorio se puede comprimir a solo íconos.
  */
 function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
-  const [menuAbierto, setMenuAbierto] = useState(false);     // barra lateral (celular)
-  const [usuarioAbierto, setUsuarioAbierto] = useState(false); // menú del usuario
-  const refUsuario = useRef(null);
+  const [menuAbierto, setMenuAbierto] = useState(false); // barra lateral (celular)
+  // Barra lateral comprimida (solo íconos, en escritorio). Se recuerda entre sesiones.
+  const [comprimida, setComprimida] = useState(() => localStorage.getItem('hurdata_sidebar_comprimida') === '1');
+
+  const alternarCompresion = () => {
+    setComprimida((v) => {
+      localStorage.setItem('hurdata_sidebar_comprimida', v ? '0' : '1');
+      return !v;
+    });
+  };
 
   // Usuario con login real (no invitado)
   const esAutorizado = Boolean(usuario) && usuario.role !== 'invitado';
@@ -30,24 +38,17 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
     ...(puedeVerCargas ? [{ to: '/cargas', texto: 'Cargas', Icono: Upload }] : []),
   ];
 
-  // Cerrar con Escape y al hacer clic fuera del menú del usuario
+  // Cerrar el menú del celular con Escape
   useEffect(() => {
-    const alTeclear = (e) => {
-      if (e.key === 'Escape') { setMenuAbierto(false); setUsuarioAbierto(false); }
-    };
-    const alHacerClic = (e) => {
-      if (refUsuario.current && !refUsuario.current.contains(e.target)) setUsuarioAbierto(false);
-    };
+    const alTeclear = (e) => { if (e.key === 'Escape') setMenuAbierto(false); };
     document.addEventListener('keydown', alTeclear);
-    document.addEventListener('mousedown', alHacerClic);
-    return () => {
-      document.removeEventListener('keydown', alTeclear);
-      document.removeEventListener('mousedown', alHacerClic);
-    };
+    return () => document.removeEventListener('keydown', alTeclear);
   }, []);
 
+  const textoTema = theme === 'light' ? 'Modo oscuro' : 'Modo claro';
+
   return (
-    <div className={styles.shell}>
+    <div className={comprimida ? `${styles.shell} ${styles.comprimido}` : styles.shell}>
       {/* ── Cabecera ── */}
       <header className={styles.header}>
         <button
@@ -60,67 +61,78 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
           {menuAbierto ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
         </button>
 
-        <div className={styles.marca}>
-          <span className={styles.logoCaja}>
-            <img src={logo} alt="Universidad Nacional de Hurlingham" className={styles.logoCabecera} />
-          </span>
-        </div>
-
-        <div className={styles.usuario} ref={refUsuario}>
-          {usuario && (
-            <button
-              type="button"
-              className={styles.usuarioBtn}
-              onClick={() => setUsuarioAbierto((v) => !v)}
-              aria-haspopup="menu"
-              aria-expanded={usuarioAbierto}
-              title={usuario.cargo}
-            >
-              <span className={styles.avatar}>
-                {esAutorizado
-                  ? <GraduationCap size={17} aria-hidden="true" />
-                  : <User size={17} aria-hidden="true" />}
-              </span>
-              <span className={styles.nombre}>{usuario.nombre}</span>
-              <ChevronDown size={16} aria-hidden="true" />
-            </button>
-          )}
-          {usuarioAbierto && (
-            <div className={styles.desplegable} role="menu">
-              {usuario?.cargo && <p className={styles.cargo}>{usuario.cargo}</p>}
-              <button type="button" role="menuitem" className={styles.opcion} onClick={toggleTheme}>
-                <IconoTema theme={theme} size={16} />
-                {theme === 'light' ? 'Modo oscuro' : 'Modo claro'}
-              </button>
-              {onLogout && (
-                <button type="button" role="menuitem" className={`${styles.opcion} ${styles.salir}`} onClick={onLogout}>
-                  <LogOut size={16} aria-hidden="true" />
-                  Cerrar sesión
-                </button>
-              )}
-            </div>
-          )}
-        </div>
+        <span className={styles.logoCaja}>
+          <img src={logo} alt="Universidad Nacional de Hurlingham" className={styles.logoCabecera} />
+        </span>
       </header>
 
       {/* ── Barra lateral ── */}
       <aside className={`${styles.sidebar} ${menuAbierto ? styles.sidebarAbierta : ''}`} aria-label="Secciones">
-        <nav className={styles.menu}>
-          {secciones.map(({ to, texto, Icono, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              onClick={() => setMenuAbierto(false)}
-              className={({ isActive }) => (isActive ? `${styles.item} ${styles.itemActivo}` : styles.item)}
+        {/* Botón sobre el borde de la barra (solo escritorio) */}
+        <button
+          type="button"
+          className={styles.colapsar}
+          onClick={alternarCompresion}
+          aria-label={comprimida ? 'Expandir la barra lateral' : 'Comprimir la barra lateral'}
+          title={comprimida ? 'Expandir' : 'Comprimir'}
+        >
+          {comprimida
+            ? <ChevronRight size={16} aria-hidden="true" />
+            : <ChevronLeft size={16} aria-hidden="true" />}
+        </button>
+
+        <div className={styles.interior}>
+          <nav className={styles.menu}>
+            {secciones.map(({ to, texto, Icono, end }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={end}
+                onClick={() => setMenuAbierto(false)}
+                title={comprimida ? texto : undefined}
+                className={({ isActive }) => (isActive ? `${styles.item} ${styles.itemActivo}` : styles.item)}
+              >
+                <Icono size={19} aria-hidden="true" />
+                <span className={styles.textoItem}>{texto}</span>
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className={styles.pie}>
+            {usuario && (
+              <div className={styles.perfil} title={usuario.cargo || usuario.nombre}>
+                <span className={styles.avatar}>
+                  {esAutorizado
+                    ? <GraduationCap size={17} aria-hidden="true" />
+                    : <User size={17} aria-hidden="true" />}
+                </span>
+                <span className={`${styles.textoItem} ${styles.datosPerfil}`}>
+                  <strong>{usuario.nombre}</strong>
+                  {usuario.cargo && <small>{usuario.cargo}</small>}
+                </span>
+              </div>
+            )}
+            <button
+              type="button"
+              className={styles.item}
+              onClick={toggleTheme}
+              title={comprimida ? textoTema : undefined}
             >
-              <Icono size={19} aria-hidden="true" />
-              {texto}
-            </NavLink>
-          ))}
-        </nav>
-        <div className={styles.pie}>
-          <img src={logoGris} alt="Universidad Nacional de Hurlingham" className={styles.logoPie} />
+              <IconoTema theme={theme} size={19} sobreVerde />
+              <span className={styles.textoItem}>{textoTema}</span>
+            </button>
+            {onLogout && (
+              <button
+                type="button"
+                className={`${styles.item} ${styles.cerrar}`}
+                onClick={onLogout}
+                title={comprimida ? 'Cerrar sesión' : undefined}
+              >
+                <LogOut size={19} aria-hidden="true" />
+                <span className={styles.textoItem}>Cerrar sesión</span>
+              </button>
+            )}
+          </div>
         </div>
       </aside>
 
@@ -139,7 +151,7 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
       {/* ── Footer ── */}
       <footer className={styles.footer}>
         <span>© {new Date().getFullYear()} HurData · Proyecto Integrador de Programación · Universidad Nacional de Hurlingham</span>
-        <span>Fuente de los datos: Estadísticas de fin de cursada del SIU Guaraní</span>
+        <img src={logoGris} alt="Universidad Nacional de Hurlingham" className={styles.logoFooter} />
       </footer>
     </div>
   );

@@ -1,4 +1,4 @@
-/* Marco: cabecera arriba, barra lateral a la izquierda, contenido a la derecha */
+/* Marco: cabecera arriba, barra lateral a la izquierda, contenido y footer a la derecha */
 .shell {
   --alto-cabecera: 64px;
   --ancho-sidebar: 232px;
@@ -10,6 +10,7 @@
     "header header"
     "sidebar contenido"
     "sidebar footer";
+  transition: grid-template-columns 0.2s ease;
 }
 
 /* ── Cabecera ─────────────────────────────────────────────── */
@@ -20,7 +21,6 @@
   z-index: 30;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   padding: 0 20px;
   background-color: var(--bg-card, #ffffff);
@@ -28,12 +28,7 @@
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
-.marca {
-  display: flex;
-  align-items: center;
-  margin-right: auto;
-}
-/* El logo es gris oscuro sobre transparente: va en una caja blanca para verse también en modo oscuro */
+/* El logo es gris oscuro sobre transparente */
 .logoCaja {
   display: inline-flex;
   align-items: center;
@@ -70,102 +65,30 @@
   cursor: pointer;
 }
 
-/* ── Usuario ──────────────────────────────────────────────── */
-.usuario {
-  position: relative;
-}
-.usuarioBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 10px 5px 6px;
-  border: 1px solid var(--border-color, #e2e8f0);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--text-primary, #0f172a);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-.usuarioBtn:hover {
-  background-color: var(--bg-subtle, #f1f5f9);
-}
-.avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background-color: #007A33;
-  color: #ffffff;
-}
-.nombre {
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.desplegable {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 8px);
-  min-width: 210px;
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  background-color: var(--bg-card, #ffffff);
-  border: 1px solid var(--border-color, #e2e8f0);
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
-}
-.cargo {
-  margin: 0;
-  padding: 6px 10px 8px;
-  font-size: 0.75rem;
-  color: var(--text-secondary, #475569);
-  border-bottom: 1px solid var(--border-color, #e2e8f0);
-}
-.opcion {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 9px 10px;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--text-primary, #0f172a);
-  font-size: 0.85rem;
-  text-align: left;
-  cursor: pointer;
-}
-.opcion:hover {
-  background-color: var(--bg-subtle, #f1f5f9);
-}
-.salir {
-  color: #ef4444;
-  font-weight: 600;
-}
-
 /* ── Barra lateral ────────────────────────────────────────── */
 .sidebar {
   grid-area: sidebar;
   position: sticky;
   top: var(--alto-cabecera);
   height: calc(100vh - var(--alto-cabecera));
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 16px 12px;
+  z-index: 20;
   background-color: #1f2d3d;
   color: #e2e8f0;
-  overflow-y: auto;
 }
 [data-theme="dark"] .sidebar {
   background-color: #0b1220;
   border-right: 1px solid var(--border-color, #334155);
+}
+/* Contenedor con scroll propio: así el botón del borde no queda recortado */
+.interior {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 12px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 .menu {
   display: flex;
@@ -176,12 +99,18 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
   padding: 11px 14px;
+  border: none;
   border-radius: 8px;
+  background: transparent;
   color: #cbd5e1;
+  font-family: inherit;
   font-size: 0.95rem;
   font-weight: 600;
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 .item:hover {
@@ -193,32 +122,81 @@
   background-color: #ea7a1c;
   color: #ffffff;
 }
-.pie {
+
+/* Botón redondo sobre el borde derecho de la barra */
+.colapsar {
+  position: absolute;
+  top: 20px;
+  right: -13px;
+  z-index: 5;
   display: flex;
+  align-items: center;
   justify-content: center;
-  padding-top: 16px;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 50%;
+  background-color: var(--bg-card, #ffffff);
+  color: var(--text-primary, #0f172a);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.25);
+  cursor: pointer;
 }
-.logoPie {
-  width: 104px;
-  height: auto;
-  display: block;
-  /* El logo gris se pasa a blanco para leerse sobre el fondo oscuro, sin competir con el de la cabecera */
-  filter: brightness(0) invert(1);
-  opacity: 0.7;
+.colapsar:hover {
+  background-color: #ea7a1c;
+  border-color: #ea7a1c;
+  color: #ffffff;
 }
 
-/* ── Footer ─────────────────────────────────────────────── */
-.footer {
-  grid-area: footer;
+/* Pie de la barra: usuario, tema y cerrar sesión */
+.pie {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 4px 24px;
-  padding: 14px clamp(12px, 3vw, 24px);
-  border-top: 1px solid var(--border-color, #e2e8f0);
-  background-color: var(--bg-card, #ffffff);
-  color: var(--text-secondary, #475569);
-  font-size: 0.75rem;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+.perfil {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 14px 10px;
+  color: #ffffff;
+}
+.avatar {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #007A33;
+  color: #ffffff;
+}
+.datosPerfil {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+.datosPerfil strong {
+  font-size: 0.88rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.datosPerfil small {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cerrar {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.cerrar:hover {
+  background-color: #dc2626;
 }
 
 /* ── Contenido ────────────────────────────────────────────── */
@@ -228,23 +206,69 @@
   padding: clamp(12px, 3vw, 24px);
 }
 
+/* ── Footer ───────────────────────────────────────────────── */
+.footer {
+  grid-area: footer;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding: 12px clamp(12px, 3vw, 24px);
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  background-color: var(--bg-card, #ffffff);
+  color: var(--text-secondary, #475569);
+  font-size: 0.75rem;
+}
+.logoFooter {
+  height: 40px;
+  width: auto;
+  display: block;
+  opacity: 0.85;
+}
+[data-theme="dark"] .logoFooter {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+
 .fondo {
   display: none;
 }
 
+/* ── Barra comprimida (solo escritorio): solo íconos ── */
+@media (min-width: 901px) {
+  .comprimido {
+    --ancho-sidebar: 68px;
+  }
+  .comprimido .interior {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .comprimido .item,
+  .comprimido .perfil {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .comprimido .textoItem {
+    display: none;
+  }
+}
+
 /* ── Celular y tablet: la barra lateral se vuelve un menú deslizable ── */
 @media (max-width: 900px) {
+  .colapsar {
+    display: none;
+  }
   .shell {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
       "header"
-      "contenido";
+      "contenido"
+      "footer";
   }
   .hamburguesa {
     display: inline-flex;
-  }
-  .marca {
-    margin-right: auto;
   }
   .sidebar {
     position: fixed;
@@ -270,12 +294,6 @@
     background: rgba(15, 23, 42, 0.45);
     cursor: pointer;
   }
-  .nombre {
-    display: none;
-  }
-  .usuarioBtn {
-    padding-right: 8px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -285,7 +303,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sidebar {
+  .sidebar,
+  .shell {
     transition: none;
   }
 }
