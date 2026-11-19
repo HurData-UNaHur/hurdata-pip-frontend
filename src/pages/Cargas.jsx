@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import styles from './Cargas.module.css';
 import { getCargas } from '../services/api';
+import { plural } from '../utils/texto';
 
 const ESTADOS = [
   { value: '', label: 'Todos los estados' },
@@ -112,8 +113,10 @@ function Cargas() {
                     <td>{c.periodo_label}</td>
                     <td>{c.nombre_carrera}</td>
                     <td>
-                      {c.materias} materias
-                      <span className={styles.detalle}>{c.comisiones} comisiones · {c.resultados} resultados</span>
+                      {plural(c.materias, 'materia', 'materias')}
+                      <span className={styles.detalle}>
+                        {plural(c.comisiones, 'comisión', 'comisiones')} · {plural(c.resultados, 'resultado', 'resultados')}
+                      </span>
                     </td>
                     <td>
                       <span className={badge.clase}>{badge.texto}</span>

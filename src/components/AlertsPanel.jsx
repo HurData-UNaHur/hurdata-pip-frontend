@@ -1,4 +1,5 @@
 import styles from './AlertsPanel.module.css';
+import { plural } from '../utils/texto';
 
 function AlertsPanel({ comisiones }) {
   // Filtramos las comisiones con deserción >= 40%
@@ -22,7 +23,7 @@ function AlertsPanel({ comisiones }) {
                 ⚠️ Alta deserción en {c.nombre}     
               </div> 
               <div className={styles.alertDesc}>
-                El <b>{pctLibre}%</b> de los inscriptos ({c.libre} estudiantes) quedaron libres o abandonaron.
+                El <b>{pctLibre}%</b> de los inscriptos ({plural(c.libre, 'estudiante', 'estudiantes')}) quedaron libres o abandonaron.
               </div>
             </div>
           );

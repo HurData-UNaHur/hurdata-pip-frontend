@@ -1,4 +1,5 @@
 import styles from './StackedBarChart.module.css';
+import { plural } from '../utils/texto';
 
 function StackedBarChart({ comisiones }) {
   return (
@@ -43,7 +44,7 @@ function StackedBarChart({ comisiones }) {
           <div key={index} className={styles.comisionItem}>
             <div className={styles.comisionHeader}>
               <span>
-                <strong>{c.nombre}</strong> ({c.total} alumnos)
+                <strong>{c.nombre}</strong> ({plural(c.total, 'alumno', 'alumnos')})
               </span>
               <span>
                 {pctPromo}% P / {pctReg}% R / {pctDesap}% D / {pctLibre}% L

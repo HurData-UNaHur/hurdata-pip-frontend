@@ -4,6 +4,7 @@ import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
 import StackedBarChart from '../components/StackedBarChart';
 import AlertsPanel from '../components/AlertsPanel';
+import { plural } from '../utils/texto';
 
 function Dashboard({ 
   dataExcel, 
@@ -57,8 +58,8 @@ function Dashboard({
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Unahur * Estadísticas General.</h1>
-        <p className={styles.subtitle}>Panel de control Académico y Gestión de Comisiones.</p>
+        <h1 className={styles.title}>Estadísticas generales</h1>
+        <p className={styles.subtitle}>Panel de control académico y gestión de comisiones</p>
       </header>
 
       <Filters
@@ -79,24 +80,24 @@ function Dashboard({
         <KpiCard
           titulo="TOTAL INSCRIPTOS"
           valor={totalAlumnos}
-          subtitulo={`${comisiones.length} comisiones`}
+          subtitulo={plural(comisiones.length, 'comisión', 'comisiones')}
         />
         <KpiCard
           titulo="PROMOCIONADOS"
           valor={pctPromo}
-          subtitulo={`${totalPromo} alumnos`}
+          subtitulo={plural(totalPromo, 'alumno', 'alumnos')}
           colorBorde="#10b981"
         />
         <KpiCard
           titulo="REGULARES"
           valor={pctReg}
-          subtitulo={`${totalReg} alumnos`}
+          subtitulo={plural(totalReg, 'alumno', 'alumnos')}
           colorBorde="#3b82f6"
         />
         <KpiCard
           titulo="LIBRES / ABANDONO"
           valor={pctLibre}
-          subtitulo={`${totalLibre} alumnos`}
+          subtitulo={plural(totalLibre, 'alumno', 'alumnos')}
           colorBorde="#ef4444"
         />
       </section>

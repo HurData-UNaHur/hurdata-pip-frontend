@@ -10,7 +10,8 @@ function KpiCard({ titulo, valor, subtitulo, colorBorde }) {
       }}
     >
       <span className={styles.titulo}>{titulo}</span>
-      <h2 className={styles.valor}>{valor}</h2>
+      {/* El número toma el color del indicador (verde, azul, rojo); sin color, el verde UNaHur del CSS */}
+      <h2 className={styles.valor} style={colorBorde ? { color: colorBorde } : undefined}>{valor}</h2>
       {subtitulo && <span className={styles.subtitulo}>{subtitulo}</span>}
     </div>
   );
