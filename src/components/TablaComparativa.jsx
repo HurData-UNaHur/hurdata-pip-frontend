@@ -1,101 +1,244 @@
-import { useState } from 'react';
-import { ArrowDown, ArrowUp, Minus } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ArrowDown, ArrowUp, Minus, Search, TriangleAlert } from 'lucide-react';
 import styles from './TablaComparativa.module.css';
-import { formatearPeriodoCorto } from '../utils/texto';
+import { formatearNumero, formatearPeriodoCorto, plural } from '../utils/texto';
+import { UMBRAL_RIESGO_ALTO, UMBRAL_SALTO_LIBRES } from '../utils/umbrales';
 
-function Cambio({ valor }) {
-  if (valor == null) return <span className={styles.sinDato}>—</span>;
-  if (valor === 0) {
-    return <span className={styles.igual}><Minus size={14} className="icono-inline" aria-hidden="true" />0 pp</span>;
-  }
-  const empeoro = valor > 0; // más libres
-  const Icono = empeoro ? ArrowUp : ArrowDown;
+// Mismos colores que el resto de la app
+const SEGMENTOS = [
+  { clave: 'promo', nombre: 'Promoción', color: '#10b981' },
+  { clave: 'reg', nombre: 'Regulares', color: '#3b82f6' },
+  { clave: 'desap', nombre: 'Desaprobados', color: '#f59e0b' },
+  { clave: 'libre', nombre: 'Libres', color: '#ef4444' },
+];
+
+// Para buscar sin importar tildes ni mayúsculas
+const normalizar = (t) => String(t ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+const num = (v, sufijo = '') => (v == null ? '—' : `${formatearNumero(v)}${sufijo}`);
+
+/*
+ * Cambio con flecha. El color depende de si el cambio es bueno o malo, no de si sube o baja:
+ * más inscriptos es bueno (verde), más libres es malo (rojo).
+ */
+function Delta({ valor, unidad, subeEsBueno }) {
+  if (valor == null) return null;
+  if (valor === 0) return <span className={styles.igual}><Minus size={12} className="icono-inline" aria-hidden="true" />0{unidad}</span>;
+  const sube = valor > 0;
+  const Icono = sube ? ArrowUp : ArrowDown;
   return (
-    <span className={empeoro ? styles.empeoro : styles.mejoro} title={empeoro ? 'Más libres que antes' : 'Menos libres que antes'}>
-      <Icono size={14} className="icono-inline" aria-hidden="true" />
-      {Math.abs(valor)} pp
+    <span className={`${styles.delta} ${sube === subeEsBueno ? styles.bueno : styles.malo}`}>
+      <Icono size={12} className="icono-inline" aria-hidden="true" />
+      {Math.abs(valor)}{unidad}
     </span>
   );
 }
 
-const fmt = (v, sufijo = '') => (v == null ? '—' : `${v}${sufijo}`);
+// Barra apilada con la distribución de un período (promoción, regulares, desaprobados, libres)
+function Barra({ dist, etiqueta }) {
+  if (!dist) return <span className={styles.barraVacia} aria-hidden="true" />;
+  const detalle = SEGMENTOS.map((s) => `${s.nombre} ${dist[s.clave]} %`).join(', ');
+  return (
+    <span className={styles.barra} role="img" aria-label={`${etiqueta}: ${detalle}`} title={`${etiqueta}: ${detalle}`}>
+      {SEGMENTOS.map((s) => dist[s.clave] > 0 && (
+        <span key={s.clave} style={{ flexGrow: dist[s.clave], background: s.color }} />
+      ))}
+    </span>
+  );
+}
+
+// Motivos por los que una materia merece atención
+const motivosDe = (f) => {
+  const motivos = [];
+  if (f.libresB != null && f.libresB >= UMBRAL_RIESGO_ALTO) motivos.push(`Riesgo alto: ${f.libresB} % de libres`);
+  if (f.cambio != null && f.cambio >= UMBRAL_SALTO_LIBRES) motivos.push(`Los libres subieron ${f.cambio} pp`);
+  return motivos;
+};
+
+const valorDeOrden = (f, clave) => (clave === 'nombre' ? f.nombre : f[clave]);
 
 /*
- * Tabla período A vs período B, ordenable por columna.
+ * Tabla período A vs período B por materia, con buscador y orden por columna.
  * filas: resultado de compararMaterias (utils/comparar.js).
- * Por defecto, primero lo que más empeoró (mayor aumento de libres).
+ * Por defecto: primero las materias cuyos libres más subieron.
  */
 export default function TablaComparativa({ filas, periodoA, periodoB }) {
   const etiquetaA = formatearPeriodoCorto(periodoA);
   const etiquetaB = formatearPeriodoCorto(periodoB);
-  const COLUMNAS = [
-    { clave: 'nombre', titulo: 'Materia' },
-    { clave: 'inscriptosB', titulo: `Inscriptos ${etiquetaA} → ${etiquetaB}` },
-    { clave: 'libresA', titulo: `Libres ${etiquetaA}` },
-    { clave: 'libresB', titulo: `Libres ${etiquetaB}` },
-    { clave: 'cambio', titulo: 'Cambio', ayuda: 'Diferencia en puntos porcentuales del % de libres' },
-  ];
 
   const [orden, setOrden] = useState({ clave: 'cambio', direccion: 'desc' });
+  const [soloAmbas, setSoloAmbas] = useState(false);
+  const [busqueda, setBusqueda] = useState('');
+
+  const COLUMNAS = [
+    { clave: 'nombre', titulo: 'Materia' },
+    { clave: 'cambioInscr', titulo: 'Inscriptos', sub: `${etiquetaA} → ${etiquetaB}`, numerica: true,
+      ayuda: 'Ordena por la variación en %' },
+    { clave: 'cambio', titulo: 'Libres', sub: `${etiquetaA} → ${etiquetaB}`, numerica: true,
+      ayuda: 'Ordena por la variación en puntos porcentuales' },
+    { clave: null, titulo: 'Distribución', sub: 'A arriba, B abajo' },
+    { clave: null, titulo: 'Alerta' },
+  ];
+
   const ordenarPor = (clave) => setOrden((prev) => (
     prev.clave === clave
       ? { clave, direccion: prev.direccion === 'asc' ? 'desc' : 'asc' }
       : { clave, direccion: clave === 'nombre' ? 'asc' : 'desc' }
   ));
 
-  const ordenadas = [...filas].sort((x, y) => {
-    const a = x[orden.clave];
-    const b = y[orden.clave];
-    // Sin dato siempre al final, sin importar la dirección
-    if (a == null && b == null) return 0;
-    if (a == null) return 1;
-    if (b == null) return -1;
-    const cmp = orden.clave === 'nombre'
-      ? a.localeCompare(b, 'es', { sensitivity: 'base' })
-      : a - b;
-    return orden.direccion === 'asc' ? cmp : -cmp;
-  });
+  const resumen = useMemo(() => ({
+    ambas: filas.filter((f) => f.estado === 'ambas').length,
+    nuevas: filas.filter((f) => f.estado === 'nueva').length,
+    discontinuadas: filas.filter((f) => f.estado === 'discontinuada').length,
+    empeoran: filas.filter((f) => f.cambio != null && f.cambio >= UMBRAL_SALTO_LIBRES).length,
+    mejoran: filas.filter((f) => f.cambio != null && f.cambio <= -UMBRAL_SALTO_LIBRES).length,
+  }), [filas]);
+
+  const visibles = useMemo(() => {
+    const q = normalizar(busqueda.trim());
+    const filtradas = filas.filter((f) => (
+      (!soloAmbas || f.estado === 'ambas')
+      && (!q || normalizar(f.nombre).includes(q) || normalizar(f.id).includes(q))
+    ));
+    return filtradas.sort((x, y) => {
+      const a = valorDeOrden(x, orden.clave);
+      const b = valorDeOrden(y, orden.clave);
+      // Sin dato siempre al final, sin importar la dirección
+      if (a == null && b == null) return 0;
+      if (a == null) return 1;
+      if (b == null) return -1;
+      const cmp = orden.clave === 'nombre' ? a.localeCompare(b, 'es', { sensitivity: 'base' }) : a - b;
+      return orden.direccion === 'asc' ? cmp : -cmp;
+    });
+  }, [filas, soloAmbas, busqueda, orden]);
 
   return (
     <div className={styles.contenedor}>
-      <table className={styles.tabla}>
-        <thead>
-          <tr>
-            {COLUMNAS.map((col) => {
-              const activa = orden.clave === col.clave;
-              return (
-                <th key={col.clave} aria-sort={activa ? (orden.direccion === 'asc' ? 'ascending' : 'descending') : 'none'}>
-                  <button
-                    type="button"
-                    className={styles.sortBtn}
-                    onClick={() => ordenarPor(col.clave)}
-                    title={`Ordenar por ${col.titulo}${col.ayuda ? ` — ${col.ayuda}` : ''}`}
-                  >
+      {/* Resumen de lo que cambió */}
+      <div className={styles.resumen}>
+        <span>{plural(resumen.ambas, 'materia', 'materias')} en ambos períodos</span>
+        {resumen.empeoran > 0 && <span className={styles.malo}>{resumen.empeoran} con +{UMBRAL_SALTO_LIBRES} pp de libres o más</span>}
+        {resumen.mejoran > 0 && <span className={styles.bueno}>{resumen.mejoran} con −{UMBRAL_SALTO_LIBRES} pp o menos</span>}
+        {resumen.nuevas > 0 && <span>{plural(resumen.nuevas, 'nueva', 'nuevas')}</span>}
+        {resumen.discontinuadas > 0 && (
+          <span>{plural(resumen.discontinuadas, 'dejó de dictarse', 'dejaron de dictarse')}</span>
+        )}
+      </div>
+
+      {/* Controles */}
+      <div className={styles.controles}>
+        <label className={styles.buscador}>
+          <Search size={15} aria-hidden="true" />
+          <input
+            type="search"
+            placeholder="Buscar materia o código"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            aria-label="Buscar materia o código"
+          />
+        </label>
+        <label className={styles.switch}>
+          <input type="checkbox" checked={soloAmbas} onChange={(e) => setSoloAmbas(e.target.checked)} />
+          Solo materias dictadas en ambos períodos
+        </label>
+      </div>
+
+      {/* Referencias de la distribución */}
+      <div className={styles.referencias} aria-hidden="true">
+        {SEGMENTOS.map((s) => (
+          <span key={s.clave}><i style={{ background: s.color }} />{s.nombre}</span>
+        ))}
+        <span className={styles.periodos}>A = {etiquetaA} · B = {etiquetaB}</span>
+      </div>
+
+      <div className={styles.scroll}>
+        <table className={styles.tabla}>
+          <thead>
+            <tr>
+              {COLUMNAS.map((col) => {
+                const activa = col.clave !== null && orden.clave === col.clave;
+                const contenido = (
+                  <span className={styles.thTexto}>
                     {col.titulo}
-                    <span className={activa ? styles.sortIconActive : styles.sortIcon} aria-hidden="true">
-                      {activa ? (orden.direccion === 'asc' ? '▲' : '▼') : '↕'}
+                    {col.sub && <small>{col.sub}</small>}
+                  </span>
+                );
+                return (
+                  <th
+                    key={col.titulo}
+                    className={col.numerica ? styles.derecha : undefined}
+                    aria-sort={activa ? (orden.direccion === 'asc' ? 'ascending' : 'descending') : undefined}
+                  >
+                    {col.clave === null ? (
+                      <div className={styles.thFijo}>{contenido}</div>
+                    ) : (
+                      <button
+                        type="button"
+                        className={`${styles.sortBtn} ${col.numerica ? styles.sortBtnDerecha : ''}`}
+                        onClick={() => ordenarPor(col.clave)}
+                        title={`Ordenar por ${col.titulo}${col.ayuda ? `. ${col.ayuda}` : ''}`}
+                      >
+                        {contenido}
+                        <span className={activa ? styles.sortIconActive : styles.sortIcon} aria-hidden="true">
+                          {activa ? (orden.direccion === 'asc' ? '▲' : '▼') : '↕'}
+                        </span>
+                      </button>
+                    )}
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {visibles.length === 0 && (
+              <tr>
+                <td colSpan={5} className={styles.vacio}>
+                  {filas.length === 0 ? 'No hay materias para comparar.' : 'Ninguna materia coincide con el filtro.'}
+                </td>
+              </tr>
+            )}
+            {visibles.map((f) => {
+              const motivos = motivosDe(f);
+              const critico = f.libresB != null && f.libresB >= UMBRAL_RIESGO_ALTO;
+              return (
+                <tr key={f.id} className={f.estado === 'ambas' ? undefined : styles.filaSinPar}>
+                  <td>
+                    <strong>{f.nombre}</strong>
+                    {f.estado === 'nueva' && <span className={styles.etiquetaNueva}>Nueva</span>}
+                    {f.estado === 'discontinuada' && <span className={styles.etiquetaDisc}>Dejó de dictarse</span>}
+                  </td>
+                  <td className={styles.derecha}>
+                    <span className={styles.valores}>{num(f.inscriptosA)} → {num(f.inscriptosB)}</span>
+                    <Delta valor={f.cambioInscr} unidad=" %" subeEsBueno />
+                  </td>
+                  <td className={styles.derecha}>
+                    <span className={styles.valores}>{num(f.libresA, ' %')} → {num(f.libresB, ' %')}</span>
+                    <Delta valor={f.cambio} unidad=" pp" subeEsBueno={false} />
+                  </td>
+                  <td>
+                    <span className={styles.barras}>
+                      <span className={styles.filaBarra}><b>A</b><Barra dist={f.distA} etiqueta={`Período A (${etiquetaA})`} /></span>
+                      <span className={styles.filaBarra}><b>B</b><Barra dist={f.distB} etiqueta={`Período B (${etiquetaB})`} /></span>
                     </span>
-                  </button>
-                </th>
+                  </td>
+                  <td className={styles.centro}>
+                    {motivos.length > 0 && (
+                      <span
+                        className={critico ? styles.alertaCritica : styles.alerta}
+                        role="img"
+                        aria-label={motivos.join('. ')}
+                        title={motivos.join(' · ')}
+                      >
+                        <TriangleAlert size={17} aria-hidden="true" />
+                      </span>
+                    )}
+                  </td>
+                </tr>
               );
             })}
-          </tr>
-        </thead>
-        <tbody>
-          {ordenadas.length === 0 && (
-            <tr><td colSpan={5} className={styles.sinDato}>No hay materias para comparar.</td></tr>
-          )}
-          {ordenadas.map((f) => (
-            <tr key={f.id}>
-              <td><strong>{f.nombre}</strong></td>
-              <td className={styles.sinCorte}>{fmt(f.inscriptosA)} → {fmt(f.inscriptosB)}</td>
-              <td>{fmt(f.libresA, ' %')}</td>
-              <td>{fmt(f.libresB, ' %')}</td>
-              <td className={styles.sinCorte}><Cambio valor={f.cambio} /></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

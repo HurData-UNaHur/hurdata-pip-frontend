@@ -15,6 +15,12 @@ export const plural = (cantidad, singular, pluralTexto) =>
  *   formatearPeriodo('2023 - PRIMER CUATRIMESTRE') → '2023 - Primer cuatrimestre'
  */
 /*
+ * Número con separador de miles de Argentina.
+ *   formatearNumero(7886) → '7.886'
+ */
+export const formatearNumero = (n) => Number(n).toLocaleString('es-AR');
+
+/*
  * Label de período corto, para ejes de gráficos.
  *   formatearPeriodoCorto('2023 - PRIMER CUATRIMESTRE')  → '2023 · 1C'
  *   formatearPeriodoCorto('2023 - SEGUNDO CUATRIMESTRE') → '2023 · 2C'

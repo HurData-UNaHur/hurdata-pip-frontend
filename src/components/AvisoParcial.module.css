@@ -1,0 +1,26 @@
+.aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(245, 158, 11, 0.55);
+  background-color: rgba(245, 158, 11, 0.12);
+  color: var(--text-primary, #0f172a);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.aviso p {
+  margin: 0;
+}
+
+.aviso p + p {
+  margin-top: 4px;
+}
+
+.icono {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #f59e0b;
+}

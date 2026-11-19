@@ -3,9 +3,11 @@ import styles from './Evolucion.module.css';
 import EstadoVacio from '../components/EstadoVacio';
 import GraficoEvolucion from '../components/GraficoEvolucion';
 import TablaComparativa from '../components/TablaComparativa';
+import AvisoParcial from '../components/AvisoParcial';
 import { compararMaterias } from '../utils/comparar';
 import { getCarrerasTodas, getDatos, getEvolucion } from '../services/api';
-import { sumarEstados, transformarDatosBackend } from '../utils/transformData';
+import { transformarDatosBackend } from '../utils/transformData';
+import { aPunto, periodosParciales, periodosPorDefecto } from '../utils/evolucion';
 import { formatearPeriodo } from '../utils/texto';
 
 const CUATRIMESTRES = [
@@ -14,30 +16,16 @@ const CUATRIMESTRES = [
   { value: 'SEGUNDO', label: 'Solo segundo cuatrimestre' },
 ];
 
-const pct = (parte, total) => (total > 0 ? Math.round((parte / total) * 100) : 0);
-
-// Período del backend → punto del gráfico (misma regla de estados que el resto de la app)
-const aPunto = (p) => {
-  const { promo, reg, libre, desap, total } = sumarEstados(p.estados);
-  return {
-    label: p.label,
-    comisiones: p.comisiones,
-    inscriptos: total,
-    pctPromo: pct(promo, total),
-    pctReg: pct(reg, total),
-    pctDesap: pct(desap, total),
-    pctLibre: pct(libre, total),
-  };
-};
+// Respuesta vacía de /api/evolucion
+const SIN_EVOLUCION = { materias: [], periodos: [] };
 
 /*
  * Evolución entre períodos de una carrera:
  *   1. Gráfico de la carrera completa o de una materia (% por estado e inscriptos).
- *   2. Tabla comparativa de dos períodos, por materia (cambio del % de libres).
+ *   2. Tabla comparativa de dos períodos, por materia (cambios de inscriptos y de libres).
+ * Los períodos con datos parciales (muy pocas comisiones) se marcan y no se usan por defecto.
  * Público: lo ve también el modo invitado.
  */
-// Respuesta vacía de /api/evolucion
-const SIN_EVOLUCION = { materias: [], periodos: [] };
 
 function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, theme }) {
   const [carreras, setCarreras] = useState([]);
@@ -100,13 +88,17 @@ function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, the
   const coincideCuatrimestre = (p) =>
     cuatrimestre === 'todos' || p.cuatrimestre.toUpperCase().startsWith(cuatrimestre);
 
-  const periodosGrafico = claveMateria ? deMateria.periodos : datosBase.periodos;
-  const puntos = periodosGrafico.filter(coincideCuatrimestre).map(aPunto);
+  // Períodos con muy pocas comisiones frente al resto de la carrera (se calculan sobre todos, sin filtro)
+  const parciales = periodosParciales(datosBase.periodos);
 
-  // Comparativa: períodos de la carrera con el filtro; por defecto, los dos más recientes
+  const periodosGrafico = claveMateria ? deMateria.periodos : datosBase.periodos;
+  const puntos = periodosGrafico.filter(coincideCuatrimestre).map((p) => aPunto(p, parciales));
+
+  // Comparativa: por defecto, los dos períodos más recientes que no sean parciales
   const labels = datosBase.periodos.filter(coincideCuatrimestre).map((p) => p.label);
-  const periodoA = labels.includes(periodoAElegido) ? periodoAElegido : (labels[labels.length - 2] || '');
-  const periodoB = labels.includes(periodoBElegido) ? periodoBElegido : (labels[labels.length - 1] || '');
+  const [defectoA, defectoB] = periodosPorDefecto(labels, parciales);
+  const periodoA = labels.includes(periodoAElegido) ? periodoAElegido : defectoA;
+  const periodoB = labels.includes(periodoBElegido) ? periodoBElegido : defectoB;
   const claveComparativa = carrera && periodoA && periodoB && periodoA !== periodoB
     ? `${carrera}|${periodoA}|${periodoB}` : null;
 
@@ -200,6 +192,7 @@ function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, the
                     Hay un solo período cargado con este filtro. Cargá otro para ver la evolución.
                   </p>
                 )}
+                <AvisoParcial parciales={parciales} labels={puntos.map((p) => p.label)} />
                 <GraficoEvolucion puntos={puntos} theme={theme} />
               </>
             )}
@@ -211,7 +204,7 @@ function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, the
               <div>
                 <h2 className={styles.cardTitle}>Comparar dos períodos</h2>
                 <p className={styles.subtitle}>
-                  Cambio del % de libres por materia. Por defecto, primero lo que más empeoró.
+                  Cambios de inscriptos y de libres por materia. Por defecto, primero lo que más empeoró.
                 </p>
               </div>
               <div className={styles.comparar}>
@@ -235,6 +228,7 @@ function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, the
               <div className={`skeleton ${styles.skTabla}`} aria-label="Cargando comparativa" />
             ) : (
               <>
+                <AvisoParcial parciales={parciales} labels={[periodoA, periodoB]} />
                 {filasComparativa.length > 0 && !filasComparativa.some((f) => f.cambio != null) && (
                   <p className={styles.aviso}>
                     Ninguna materia se repite entre los dos períodos (se comparan por código de

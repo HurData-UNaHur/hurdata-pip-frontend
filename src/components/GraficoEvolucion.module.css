@@ -1,0 +1,114 @@
+.contenedor {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Resumen del último período ───────────────────────────────────────── */
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.resumenItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-top: 3px solid;
+  background-color: var(--bg-subtle, #f1f5f9);
+}
+
+.resumenTitulo {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-secondary, #475569);
+}
+
+.resumenValor {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.buena,
+.mala,
+.igual {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.buena {
+  color: #16a34a;
+}
+
+.mala {
+  color: #ef4444;
+}
+
+.igual {
+  color: var(--text-secondary, #64748b);
+}
+
+/* ── Leyenda clickeable ───────────────────────────────────────────────── */
+.leyenda {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--text-secondary, #64748b);
+}
+
+.chip:focus-visible {
+  outline: 2px solid #007A33;
+  outline-offset: 2px;
+}
+
+.chipOff {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.punto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* ── Nota de datos parciales ──────────────────────────────────────────── */
+.nota {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #475569);
+}
+
+.notaPunto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px dashed #f59e0b;
+}

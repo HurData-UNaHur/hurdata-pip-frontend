@@ -1,5 +1,95 @@
 /* Misma base visual que la tabla de Materias */
 .contenedor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Resumen, controles y referencias ─────────────────────────────────── */
+.resumen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
+}
+
+.controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+
+.buscador {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  min-width: 240px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  background-color: var(--bg-subtle, #f1f5f9);
+  color: var(--text-secondary, #475569);
+}
+
+.buscador:focus-within {
+  border-color: #007A33;
+}
+
+.buscador input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-primary, #0f172a);
+  font-size: 0.85rem;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--text-primary, #0f172a);
+  cursor: pointer;
+}
+
+.switch input {
+  width: 16px;
+  height: 16px;
+  accent-color: #007A33;
+  cursor: pointer;
+}
+
+.referencias {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  font-size: 0.72rem;
+  color: var(--text-secondary, #475569);
+}
+
+.referencias i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 5px;
+  border-radius: 2px;
+}
+
+.periodos {
+  margin-left: auto;
+  font-weight: 600;
+}
+
+/* ── Tabla ────────────────────────────────────────────────────────────── */
+.scroll {
   overflow-x: auto;
 }
 
@@ -8,7 +98,7 @@
   border-collapse: collapse;
   text-align: left;
   font-size: 0.82rem;
-  min-width: 620px;
+  min-width: 860px;
 }
 
 .tabla th {
@@ -16,34 +106,80 @@
   color: var(--text-primary, #1e293b);
   border-bottom: 2px solid var(--border-color, #cbd5e1);
   padding: 0;
+  vertical-align: bottom;
 }
 
 .tabla td {
   padding: 8px 10px;
   border-bottom: 1px solid var(--border-color, #e2e8f0);
   color: var(--text-secondary, #334155);
+  vertical-align: middle;
 }
 
 .tabla tr:last-child td {
   border-bottom: none;
 }
 
-.sinCorte {
+/* Números alineados a la derecha, con cifras del mismo ancho */
+.derecha {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.centro {
+  text-align: center;
+}
+
+.filaSinPar td {
+  background-color: rgba(148, 163, 184, 0.07);
+}
+
+.vacio {
+  text-align: center;
+  opacity: 0.8;
+}
+
+/* ── Encabezados ordenables ───────────────────────────────────────────── */
+.thTexto {
+  display: flex;
+  flex-direction: column;
+  align-items: inherit;
+  line-height: 1.2;
+}
+
+.thTexto small {
+  margin-top: 2px;
+  font-size: 0.68rem;
+  font-weight: 500;
+  opacity: 0.75;
   white-space: nowrap;
+}
+
+.thFijo {
+  padding: 8px 10px;
+  font-weight: 700;
 }
 
 .sortBtn {
   all: unset;
   box-sizing: border-box;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 4px;
   width: 100%;
   padding: 8px 10px;
   cursor: pointer;
   font-weight: 700;
   color: inherit;
-  white-space: nowrap;
+}
+
+.sortBtnDerecha {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.sortBtnDerecha .thTexto {
+  align-items: flex-end;
 }
 
 .sortBtn:hover {
@@ -65,27 +201,117 @@
   color: #007A33;
 }
 
-/* Cambio del % de libres */
-.empeoro,
-.mejoro,
+/* ── Cambios (color según sea bueno o malo) ───────────────────────────── */
+.valores {
+  display: inline-block;
+  min-width: 96px;
+  color: var(--text-primary, #0f172a);
+  white-space: nowrap;
+}
+
+.delta,
 .igual {
+  display: inline-block;
+  min-width: 62px;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.74rem;
   font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
 }
 
-.empeoro {
-  color: #ef4444;
-}
-
-.mejoro {
+.bueno {
   color: #16a34a;
 }
 
-.igual,
-.sinDato {
+.malo {
+  color: #ef4444;
+}
+
+.delta.bueno {
+  background-color: rgba(34, 197, 94, 0.14);
+}
+
+.delta.malo {
+  background-color: rgba(239, 68, 68, 0.14);
+}
+
+.igual {
   color: var(--text-secondary, #64748b);
 }
 
-td.sinDato {
-  text-align: center;
-  opacity: 0.8;
+/* ── Etiquetas de materias sin par ────────────────────────────────────── */
+.etiquetaNueva,
+.etiquetaDisc {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.etiquetaNueva {
+  color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.14);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.etiquetaDisc {
+  color: var(--text-secondary, #64748b);
+  background-color: rgba(148, 163, 184, 0.14);
+  border: 1px solid rgba(148, 163, 184, 0.45);
+}
+
+/* ── Mini barras de distribución ──────────────────────────────────────── */
+.barras {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 150px;
+}
+
+.filaBarra {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filaBarra b {
+  width: 10px;
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: var(--text-secondary, #64748b);
+}
+
+.barra,
+.barraVacia {
+  display: flex;
+  flex: 1;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.barraVacia {
+  background-color: rgba(148, 163, 184, 0.2);
+}
+
+/* ── Alertas ──────────────────────────────────────────────────────────── */
+.alerta,
+.alertaCritica {
+  display: inline-flex;
+  cursor: help;
+}
+
+.alerta {
+  color: #f59e0b;
+}
+
+.alertaCritica {
+  color: #ef4444;
 }

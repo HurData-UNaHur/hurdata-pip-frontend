@@ -4,19 +4,10 @@ import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
 import EstadoVacio from '../components/EstadoVacio';
 import { formatearPeriodo } from '../utils/texto';
-
-// Umbrales de % de libres: los usan la columna Indicador y el color de las tarjetas
-const UMBRAL_RIESGO_ALTO = 70;
-const UMBRAL_ATENCION = 45;
-
-const COLOR_POR_NIVEL = {
-  riesgo: '#ef4444',   // rojo
-  atencion: '#f59e0b', // ámbar
-  estable: '#22c55e',  // verde
-};
-
-const nivelPorLibres = (pctLibre) =>
-  pctLibre >= UMBRAL_RIESGO_ALTO ? 'riesgo' : pctLibre >= UMBRAL_ATENCION ? 'atencion' : 'estable';
+// Los umbrales de % de libres (Indicador, colores de tarjetas, comparación de períodos) están en un solo lugar
+import {
+  COLOR_POR_NIVEL, UMBRAL_ATENCION, UMBRAL_RIESGO_ALTO, nivelPorLibres,
+} from '../utils/umbrales';
 
 function Materias({ 
   estadoDatos,
