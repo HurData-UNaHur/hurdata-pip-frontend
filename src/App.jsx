@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import Materias from './pages/Materias';
 import Predicciones from './pages/Predicciones';
 import Cargas from './pages/Cargas';
+import EstadoVacio from './components/EstadoVacio';
+// Evolución usa Recharts (pesado): se descarga recién cuando alguien entra a la página
+const Evolucion = lazy(() => import('./pages/Evolucion'));
 import Login from './pages/Login';
 import { transformarDatosBackend } from './utils/transformData';
 import { esTokenVigente, PERMISOS, tienePermiso } from './services/api';
@@ -387,6 +390,20 @@ function App() {
                 setCarrera={handleCambiarCarrera}
                 listaCarreras={listaCarreras}
               />
+            }
+          />
+          <Route
+            path="/evolucion"
+            element={
+              <Suspense fallback={<EstadoVacio estado="cargando" />}>
+                <Evolucion
+                  estadoDatos={estadoDatos}
+                  puedeCargar={puedeCargar}
+                  onReintentar={reintentarConexion}
+                  carreraInicial={carreraSeleccionada}
+                  theme={theme}
+                />
+              </Suspense>
             }
           />
           {tienePermiso(usuario, PERMISOS.VER_CARGAS) && (

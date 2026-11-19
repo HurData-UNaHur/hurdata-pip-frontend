@@ -42,6 +42,14 @@ function Navbar({ theme, toggleTheme, usuario, onLogout }) {
           >
             Predicciones
           </NavLink>
+          <NavLink
+            to="/evolucion"
+            className={({ isActive }) =>
+              isActive ? `${styles.link} ${styles.activeLink}` : styles.link
+            }
+          >
+            Evolución
+          </NavLink>
           {puedeVerCargas && (
             <NavLink
               to="/cargas"

@@ -1,0 +1,91 @@
+/* Misma base visual que la tabla de Materias */
+.contenedor {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.82rem;
+  min-width: 620px;
+}
+
+.tabla th {
+  background-color: var(--bg-subtle, #f1f5f9);
+  color: var(--text-primary, #1e293b);
+  border-bottom: 2px solid var(--border-color, #cbd5e1);
+  padding: 0;
+}
+
+.tabla td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  color: var(--text-secondary, #334155);
+}
+
+.tabla tr:last-child td {
+  border-bottom: none;
+}
+
+.sinCorte {
+  white-space: nowrap;
+}
+
+.sortBtn {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-weight: 700;
+  color: inherit;
+  white-space: nowrap;
+}
+
+.sortBtn:hover {
+  background-color: rgba(148, 163, 184, 0.12);
+}
+
+.sortBtn:focus-visible {
+  outline: 2px solid #007A33;
+  outline-offset: -2px;
+}
+
+.sortIcon {
+  font-size: 0.7rem;
+  opacity: 0.35;
+}
+
+.sortIconActive {
+  font-size: 0.7rem;
+  color: #007A33;
+}
+
+/* Cambio del % de libres */
+.empeoro,
+.mejoro,
+.igual {
+  font-weight: 700;
+}
+
+.empeoro {
+  color: #ef4444;
+}
+
+.mejoro {
+  color: #16a34a;
+}
+
+.igual,
+.sinDato {
+  color: var(--text-secondary, #64748b);
+}
+
+td.sinDato {
+  text-align: center;
+  opacity: 0.8;
+}

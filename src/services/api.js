@@ -149,6 +149,38 @@ export const getPeriodos = async () => {
 };
 
 /*
+ * ============================================================================
+ * EVOLUCIÓN (públicos, como /api/datos)
+ * ============================================================================
+ */
+
+const getJson = async (url, mensajeError) => {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(mensajeError);
+  return response.json();
+};
+
+/* Todas las carreras con datos, en cualquier período: [{ id, nombre }] */
+export const getCarrerasTodas = async () =>
+  (await getJson(`${API_URL}/api/carreras`, 'Error al obtener las carreras.')).carreras;
+
+/*
+ * Totales por período de una carrera (o de una materia), del más viejo al más nuevo.
+ * Retorna { materias: [{ codigo, nombre }], periodos: [{ label, comisiones, estados, ... }] }
+ */
+export const getEvolucion = async (carrera, materia = null) => {
+  const params = new URLSearchParams({ carrera });
+  if (materia) params.set('materia', materia);
+  return getJson(`${API_URL}/api/evolucion?${params}`, 'Error al obtener la evolución.');
+};
+
+/* Datos de un período + carrera (el mismo formato que usa el dashboard) */
+export const getDatos = async (periodo, carrera) => {
+  const params = new URLSearchParams({ periodo, carrera });
+  return getJson(`${API_URL}/api/datos?${params}`, 'Error al obtener los datos del período.');
+};
+
+/*
  * De qué Excel salen los datos de un período + carrera (requiere login).
  * Retorna { carga: { id_carga, fecha, nombre_archivo, cargado_por } | null }.
  */

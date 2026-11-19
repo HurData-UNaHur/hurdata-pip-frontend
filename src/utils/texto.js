@@ -14,6 +14,20 @@ export const plural = (cantidad, singular, pluralTexto) =>
  * Label de período del backend en formato de lectura.
  *   formatearPeriodo('2023 - PRIMER CUATRIMESTRE') → '2023 - Primer cuatrimestre'
  */
+/*
+ * Label de período corto, para ejes de gráficos.
+ *   formatearPeriodoCorto('2023 - PRIMER CUATRIMESTRE')  → '2023 · 1C'
+ *   formatearPeriodoCorto('2023 - SEGUNDO CUATRIMESTRE') → '2023 · 2C'
+ */
+export const formatearPeriodoCorto = (label) => {
+  if (!label) return '';
+  const [anio, ...resto] = label.split(' - ');
+  const nombre = resto.join(' - ').toUpperCase();
+  if (nombre.startsWith('PRIMER')) return `${anio} · 1C`;
+  if (nombre.startsWith('SEGUNDO')) return `${anio} · 2C`;
+  return formatearPeriodo(label);
+};
+
 export const formatearPeriodo = (label) => {
   if (!label) return '';
   const [anio, ...resto] = label.split(' - ');

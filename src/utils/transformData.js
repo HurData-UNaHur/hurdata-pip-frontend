@@ -1,5 +1,25 @@
 // utils/transformData.js
 
+/*
+ * Agrupa los estados del SIU en las 4 categorías que usa toda la app.
+ * Es la ÚNICA regla: la usan el dashboard (por comisión) y la evolución (por período).
+ *
+ *   estados: [{ estado: 'Libre', total_alumnos: 10 }, ...]
+ *   → { promo, reg, libre, desap, total }
+ *
+ * desap agrupa Insuficiente y Sin Condición para que la barra complete el 100 %.
+ */
+export function sumarEstados(estados = []) {
+  const get = (nombre) =>
+    estados.find((e) => e.estado?.toLowerCase() === nombre.toLowerCase())?.total_alumnos || 0;
+
+  const promo = get('Promocionó') || get('Promociono');
+  const reg = get('Regular');
+  const libre = get('Libre');
+  const desap = get('Insuficiente') + get('Sin Condición');
+  return { promo, reg, libre, desap, total: promo + reg + libre + desap };
+}
+
 export function transformarDatosBackend(resumenBackend) {
   if (!resumenBackend || !resumenBackend.actividades) {
     return { dataDashboard: {}, listaMaterias: [], nombreCarrera: '', carrerasDisponibles: [] };
@@ -24,16 +44,7 @@ export function transformarDatosBackend(resumenBackend) {
     let totalLibre = 0;
 
     const comisionesProcesadas = (act.comisiones || []).map((com) => {
-      // Helper flexible para buscar estados sin importar mayúsculas o variaciones
-      const getEstado = (nombre) => 
-        com.estados?.find((e) => e.estado?.toLowerCase() === nombre.toLowerCase())?.total_alumnos || 0;
-
-      const promo = getEstado('Promocionó') || getEstado('Promociono');
-      const reg = getEstado('Regular');
-      const libre = getEstado('Libre');
-      // Agrupamos Insuficiente y Sin Condición para que la barra complete el 100%
-      const desap = getEstado('Insuficiente') + getEstado('Sin Condición');
-      const total = promo + reg + libre + desap;
+      const { promo, reg, libre, desap, total } = sumarEstados(com.estados);
 
       totalInscriptos += total;
       totalPromo += promo;
