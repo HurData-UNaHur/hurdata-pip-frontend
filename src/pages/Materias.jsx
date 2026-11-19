@@ -33,6 +33,39 @@ function Materias({
   const rankingCritico = [...materiasProcesadas].sort((a, b) => b.pctLibre - a.pctLibre);
   const materiaMasCritica = rankingCritico[0] || { nombre: 'Sin datos', pctLibre: 0 };
 
+  // Orden de la tabla: por defecto, mayor deserción primero (igual que antes).
+  // Hacer clic en un encabezado ordena por esa columna; otro clic invierte el orden.
+  // clave: columna clickeada; campo: valor por el que se ordena.
+  // El indicador de cursada se calcula con el % de libres, así que ordena por ese valor.
+  const COLUMNAS = [
+    { clave: 'nombre', campo: 'nombre', titulo: 'Materia' },
+    { clave: 'comisiones', campo: 'comisiones', titulo: 'Comisiones' },
+    { clave: 'inscriptos', campo: 'inscriptos', titulo: 'Inscriptos' },
+    // Sin "(%)" en el título: las celdas ya muestran "62% (54)"; la aclaración va en el tooltip
+    { clave: 'promo', campo: 'pctPromo', titulo: 'Promoción', ayuda: '% sobre inscriptos (cantidad)' },
+    { clave: 'libres', campo: 'pctLibre', titulo: 'Libres / Abandono', ayuda: '% sobre inscriptos (cantidad)' },
+    { clave: 'indicador', campo: 'pctLibre', titulo: 'Indicador', ayuda: 'Según el % de libres: Riesgo alto ≥ 70 %, Atención ≥ 45 %' },
+  ];
+
+  const [orden, setOrden] = useState({ clave: 'libres', direccion: 'desc' });
+
+  const ordenarPor = (clave) => {
+    setOrden((prev) =>
+      prev.clave === clave
+        ? { clave, direccion: prev.direccion === 'asc' ? 'desc' : 'asc' }
+        // Columna nueva: texto de A a Z; números de mayor a menor
+        : { clave, direccion: clave === 'nombre' ? 'asc' : 'desc' }
+    );
+  };
+
+  const campoOrden = COLUMNAS.find((c) => c.clave === orden.clave).campo;
+  const materiasOrdenadas = [...materiasProcesadas].sort((a, b) => {
+    const cmp = campoOrden === 'nombre'
+      ? a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
+      : (a[campoOrden] ?? 0) - (b[campoOrden] ?? 0);
+    return orden.direccion === 'asc' ? cmp : -cmp;
+  });
+
   // Promedio general del porcentaje de libres entre todas las materias
   const promedioLibres = materiasProcesadas.length > 0
     ? Math.round(materiasProcesadas.reduce((acc, m) => acc + m.pctLibre, 0) / materiasProcesadas.length)
@@ -97,23 +130,38 @@ function Materias({
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Materia</th>
-              <th>Comisiones</th>
-              <th>Inscriptos</th>
-              <th>Promoción (%)</th>
-              <th>Libres / Abandono (%)</th>
-              <th>Indicador de cursada</th>
+              {COLUMNAS.map((col) => {
+                const activa = orden.clave === col.clave;
+                return (
+                  <th
+                    key={col.clave}
+                    aria-sort={activa ? (orden.direccion === 'asc' ? 'ascending' : 'descending') : 'none'}
+                  >
+                    <button
+                      type="button"
+                      className={styles.sortBtn}
+                      onClick={() => ordenarPor(col.clave)}
+                      title={`Ordenar por ${col.titulo}${col.ayuda ? ` — ${col.ayuda}` : ''}`}
+                    >
+                      {col.titulo}
+                      <span className={activa ? styles.sortIconActive : styles.sortIcon} aria-hidden="true">
+                        {activa ? (orden.direccion === 'asc' ? '▲' : '▼') : '↕'}
+                      </span>
+                    </button>
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
-            {rankingCritico.length === 0 && (
+            {materiasOrdenadas.length === 0 && (
               <tr>
                 <td colSpan={6} style={{ textAlign: 'center', opacity: 0.7 }}>
                   No hay datos cargados para el período y la carrera seleccionados.
                 </td>
               </tr>
             )}
-            {rankingCritico.map((m) => (
+            {materiasOrdenadas.map((m) => (
               <tr key={m.id}>
                 <td><strong>{m.nombre}</strong></td>
                 <td>{m.comisiones}</td>

@@ -98,3 +98,41 @@
   font-weight: 600;
   white-space: nowrap;
 }
+
+/* ── Encabezados ordenables ───────────────────────────────────────────── */
+.table th {
+  padding: 0;                   /* el padding lo pone el botón para que toda la celda sea clickeable */
+}
+
+.sortBtn {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-weight: 700;
+  color: inherit;
+  white-space: nowrap;          /* el título no se parte y la flecha queda pegada al texto */
+}
+
+.sortBtn:hover {
+  background-color: rgba(148, 163, 184, 0.12);
+}
+
+.sortBtn:focus-visible {
+  outline: 2px solid #007A33;
+  outline-offset: -2px;
+}
+
+.sortIcon {
+  font-size: 0.7rem;
+  opacity: 0.35;
+}
+
+.sortIconActive {
+  font-size: 0.7rem;
+  color: #007A33;
+}
