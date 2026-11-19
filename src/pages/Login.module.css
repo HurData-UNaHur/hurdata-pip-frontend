@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background-color: #f1f5f9;
+  background-color: #e2e8f0; /* un tono más oscuro que la tarjeta blanca para que se despegue y no encandile */
   position: relative;
   transition: background-color 0.3s ease;
 }
@@ -79,48 +79,14 @@
   line-height: 1.4;
 }
 
-/* ── Selección inicial de botones ─────────────────────────────────────── */
-.optionsContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.btnAutorizado {
-  background-color: #007A33;
-  color: #ffffff;
-  border: none;
-  border-radius: 12px;
-  padding: 16px;
-  font-size: 1.05rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  text-align: center;
-  transition: background-color 0.2s ease, transform 0.15s ease;
-}
-
-.btnAutorizado:hover {
-  background-color: #005e27;
-  transform: translateY(-1px);
-}
-
-.btnSubtext {
-  font-size: 0.78rem;
-  font-weight: 400;
-  color: #dcfce7;
-}
-
+/* ── Separador entre el formulario y el acceso como invitado ──────────── */
 .divider {
   display: flex;
   align-items: center;
   text-align: center;
-  color: #94a3b8;
+  color: #64748b;               /* 4.8:1 sobre blanco (antes #94a3b8: 2.6:1, no pasaba WCAG AA) */
   font-size: 0.82rem;
-  margin: 4px 0;
+  margin: 20px 0 14px;
 }
 
 .divider::before,
@@ -134,48 +100,44 @@
   padding: 0 10px;
 }
 
+/* Acceso secundario: una línea, borde fino y sin relleno, para no competir con "Ingresar" */
 .btnInvitado {
-  background-color: #f8fafc;
-  color: #1e293b;
+  width: 100%;
+  background-color: transparent;
+  color: #334155;
   border: 1px solid #cbd5e1;
-  border-radius: 12px;
-  padding: 14px 16px;
-  font-size: 1rem;
-  font-weight: 700;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 0.92rem;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 4px;
-  text-align: center;
+  gap: 6px;
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .btnInvitado:hover {
-  background-color: #e2e8f0;
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.btnInvitado:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btnSubtextInvitado {
-  font-size: 0.78rem;
   font-weight: 400;
   color: #64748b;
 }
 
-/* ── Formulario Personal Autorizado ───────────────────────────────────── */
+/* ── Formulario de ingreso ────────────────────────────────────────────── */
 .form {
   display: flex;
   flex-direction: column;
   gap: 14px;
-}
-
-.infoBanner {
-  background-color: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  color: #166534;
-  padding: 10px 12px;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  line-height: 1.4;
 }
 
 .fieldGroup {
@@ -236,28 +198,9 @@
   border-radius: 6px;
 }
 
-.formActions {
-  display: flex;
-  gap: 10px;
-  margin-top: 4px;
-}
-
-.btnVolver {
-  background-color: #e2e8f0;
-  color: #334155;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 16px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btnVolver:hover {
-  background-color: #cbd5e1;
-}
-
 .btnSubmit {
-  flex: 1;
+  width: 100%;
+  margin-top: 4px;
   background-color: #007A33;
   color: #ffffff;
   border: none;
@@ -272,8 +215,7 @@
   background-color: #005e27;
 }
 
-.btnSubmit:disabled,
-.btnVolver:disabled {
+.btnSubmit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -290,21 +232,20 @@
   flex-wrap: wrap;
 }
 
+/* Mismo estilo de link que "¿Olvidaste tu contraseña?" */
 .btnRegisterLink {
-  background: transparent;
-  border: 1px solid #007A33;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  font-weight: 600;
   color: #007A33;
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 0.82rem;
-  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  text-decoration: underline;
 }
 
 .btnRegisterLink:hover {
-  background-color: #007A33;
-  color: #ffffff;
+  color: #005e27;
 }
 
 .registerNotice {
@@ -393,23 +334,18 @@
 }
 
 :global([data-theme='dark']) .btnInvitado {
-  background-color: #0f172a;
-  color: #f1f5f9;
-  border-color: #334155;
+  background-color: transparent;
+  color: #e2e8f0;
+  border-color: #475569;
 }
 
 :global([data-theme='dark']) .btnInvitado:hover {
   background-color: #334155;
+  border-color: #64748b;
 }
 
 :global([data-theme='dark']) .btnSubtextInvitado {
   color: #94a3b8;
-}
-
-:global([data-theme='dark']) .infoBanner {
-  background-color: rgba(22, 101, 52, 0.25);
-  border-color: #166534;
-  color: #bbf7d0;
 }
 
 :global([data-theme='dark']) .fieldGroup label {
@@ -440,27 +376,16 @@
   color: #fca5a5;
 }
 
-:global([data-theme='dark']) .btnVolver {
-  background-color: #334155;
-  color: #f1f5f9;
-}
-
-:global([data-theme='dark']) .btnVolver:hover {
-  background-color: #475569;
-}
-
 :global([data-theme='dark']) .registerPrompt {
   color: #94a3b8;
 }
 
 :global([data-theme='dark']) .btnRegisterLink {
-  border-color: #22c55e;
   color: #4ade80;
 }
 
 :global([data-theme='dark']) .btnRegisterLink:hover {
-  background-color: #22c55e;
-  color: #0f172a;
+  color: #86efac;
 }
 
 :global([data-theme='dark']) .registerNotice {

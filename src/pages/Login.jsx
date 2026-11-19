@@ -6,7 +6,6 @@ import logoUnahur from '../assets/unahur.jpeg';
 import styles from './Login.module.css';
 
 export default function Login({ theme, toggleTheme, onLoginSuccess }) {
-  const [modoAutorizado, setModoAutorizado] = useState(false);
   const [mostrarRecuperar, setMostrarRecuperar] = useState(false);
   const [mostrarRegistro, setMostrarRegistro] = useState(false);
   const [usuario, setUsuario] = useState('');
@@ -21,7 +20,6 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
         toggleTheme={toggleTheme}
         onVolverLogin={() => {
           setMostrarRecuperar(false);
-          setModoAutorizado(true);
           setError(null);
         }}
       />
@@ -35,7 +33,6 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
         toggleTheme={toggleTheme}
         onVolverLogin={() => {
           setMostrarRegistro(false);
-          setModoAutorizado(true);
           setError(null);
         }}
       />
@@ -93,47 +90,10 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
           </p>
         </div>
 
-        {!modoAutorizado ? (
-          /* ── Vista inicial: Selección de tipo de acceso ── */
-          <div className={styles.optionsContainer}>
-            <button
-              type="button"
-              className={styles.btnAutorizado}
-              onClick={() => {
-                setModoAutorizado(true);
-                setError(null);
-              }}
-            >
-              🔐 Personal Autorizado UNAHUR
-              <span className={styles.btnSubtext}>
-                Docentes, No Docentes y Directivos (Sesión persistente)
-              </span>
-            </button>
-
-            <div className={styles.divider}>
-              <span>o bien</span>
-            </div>
-
-            <button
-              type="button"
-              className={styles.btnInvitado}
-              onClick={handleAccesoInvitado}
-            >
-              👤 Entrar como Invitado
-              <span className={styles.btnSubtextInvitado}>
-                Acceso temporal de lectura (sin modificación de archivos, se cierra al recargar)
-              </span>
-            </button>
-          </div>
-        ) : (
-          /* ── Formulario para Personal Autorizado UNAHUR ── */
-          <form onSubmit={handleSubmitAutorizado} className={styles.form}>
-            <div className={styles.infoBanner}>
-              Acceso exclusivo para <strong>Docentes, No Docentes y Directivos</strong> autorizados por la Universidad Nacional de Hurlingham.
-            </div>
-
+        {/* ── Formulario de ingreso (se muestra directo: la mayoría entra con su cuenta) ── */}
+        <form onSubmit={handleSubmitAutorizado} className={styles.form}>
             <div className={styles.fieldGroup}>
-              <label htmlFor="usuario">Usuario / Correo Institucional</label>
+              <label htmlFor="usuario">Correo institucional</label>
               <input
                 id="usuario"
                 type="text"
@@ -162,49 +122,48 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
                   onClick={() => setMostrarRecuperar(true)}
                   disabled={loading}
                 >
-                  Recuperar contraseña
+                  ¿Olvidaste tu contraseña?
                 </button>
               </div>
             </div>
 
             {error && <p className={styles.errorMsg}>⚠️ {error}</p>}
 
-            <div className={styles.formActions}>
-              <button
-                type="button"
-                className={styles.btnVolver}
-                onClick={() => {
-                  setModoAutorizado(false);
-                  setError(null);
-                }}
-                disabled={loading}
-              >
-                ← Volver
-              </button>
-              <button
-                type="submit"
-                className={styles.btnSubmit}
-                disabled={loading}
-              >
-                {loading ? 'Verificando...' : 'Ingresar'}
-              </button>
-            </div>
+            <button
+              type="submit"
+              className={styles.btnSubmit}
+              disabled={loading}
+            >
+              {loading ? 'Verificando...' : 'Ingresar'}
+            </button>
 
-            {/* ── Botón de Registro ── */}
             <div className={styles.registerPrompt}>
-              <span>¿No tenés usuario autorizado?</span>
+              <span>¿No tenés cuenta?</span>
               <button
                 type="button"
                 className={styles.btnRegisterLink}
                 onClick={() => setMostrarRegistro(true)}
                 disabled={loading}
               >
-                Registrarse
+                Solicitar acceso
               </button>
             </div>
+        </form>
 
-          </form>
-        )}
+        {/* ── Acceso secundario: invitado de solo lectura ── */}
+        <div className={styles.divider}>
+          <span>o</span>
+        </div>
+
+        <button
+          type="button"
+          className={styles.btnInvitado}
+          onClick={handleAccesoInvitado}
+          disabled={loading}
+        >
+          👤 Entrar como invitado
+          <span className={styles.btnSubtextInvitado}>· solo lectura</span>
+        </button>
       </div>
     </div>
   );
