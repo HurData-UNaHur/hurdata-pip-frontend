@@ -289,19 +289,19 @@ export const confirmarNuevaPassword = async (usuario, codigo, nuevaPassword) => 
 
 /*
  * ============================================================================
- * DIRECTIVOS
+ * INSTITUTOS
  * ============================================================================
  */
 
 /*
- * Obtiene la lista de directivos desde el backend.
- * Retorna el array directivos del objeto { directivos: [...] }.
+ * Institutos para el selector del registro.
+ * Retorna [{ id, nombre }]: el backend no envía los emails de las direcciones.
  */
-export const obtenerDirectivos = async () => {
-  const response = await fetch(`${API_URL}/api/directivos`);
-  if (!response.ok) throw new Error('Error al obtener la lista de directivos.');
+export const obtenerInstitutos = async () => {
+  const response = await fetch(`${API_URL}/api/institutos`);
+  if (!response.ok) throw new Error('Error al obtener la lista de institutos.');
   const data = await response.json();
-  return data.directivos;
+  return data.institutos;
 };
 
 
@@ -310,17 +310,24 @@ export const obtenerDirectivos = async () => {
  * REGISTRO CON APROBACIÓN DE DIRECTIVO
  * ============================================================================
  */
+/*
+ * Envía la solicitud de alta. El backend busca el email de la dirección del
+ * instituto a partir de id_instituto (el frontend nunca lo conoce).
+ * @param {string} rol  'directivo' | 'docente' | 'no_docente'
+ */
 export const solicitarRegistroUsuario = async ({
   email,
   nombre,
   password,
-  directivoEmail,
+  rol,
+  idInstituto,
 }) => {
   const payload = {
     email: email.trim().toLowerCase(),
     nombre: nombre.trim(),
     password,
-    directivo_email: directivoEmail,
+    rol,
+    id_instituto: idInstituto,
   };
 
   const response = await fetch(`${API_URL}/api/registro/solicitar`, {

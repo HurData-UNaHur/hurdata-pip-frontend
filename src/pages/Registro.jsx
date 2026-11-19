@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { obtenerDirectivos, solicitarRegistroUsuario } from '../services/api';
+import { obtenerInstitutos, solicitarRegistroUsuario } from '../services/api';
 import logoUnahur from '../assets/unahur.jpeg';
 import styles from './Registro.module.css';
 
+// id = rol del backend (app/api/permisos.py); nombre = lo que ve el usuario
 const ROLES_OPCIONES = [
-  { id: 'Directivo', label: '🏛️ Directivo' },
-  { id: 'Docente', label: '🎓 Docente' },
-  { id: 'Nodocente', label: '📋 No Docente' },
+  { id: 'directivo', nombre: 'Directivo', icono: '🏛️' },
+  { id: 'docente', nombre: 'Docente', icono: '🎓' },
+  { id: 'no_docente', nombre: 'No Docente', icono: '📋' },
 ];
 
 export default function Registro({ theme, toggleTheme, onVolverLogin }) {
@@ -14,29 +15,29 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
   const [nombre, setNombre] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [rol, setRol] = useState('Docente');
-  const [listaDirectivos, setListaDirectivos] = useState([]);
-  const [directivoEmail, setDirectivoEmail]   = useState('');
+  const [rol, setRol] = useState('docente');
+  // Institutos: el backend devuelve solo id y nombre (los emails de las direcciones no llegan al navegador)
+  const [listaInstitutos, setListaInstitutos] = useState([]);
+  const [idInstituto, setIdInstituto]         = useState('');
 
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
   const [enviado, setEnviado] = useState(false);
 
   useEffect(() => {
-    obtenerDirectivos()
-      .then((dirs) => {
-        setListaDirectivos(dirs);
-        if (dirs.length > 0) setDirectivoEmail((prev) => prev || dirs[0].email);
+    obtenerInstitutos()
+      .then((institutos) => {
+        setListaInstitutos(institutos);
+        if (institutos.length > 0) setIdInstituto((prev) => prev || String(institutos[0].id));
       })
       .catch(() => {
-        setListaDirectivos([]);
-        setError('No se pudieron cargar los directivos.');
+        setListaInstitutos([]);
+        setError('No se pudieron cargar los institutos.');
       });
   }, []);
 
-  const directivoSeleccionado = listaDirectivos.find(
-    (d) => d.email === directivoEmail
-  );
+  const institutoSeleccionado = listaInstitutos.find((i) => String(i.id) === idInstituto);
+  const rolSeleccionado = ROLES_OPCIONES.find((r) => r.id === rol);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,8 +58,8 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
       setError('Seleccioná un rol.');
       return;
     }
-    if (!directivoEmail) {
-      setError('Seleccioná un Directivo para enviar la solicitud.');
+    if (!institutoSeleccionado) {
+      setError('Seleccioná tu instituto para enviar la solicitud.');
       return;
     }
 
@@ -70,7 +71,7 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
         nombre,
         password,
         rol,
-        directivoEmail,
+        idInstituto: institutoSeleccionado.id,
       });
       setEnviado(true);
     } catch (err) {
@@ -98,7 +99,7 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
           </div>
           <h1 className={styles.title}>Registro de Usuario</h1>
           <p className={styles.subtitle}>
-            Completá tus datos y elegí el Directivo que autorizará tu alta
+            Completá tus datos y elegí tu instituto
           </p>
         </div>
 
@@ -171,31 +172,32 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
                     onClick={() => setRol(opcion.id)}
                     disabled={loading}
                   >
-                    {opcion.label}
+                    {opcion.icono} {opcion.nombre}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* ── Bloquesito para elegir el Directivo que autorizará el Alta ── */}
+            {/* ── Instituto: su dirección recibe la solicitud (el email se resuelve en el backend) ── */}
             <div className={styles.directorBox}>
-              <label htmlFor="reg-directivo">
-                🏛️ Directivo que autorizará tu solicitud
+              <label htmlFor="reg-instituto">
+                🏛️ Instituto
               </label>
               <select
-                id="reg-directivo"
-                value={directivoEmail}
-                onChange={(e) => setDirectivoEmail(e.target.value)}
-                disabled={loading}
+                id="reg-instituto"
+                value={idInstituto}
+                onChange={(e) => setIdInstituto(e.target.value)}
+                disabled={loading || listaInstitutos.length === 0}
               >
-                {listaDirectivos.map((dir) => (
-                  <option key={dir.id} value={dir.email}>
-                    {dir.nombre} — {dir.email}
+                {listaInstitutos.length === 0 && <option value="">Sin institutos disponibles</option>}
+                {listaInstitutos.map((inst) => (
+                  <option key={inst.id} value={String(inst.id)}>
+                    {inst.nombre}
                   </option>
                 ))}
               </select>
               <small>
-                Este Directivo recibirá tu solicitud para darte el alta y confirmar tu rol.
+                Tu solicitud llegará a la dirección del instituto para darte el alta y confirmar tu rol.
               </small>
             </div>
 
@@ -223,8 +225,8 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
           <div className={styles.successContainer}>
             <div className={styles.successBanner}>
               ✅ <strong>¡Datos registrados!</strong> Tu solicitud como{' '}
-              <strong>{rol}</strong> quedó asignada a{' '}
-              <strong>{directivoSeleccionado?.nombre}</strong> ({directivoEmail}).
+              <strong>{rolSeleccionado?.nombre}</strong> quedó enviada a la dirección del instituto{' '}
+              <strong>{institutoSeleccionado?.nombre}</strong>.
             </div>
 
             <button
