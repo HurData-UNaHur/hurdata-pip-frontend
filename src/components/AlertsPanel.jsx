@@ -1,3 +1,4 @@
+import { TriangleAlert } from 'lucide-react';
 import styles from './AlertsPanel.module.css';
 import { plural } from '../utils/texto';
 
@@ -20,7 +21,8 @@ function AlertsPanel({ comisiones }) {
           return (
             <div key={index} className={styles.alertBox}>
               <div className={styles.alertTitle}>
-                ⚠️ Alta deserción en {c.nombre}     
+                <TriangleAlert size={15} className="icono-inline" aria-hidden="true" />
+                Alta deserción en {c.nombre}
               </div> 
               <div className={styles.alertDesc}>
                 El <b>{pctLibre}%</b> de los inscriptos ({plural(c.libre, 'estudiante', 'estudiantes')}) quedaron libres o abandonaron.

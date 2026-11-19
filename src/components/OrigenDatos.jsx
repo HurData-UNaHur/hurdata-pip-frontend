@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import styles from './OrigenDatos.module.css';
+import { FileSpreadsheet } from 'lucide-react';
 import { getCargaActiva } from '../services/api';
 import { formatearFechaCorta } from '../utils/texto';
 
@@ -24,7 +25,8 @@ export default function OrigenDatos({ periodo, carrera }) {
 
   return (
     <p className={styles.origen}>
-      📄 Datos de <span className={styles.archivo}>{carga.nombre_archivo}</span>
+      <FileSpreadsheet size={14} className="icono-inline" aria-hidden="true" />
+      Datos de <span className={styles.archivo}>{carga.nombre_archivo}</span>
       {' · '}cargado por {carga.cargado_por} el {formatearFechaCorta(carga.fecha)}
     </p>
   );

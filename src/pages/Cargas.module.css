@@ -88,6 +88,19 @@
   display: none;
 }
 
+/* Texto de la zona de subida vacía: ícono arriba, texto abajo */
+.dropzoneTexto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Fila gris del historial mientras carga */
+.skFila {
+  height: 18px;
+}
+
 .acciones {
   display: flex;
   justify-content: space-between;
@@ -260,26 +273,21 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
   margin-left: 6px;
-  border-radius: 50%;
-  border: 1px solid var(--text-secondary, #64748b);
   color: var(--text-secondary, #64748b);
-  font-size: 0.68rem;
-  font-weight: 700;
-  font-style: italic;
-  font-family: Georgia, serif;
   cursor: help;
   vertical-align: middle;
+  border-radius: 50%;
 }
 
 .info:hover,
 .info:focus-visible {
-  border-color: var(--text-primary, #0f172a);
   color: var(--text-primary, #0f172a);
   outline: none;
+}
+
+.info:focus-visible {
+  box-shadow: 0 0 0 2px #007A33;
 }
 
 .info::after {

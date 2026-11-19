@@ -5,14 +5,13 @@
 }
 
 body {
-  background-color: #f4f6f8;
-  color: #2e393b;
   font-family: system-ui, -apple-system, sans-serif;
 }
 
 /* Variables por defecto: MODO CLARO */
 :root {
-  --bg-main: #f8fafc;
+  /* Fondo un tono más oscuro que las tarjetas blancas (igual que el login), para que no encandile */
+  --bg-main: #e2e8f0;
   --bg-card: #ffffff;
   --bg-subtle: #f1f5f9;
   --text-primary: #0f172a;
@@ -20,6 +19,8 @@ body {
   --border-color: #e2e8f0;
   --navbar-bg: #007A33;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --skeleton-base: #e2e8f0;
+  --skeleton-brillo: #f1f5f9;
 }
 
 /* Override de variables: MODO OSCURO */
@@ -32,10 +33,44 @@ body {
   --border-color: #334155;
   --navbar-bg: #064e23;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --skeleton-base: #334155;
+  --skeleton-brillo: #475569;
 }
 
 body {
   background-color: var(--bg-main);
   color: var(--text-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Íconos SVG (lucide-react) dentro de una línea de texto: alineados y con aire a la derecha */
+.icono-inline {
+  display: inline-block;
+  vertical-align: -0.15em;
+  margin-right: 0.35em;
+  flex-shrink: 0;
+}
+
+/* ── Pantallas de carga (skeleton) ─────────────────────────────────────── */
+@keyframes skeleton-brillo {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+.skeleton {
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-base) 25%,
+    var(--skeleton-brillo) 50%,
+    var(--skeleton-base) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-brillo 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
 }

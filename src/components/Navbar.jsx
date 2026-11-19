@@ -1,7 +1,9 @@
 import { NavLink } from 'react-router-dom';
 import styles from './Navbar.module.css';
 import logoUnahur from '../assets/unahur.jpeg';
+import { GraduationCap, User } from 'lucide-react';
 import { PERMISOS, tienePermiso } from '../services/api';
+import IconoTema from './IconoTema';
 
 function Navbar({ theme, toggleTheme, usuario, onLogout }) {
   // Usuario con login real (no invitado)
@@ -56,7 +58,10 @@ function Navbar({ theme, toggleTheme, usuario, onLogout }) {
         <div className={styles.rightActions}>
           {usuario && (
             <span className={styles.userBadge} title={usuario.cargo}>
-              {esAutorizado ? '🎓' : '👤'} {usuario.nombre}
+              {esAutorizado
+                ? <GraduationCap size={15} className="icono-inline" aria-hidden="true" />
+                : <User size={15} className="icono-inline" aria-hidden="true" />}
+              {usuario.nombre}
             </span>
           )}
 
@@ -65,7 +70,7 @@ function Navbar({ theme, toggleTheme, usuario, onLogout }) {
             onClick={toggleTheme} 
             title="Cambiar Tema"
           >
-            {theme === 'light' ? '🌙' : '☀️'}
+            <IconoTema theme={theme} sobreVerde />
           </button>
 
           {onLogout && (

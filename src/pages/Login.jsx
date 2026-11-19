@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { loginUnahur } from '../services/api';
 import RecuperarPassword from './RecuperarPassword';
 import Registro from './Registro';
+import { TriangleAlert, User } from 'lucide-react';
 import logoUnahur from '../assets/unahur.jpeg';
 import styles from './Login.module.css';
+import IconoTema from '../components/IconoTema';
 
 export default function Login({ theme, toggleTheme, onLoginSuccess }) {
   const [mostrarRecuperar, setMostrarRecuperar] = useState(false);
@@ -76,7 +78,7 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
         onClick={toggleTheme}
         title="Cambiar Tema"
       >
-        {theme === 'light' ? '🌙' : '☀️'}
+        <IconoTema theme={theme} />
       </button>
 
       <div className={styles.card}>
@@ -84,10 +86,10 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
           <div className={styles.logoWrapper}>
             <img src={logoUnahur} alt="UNaHur" className={styles.logo} />
           </div>
+          {/* Quién (antetítulo) → qué (título) → para qué (descripción) */}
+          <p className={styles.antetitulo}>Universidad Nacional de Hurlingham</p>
           <h1 className={styles.title}>HurData Académico</h1>
-          <p className={styles.subtitle}>
-            Universidad Nacional de Hurlingham — Análisis y Seguimiento de Cursadas
-          </p>
+          <p className={styles.subtitle}>Análisis y seguimiento de cursadas</p>
         </div>
 
         {/* ── Formulario de ingreso (se muestra directo: la mayoría entra con su cuenta) ── */}
@@ -127,7 +129,11 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
               </div>
             </div>
 
-            {error && <p className={styles.errorMsg}>⚠️ {error}</p>}
+            {error && (
+              <p className={styles.errorMsg}>
+                <TriangleAlert size={14} className="icono-inline" aria-hidden="true" />{error}
+              </p>
+            )}
 
             <button
               type="submit"
@@ -161,7 +167,8 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
           onClick={handleAccesoInvitado}
           disabled={loading}
         >
-          👤 Entrar como invitado
+          <User size={16} aria-hidden="true" />
+          Entrar como invitado
           <span className={styles.btnSubtextInvitado}>· solo lectura</span>
         </button>
       </div>

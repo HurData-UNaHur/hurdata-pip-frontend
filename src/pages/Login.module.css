@@ -79,6 +79,20 @@
   line-height: 1.4;
 }
 
+/* Antetítulo: la institución, chica y en mayúsculas espaciadas, arriba del título */
+.antetitulo {
+  margin: 0 0 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+:global([data-theme='dark']) .antetitulo {
+  color: #94a3b8;
+}
+
 /* ── Separador entre el formulario y el acceso como invitado ──────────── */
 .divider {
   display: flex;

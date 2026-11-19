@@ -60,3 +60,67 @@
   border-color: #007A33;
   color: #007A33;
 }
+
+.iconoVacio {
+  color: var(--text-secondary, #475569);
+}
+
+.iconoError {
+  color: #ef4444;
+}
+
+/* ── Skeleton de página (estado 'cargando') ───────────────────────────── */
+.skeletonPagina {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skeletonFiltros {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.skFiltro {
+  height: 34px;
+}
+
+.skeletonKpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.skKpi {
+  height: 104px;
+  border-radius: 10px;
+}
+
+.skeletonPaneles {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+.skPanel {
+  height: 180px;
+  border-radius: 10px;
+}
+
+@media (max-width: 900px) {
+  .skeletonPaneles {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .skeletonFiltros,
+  .skeletonKpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

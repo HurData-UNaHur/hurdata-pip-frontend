@@ -6,6 +6,17 @@ import {
 } from '../services/api';
 import logoUnahur from '../assets/unahur.jpeg';
 import styles from './RecuperarPassword.module.css';
+import { CircleCheck, TriangleAlert } from 'lucide-react';
+import IconoTema from '../components/IconoTema';
+
+// Mensaje de error del formulario (se repite en los 3 pasos)
+function ErrorMsg({ texto }) {
+  return (
+    <p className={styles.errorMsg}>
+      <TriangleAlert size={14} className="icono-inline" aria-hidden="true" />{texto}
+    </p>
+  );
+}
 
 export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin }) {
   const [paso, setPaso]                       = useState(1); // 1: Email | 2: Código | 3: Nueva clave | 4: Éxito
@@ -83,7 +94,7 @@ export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin })
         onClick={toggleTheme}
         title="Cambiar Tema"
       >
-        {theme === 'light' ? '🌙' : '☀️'}
+        <IconoTema theme={theme} />
       </button>
 
       <div className={styles.card}>
@@ -128,7 +139,7 @@ export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin })
               />
             </div>
 
-            {error && <p className={styles.errorMsg}>⚠️ {error}</p>}
+            {error && <ErrorMsg texto={error} />}
 
             <div className={styles.formActions}>
               <button
@@ -184,7 +195,7 @@ export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin })
               />
             </div>
 
-            {error && <p className={styles.errorMsg}>⚠️ {error}</p>}
+            {error && <ErrorMsg texto={error} />}
 
             <div className={styles.formActions}>
               <button
@@ -232,7 +243,7 @@ export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin })
               />
             </div>
 
-            {error && <p className={styles.errorMsg}>⚠️ {error}</p>}
+            {error && <ErrorMsg texto={error} />}
 
             <div className={styles.formActions}>
               <button
@@ -260,7 +271,9 @@ export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin })
         {/* ── PASO 4: Confirmación Exitosa ── */}
         {paso === 4 && (
           <div className={styles.successBox}>
-            <div className={styles.successIcon}>✅</div>
+            <div className={styles.successIcon}>
+              <CircleCheck size={44} color="#16a34a" aria-hidden="true" />
+            </div>
             <h3>¡Contraseña actualizada!</h3>
             <p>
               Ya podés iniciar sesión en <strong>HurData Académico</strong> con tu nueva clave.

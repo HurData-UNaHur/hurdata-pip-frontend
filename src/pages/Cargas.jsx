@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { CircleCheck, CloudUpload, FileSpreadsheet, Info, TriangleAlert } from 'lucide-react';
 import styles from './Cargas.module.css';
 import {
   getCargas, uploadSiuExcel, deletePeriodo, resetDatabase, PERMISOS, tienePermiso,
@@ -35,6 +36,11 @@ const avisoOmitidas = (r = {}) => {
 };
 
 const TEXTO_ESTADO_BAJA = { reemplazada: 'Reemplazada', borrada: 'Borrada' };
+
+// Ícono delante de los mensajes de resultado: verde si salió bien, rojo si no
+const IconoResultado = ({ ok }) => (ok
+  ? <CircleCheck size={15} color="#16a34a" className="icono-inline" aria-hidden="true" />
+  : <TriangleAlert size={15} color="#ef4444" className="icono-inline" aria-hidden="true" />);
 
 /*
  * Página Cargas: todo lo relacionado con los Excel del SIU.
@@ -262,9 +268,15 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
             aria-label="Elegir archivo .xlsx"
           >
             {archivo ? (
-              <span>📄 <strong>{archivo.name}</strong> — hacé clic para cambiarlo</span>
+              <span>
+                <FileSpreadsheet size={16} className="icono-inline" aria-hidden="true" />
+                <strong>{archivo.name}</strong> — hacé clic para cambiarlo
+              </span>
             ) : (
-              <span>Arrastrá el archivo <code>.xlsx</code> acá o hacé clic para elegirlo</span>
+              <span className={styles.dropzoneTexto}>
+                <CloudUpload size={28} aria-hidden="true" />
+                Arrastrá el archivo <code>.xlsx</code> acá o hacé clic para elegirlo
+              </span>
             )}
             <input
               ref={inputArchivo}
@@ -291,7 +303,7 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
           </div>
           {resultado && (
             <div className={resultado.ok ? styles.msgOk : styles.msgError}>
-              <p>{resultado.ok ? '✅' : '⚠️'} {resultado.texto}</p>
+              <p><IconoResultado ok={resultado.ok} />{resultado.texto}</p>
               {resultado.aviso && <p className={styles.msgAviso}>{resultado.aviso}</p>}
             </div>
           )}
@@ -319,11 +331,11 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
           </div>
         </div>
 
-        {error && <p className={styles.error}>⚠️ {error}</p>}
+        {error && <p className={styles.error}><IconoResultado ok={false} />{error}</p>}
 
         {resultadoAccion && (
           <div className={resultadoAccion.ok ? styles.msgOk : styles.msgError}>
-            <p>{resultadoAccion.ok ? '✅' : '⚠️'} {resultadoAccion.texto}</p>
+            <p><IconoResultado ok={resultadoAccion.ok} />{resultadoAccion.texto}</p>
             {resultadoAccion.aviso && <p className={styles.msgAviso}>{resultadoAccion.aviso}</p>}
           </div>
         )}
@@ -354,7 +366,12 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={9} className={styles.vacio}>Cargando historial...</td></tr>
+                // Filas grises mientras llega el historial
+                [0, 1, 2].map((i) => (
+                  <tr key={`sk-${i}`} aria-hidden="true">
+                    <td colSpan={9}><div className={`skeleton ${styles.skFila}`} /></td>
+                  </tr>
+                ))
               ) : cargas.length === 0 ? (
                 <tr><td colSpan={9} className={styles.vacio}>No hay cargas para mostrar.</td></tr>
               ) : (
@@ -383,7 +400,7 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
                         <span className={badge.clase}>{badge.texto}</span>
                         {infoBaja && (
                           <span className={styles.info} tabIndex={0} aria-label={infoBaja} data-tooltip={infoBaja}>
-                            i
+                            <Info size={15} aria-hidden="true" />
                           </span>
                         )}
                       </td>

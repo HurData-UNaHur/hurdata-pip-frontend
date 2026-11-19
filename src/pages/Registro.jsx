@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
+import { CircleCheck, ClipboardList, GraduationCap, Landmark, TriangleAlert } from 'lucide-react';
 import { obtenerInstitutos, solicitarRegistroUsuario } from '../services/api';
+import IconoTema from '../components/IconoTema';
 import logoUnahur from '../assets/unahur.jpeg';
 import styles from './Registro.module.css';
 
 // id = rol del backend (app/api/permisos.py); nombre = lo que ve el usuario
 const ROLES_OPCIONES = [
-  { id: 'directivo', nombre: 'Directivo', icono: '🏛️' },
-  { id: 'docente', nombre: 'Docente', icono: '🎓' },
-  { id: 'no_docente', nombre: 'No Docente', icono: '📋' },
+  { id: 'directivo', nombre: 'Directivo', Icono: Landmark },
+  { id: 'docente', nombre: 'Docente', Icono: GraduationCap },
+  { id: 'no_docente', nombre: 'No Docente', Icono: ClipboardList },
 ];
 
 export default function Registro({ theme, toggleTheme, onVolverLogin }) {
@@ -89,7 +91,7 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
         onClick={toggleTheme}
         title="Cambiar Tema"
       >
-        {theme === 'light' ? '🌙' : '☀️'}
+        <IconoTema theme={theme} />
       </button>
 
       <div className={styles.card}>
@@ -172,7 +174,8 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
                     onClick={() => setRol(opcion.id)}
                     disabled={loading}
                   >
-                    {opcion.icono} {opcion.nombre}
+                    <opcion.Icono size={15} className="icono-inline" aria-hidden="true" />
+                    {opcion.nombre}
                   </button>
                 ))}
               </div>
@@ -181,7 +184,8 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
             {/* ── Instituto: su dirección recibe la solicitud (el email se resuelve en el backend) ── */}
             <div className={styles.directorBox}>
               <label htmlFor="reg-instituto">
-                🏛️ Instituto
+                <Landmark size={15} className="icono-inline" aria-hidden="true" />
+                Instituto
               </label>
               <select
                 id="reg-instituto"
@@ -201,7 +205,11 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
               </small>
             </div>
 
-            {error && <p className={styles.errorMsg}>⚠️ {error}</p>}
+            {error && (
+              <p className={styles.errorMsg}>
+                <TriangleAlert size={14} className="icono-inline" aria-hidden="true" />{error}
+              </p>
+            )}
 
             <div className={styles.formActions}>
               <button
@@ -224,7 +232,8 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
         ) : (
           <div className={styles.successContainer}>
             <div className={styles.successBanner}>
-              ✅ <strong>¡Datos registrados!</strong> Tu solicitud como{' '}
+              <CircleCheck size={16} className="icono-inline" aria-hidden="true" />
+              <strong>¡Datos registrados!</strong> Tu solicitud como{' '}
               <strong>{rolSeleccionado?.nombre}</strong> quedó enviada a la dirección del instituto{' '}
               <strong>{institutoSeleccionado?.nombre}</strong>.
             </div>
