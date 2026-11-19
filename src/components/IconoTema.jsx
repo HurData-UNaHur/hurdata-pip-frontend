@@ -4,7 +4,7 @@ import { Moon, Sun } from 'lucide-react';
  * Ícono del botón de cambio de tema: luna en modo claro (pasar a oscuro),
  * sol en modo oscuro (pasar a claro).
  *
- *   sobreVerde: el botón está en la Navbar verde → la luna va en blanco.
+ *   sobreVerde: el botón está sobre un fondo verde → la luna va en blanco.
  */
 export default function IconoTema({ theme, sobreVerde = false, size = 18 }) {
   return theme === 'light'

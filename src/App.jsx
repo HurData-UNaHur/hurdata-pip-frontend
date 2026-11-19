@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
+import AppShell from './components/AppShell';
 import Dashboard from './pages/Dashboard';
 import Materias from './pages/Materias';
 import Predicciones from './pages/Predicciones';
@@ -328,14 +328,12 @@ function App() {
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <BrowserRouter key={resetKey}>
-      <Navbar
+      <AppShell
         theme={theme}
         toggleTheme={toggleTheme}
         usuario={usuario}
         onLogout={handleLogout}
-      />
-
-      <main style={{ padding: 'clamp(12px, 3vw, 24px)' }}>
+      >
         <Routes>
           <Route
             path="/"
@@ -419,7 +417,7 @@ function App() {
             />
           )}
         </Routes>
-      </main>
+      </AppShell>
     </BrowserRouter>
   );
 }

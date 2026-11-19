@@ -1,0 +1,291 @@
+/* Marco: cabecera arriba, barra lateral a la izquierda, contenido a la derecha */
+.shell {
+  --alto-cabecera: 64px;
+  --ancho-sidebar: 232px;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: var(--ancho-sidebar) minmax(0, 1fr);
+  grid-template-rows: var(--alto-cabecera) 1fr auto;
+  grid-template-areas:
+    "header header"
+    "sidebar contenido"
+    "sidebar footer";
+}
+
+/* ── Cabecera ─────────────────────────────────────────────── */
+.header {
+  grid-area: header;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 20px;
+  background-color: var(--bg-card, #ffffff);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+.marca {
+  display: flex;
+  align-items: center;
+  margin-right: auto;
+}
+/* El logo es gris oscuro sobre transparente: va en una caja blanca para verse también en modo oscuro */
+.logoCaja {
+  display: inline-flex;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+.logoCabecera {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+/*
+ * Modo oscuro: sin caja blanca. invert + hue-rotate(180deg) invierte la luminosidad (el texto gris
+ * oscuro pasa a gris claro) y mantiene los tonos del símbolo, que son de brillo medio.
+ */
+[data-theme="dark"] .logoCaja {
+  background-color: transparent;
+  padding: 0;
+}
+[data-theme="dark"] .logoCabecera {
+  filter: invert(1) hue-rotate(180deg);
+}
+.hamburguesa {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-primary, #0f172a);
+  cursor: pointer;
+}
+
+/* ── Usuario ──────────────────────────────────────────────── */
+.usuario {
+  position: relative;
+}
+.usuarioBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px 5px 6px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-primary, #0f172a);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.usuarioBtn:hover {
+  background-color: var(--bg-subtle, #f1f5f9);
+}
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #007A33;
+  color: #ffffff;
+}
+.nombre {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.desplegable {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 210px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background-color: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+}
+.cargo {
+  margin: 0;
+  padding: 6px 10px 8px;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #475569);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+.opcion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-primary, #0f172a);
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+}
+.opcion:hover {
+  background-color: var(--bg-subtle, #f1f5f9);
+}
+.salir {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* ── Barra lateral ────────────────────────────────────────── */
+.sidebar {
+  grid-area: sidebar;
+  position: sticky;
+  top: var(--alto-cabecera);
+  height: calc(100vh - var(--alto-cabecera));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 12px;
+  background-color: #1f2d3d;
+  color: #e2e8f0;
+  overflow-y: auto;
+}
+[data-theme="dark"] .sidebar {
+  background-color: #0b1220;
+  border-right: 1px solid var(--border-color, #334155);
+}
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 8px;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.item:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+.itemActivo,
+.itemActivo:hover {
+  background-color: #ea7a1c;
+  color: #ffffff;
+}
+.pie {
+  display: flex;
+  justify-content: center;
+  padding-top: 16px;
+}
+.logoPie {
+  width: 104px;
+  height: auto;
+  display: block;
+  /* El logo gris se pasa a blanco para leerse sobre el fondo oscuro, sin competir con el de la cabecera */
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+
+/* ── Footer ─────────────────────────────────────────────── */
+.footer {
+  grid-area: footer;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 24px;
+  padding: 14px clamp(12px, 3vw, 24px);
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  background-color: var(--bg-card, #ffffff);
+  color: var(--text-secondary, #475569);
+  font-size: 0.75rem;
+}
+
+/* ── Contenido ────────────────────────────────────────────── */
+.contenido {
+  grid-area: contenido;
+  min-width: 0;
+  padding: clamp(12px, 3vw, 24px);
+}
+
+.fondo {
+  display: none;
+}
+
+/* ── Celular y tablet: la barra lateral se vuelve un menú deslizable ── */
+@media (max-width: 900px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "header"
+      "contenido";
+  }
+  .hamburguesa {
+    display: inline-flex;
+  }
+  .marca {
+    margin-right: auto;
+  }
+  .sidebar {
+    position: fixed;
+    top: var(--alto-cabecera);
+    left: 0;
+    bottom: 0;
+    width: var(--ancho-sidebar);
+    height: auto;
+    z-index: 40;
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+  }
+  .sidebarAbierta {
+    transform: translateX(0);
+    box-shadow: 8px 0 24px rgba(0, 0, 0, 0.35);
+  }
+  .fondo {
+    display: block;
+    position: fixed;
+    inset: var(--alto-cabecera) 0 0 0;
+    z-index: 35;
+    border: none;
+    background: rgba(15, 23, 42, 0.45);
+    cursor: pointer;
+  }
+  .nombre {
+    display: none;
+  }
+  .usuarioBtn {
+    padding-right: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logoCabecera {
+    height: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
+}
