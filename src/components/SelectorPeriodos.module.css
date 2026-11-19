@@ -1,0 +1,58 @@
+.selector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  min-width: 0;
+}
+.legend {
+  padding: 0 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-secondary, #475569);
+}
+.grupos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+.grupo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.anio {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+}
+.opcion {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #475569);
+  cursor: pointer;
+}
+.acciones {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+.acciones button {
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: transparent;
+  color: var(--text-primary, #0f172a);
+  cursor: pointer;
+}
+.acciones button:hover {
+  background-color: var(--bg-hover, rgba(148, 163, 184, 0.15));
+}

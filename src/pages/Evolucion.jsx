@@ -4,6 +4,7 @@ import EstadoVacio from '../components/EstadoVacio';
 import GraficoEvolucion from '../components/GraficoEvolucion';
 import TablaComparativa from '../components/TablaComparativa';
 import AvisoParcial from '../components/AvisoParcial';
+import SelectorPeriodos from '../components/SelectorPeriodos';
 import { compararMaterias } from '../utils/comparar';
 import { getCarrerasTodas, getDatos, getEvolucion } from '../services/api';
 import { transformarDatosBackend } from '../utils/transformData';
@@ -34,6 +35,7 @@ function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, the
   const [materia, setMateria] = useState('');               // '' = toda la carrera
   const [periodoAElegido, setPeriodoAElegido] = useState('');
   const [periodoBElegido, setPeriodoBElegido] = useState('');
+  const [excluidos, setExcluidos] = useState([]);        // períodos destildados del gráfico
   const [error, setError] = useState(null);
 
   // Cada respuesta se guarda junto con la consulta que la pidió ('clave'):
@@ -92,7 +94,8 @@ function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, the
   const parciales = periodosParciales(datosBase.periodos);
 
   const periodosGrafico = claveMateria ? deMateria.periodos : datosBase.periodos;
-  const puntos = periodosGrafico.filter(coincideCuatrimestre).map((p) => aPunto(p, parciales));
+  const periodosElegibles = periodosGrafico.filter(coincideCuatrimestre);
+  const puntos = periodosElegibles.filter((p) => !excluidos.includes(p.label)).map((p) => aPunto(p, parciales));
 
   // Comparativa: por defecto, los dos períodos más recientes que no sean parciales
   const labels = datosBase.periodos.filter(coincideCuatrimestre).map((p) => p.label);
@@ -129,6 +132,7 @@ function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, the
   const cambiarCarrera = (nueva) => {
     setCarreraElegida(nueva);
     setMateria('');
+    setExcluidos([]);
     setPeriodoAElegido('');
     setPeriodoBElegido('');
   };
@@ -181,10 +185,14 @@ function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, the
               </div>
             </div>
 
+            {!cargandoGrafico && (
+              <SelectorPeriodos periodos={periodosElegibles} excluidos={excluidos} onChange={setExcluidos} />
+            )}
+
             {cargandoGrafico ? (
               <div className={`skeleton ${styles.skGrafico}`} aria-label="Cargando gráfico" />
             ) : puntos.length === 0 ? (
-              <p className={styles.aviso}>No hay datos para la carrera y el cuatrimestre elegidos.</p>
+              <p className={styles.aviso}>No hay períodos para mostrar. Revisá el cuatrimestre y los períodos tildados.</p>
             ) : (
               <>
                 {puntos.length === 1 && (
