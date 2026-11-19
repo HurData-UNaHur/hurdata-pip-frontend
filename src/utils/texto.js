@@ -20,3 +20,16 @@ export const formatearPeriodo = (label) => {
   const nombre = resto.join(' - ').toLowerCase();
   return nombre ? `${anio} - ${nombre.charAt(0).toUpperCase()}${nombre.slice(1)}` : label;
 };
+
+/*
+ * Fecha ISO 8601 (UTC, como la guarda el backend) en hora local, formato corto
+ * de 24 h para que entre en una línea.
+ *   formatearFechaCorta('2026-11-18T22:14:05+00:00') → '18/11/26 19:14' (en Argentina)
+ */
+export const formatearFechaCorta = (iso) => {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const dos = (n) => String(n).padStart(2, '0');
+  return `${dos(d.getDate())}/${dos(d.getMonth() + 1)}/${String(d.getFullYear()).slice(-2)} ` +
+    `${dos(d.getHours())}:${dos(d.getMinutes())}`;
+};

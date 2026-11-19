@@ -34,15 +34,11 @@
   gap: 12px;
 }
 
+/* Gráfico y alertas lado a lado, siempre con la misma altura (aunque no haya alertas) */
 .mainGrid {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 16px;
-  align-items: start;
-}
-
-/* Se activa solo cuando cantidad de comisiones === cantidad de alertas */
-.mainGridEqual {
   align-items: stretch;
 }
 

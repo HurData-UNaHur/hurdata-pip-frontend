@@ -1,0 +1,11 @@
+/* Línea informativa debajo de los filtros: de qué Excel salen los datos */
+.origen {
+  margin: -4px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-secondary, #475569);
+}
+
+.archivo {
+  font-style: italic;
+  font-weight: 600;
+}

@@ -46,6 +46,9 @@ function App() {
     return saved ? JSON.parse(saved) : [];
   });
   const [materiaSeleccionada, setMateriaSeleccionada] = useState('');
+  // Conexión con el backend: 'cargando' | 'ok' | 'error' (separa "backend caído" de "no hay datos")
+  const [estadoConexion, setEstadoConexion] = useState('cargando');
+  const [intentoCarga, setIntentoCarga] = useState(0);
 
   // ── Sesión de Usuario ─────────────────────────────────────────────────────
   const handleLoginSuccess = (datosUsuario) => {
@@ -108,6 +111,7 @@ function App() {
   const toggleTheme = () => setTheme((t) => (t === 'light' ? 'dark' : 'light'));
 
   // ── Carga inicial de períodos ─────────────────────────────────────────────
+  // Se repite al tocar "Reintentar" (intentoCarga cambia).
   useEffect(() => {
     let cancelado = false;
 
@@ -118,6 +122,7 @@ function App() {
       })
       .then((data) => {
         if (cancelado) return;
+        setEstadoConexion('ok');
         if (data?.periodos?.length > 0) {
           setListaPeriodos(data.periodos);
           setPeriodoSeleccionado(data.periodos[0].label);
@@ -126,11 +131,25 @@ function App() {
         }
       })
       .catch(() => {
-        if (!cancelado) quedarSinDatos();
+        if (cancelado) return;
+        // Backend caído: no es lo mismo que "no hay datos"
+        quedarSinDatos();
+        setEstadoConexion('error');
       });
 
     return () => { cancelado = true; };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [intentoCarga]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const reintentarConexion = () => {
+    setEstadoConexion('cargando');
+    setIntentoCarga((n) => n + 1);
+  };
+
+  // Lo que ven las páginas: 'cargando' | 'error' | 'vacio' (sin datos en la DB) | 'ok'
+  const estadoDatos = estadoConexion !== 'ok'
+    ? estadoConexion
+    : (listaPeriodos.length > 0 ? 'ok' : 'vacio');
+  const puedeCargar = tienePermiso(usuario, PERMISOS.CARGAR);
 
   // ── Carreras al cambiar período ───────────────────────────────────────────
   useEffect(() => {
@@ -160,6 +179,7 @@ function App() {
         setListaCarreras([]);
         setCarreraSeleccionada('');
         localStorage.removeItem('hurdata_carrera_activa');
+        setEstadoConexion('error');
       });
   }, [periodoSeleccionado]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -176,7 +196,10 @@ function App() {
         return res.json();
       })
       .then((data) => actualizarDatosLocales(data))
-      .catch(() => limpiarDatosLocales());
+      .catch(() => {
+        limpiarDatosLocales();
+        setEstadoConexion('error');
+      });
   }, [periodoSeleccionado, carreraSeleccionada]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCambiarCarrera = (nuevaCarrera) => {
@@ -196,6 +219,7 @@ function App() {
       const periodoActivo = periodoSubido || (dataP?.periodos?.[0]?.label ?? periodoSeleccionado);
 
       if (dataP?.periodos?.length > 0) setListaPeriodos(dataP.periodos);
+      setEstadoConexion('ok'); // la subida demuestra que el backend responde
 
       // 2. Refrescar carreras del período subido
       const resCarreras = await fetch(`${API_URL}/api/carreras?periodo=${encodeURIComponent(periodoActivo)}`);
@@ -250,14 +274,16 @@ function App() {
 
     try {
       const res = await fetch(`${API_URL}/api/periodos`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.periodos?.length > 0) {
-          periodosFinal = data.periodos;
-          periodoFinal  = data.periodos[0].label;
-        }
+      if (!res.ok) throw new Error('sin respuesta');
+      const data = await res.json();
+      if (data?.periodos?.length > 0) {
+        periodosFinal = data.periodos;
+        periodoFinal  = data.periodos[0].label;
       }
-    } catch { /* sin conexión: queda vacío */ }
+      setEstadoConexion('ok');
+    } catch {
+      setEstadoConexion('error'); // sin conexión: se muestra el error con "Reintentar"
+    }
 
     if (periodoFinal) try {
       const res = await fetch(`${API_URL}/api/carreras?periodo=${encodeURIComponent(periodoFinal)}`);
@@ -312,6 +338,10 @@ function App() {
             path="/"
             element={
               <Dashboard
+                estadoDatos={estadoDatos}
+                puedeCargar={puedeCargar}
+                onReintentar={reintentarConexion}
+                mostrarOrigen={tieneSesionPersistente(usuario)}
                 dataExcel={dataDashboard}
                 listaMateriasExcel={listaMateriasExcel}
                 periodo={periodoSeleccionado}
@@ -327,6 +357,9 @@ function App() {
             path="/materias"
             element={
               <Materias
+                estadoDatos={estadoDatos}
+                puedeCargar={puedeCargar}
+                onReintentar={reintentarConexion}
                 listaMateriasExcel={listaMateriasExcel}
                 periodo={periodoSeleccionado}
                 setPeriodo={setPeriodoSeleccionado}
@@ -341,6 +374,9 @@ function App() {
             path="/predicciones"
             element={
               <Predicciones
+                estadoDatos={estadoDatos}
+                puedeCargar={puedeCargar}
+                onReintentar={reintentarConexion}
                 listaMateriasExcel={listaMateriasExcel}
                 materiaSeleccionada={materiaSeleccionada}
                 setMateriaSeleccionada={setMateriaSeleccionada}

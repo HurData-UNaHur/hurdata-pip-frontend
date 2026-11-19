@@ -3,7 +3,7 @@ import styles from './Cargas.module.css';
 import {
   getCargas, uploadSiuExcel, deletePeriodo, resetDatabase, PERMISOS, tienePermiso,
 } from '../services/api';
-import { formatearPeriodo, plural } from '../utils/texto';
+import { formatearFechaCorta, formatearPeriodo, plural } from '../utils/texto';
 
 const ESTADOS = [
   { value: '', label: 'Todos los estados' },
@@ -18,15 +18,8 @@ const BADGE_POR_ESTADO = {
   borrada: { clase: styles.badgeBorrada, texto: 'Borrada' },
 };
 
-// El backend guarda las fechas en UTC (ISO 8601); se muestran en hora local,
-// formato corto de 24 h para que entren en una línea: '18/11/26 19:14'
-const formatearFecha = (iso) => {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  const dos = (n) => String(n).padStart(2, '0');
-  return `${dos(d.getDate())}/${dos(d.getMonth() + 1)}/${String(d.getFullYear()).slice(-2)} ` +
-    `${dos(d.getHours())}:${dos(d.getMinutes())}`;
-};
+// Fechas del backend (UTC) en hora local y en una línea: '18/11/26 19:14'
+const formatearFecha = formatearFechaCorta;
 
 // Texto del resultado de una subida (resumen que devuelve POST /upload)
 const textoResumen = (r = {}) =>

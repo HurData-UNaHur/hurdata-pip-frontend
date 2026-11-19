@@ -2,6 +2,7 @@ import { useState } from 'react';
 import styles from './Materias.module.css';
 import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
+import EstadoVacio from '../components/EstadoVacio';
 import { formatearPeriodo } from '../utils/texto';
 
 // Umbrales de % de libres: los usan la columna Indicador y el color de las tarjetas
@@ -18,6 +19,9 @@ const nivelPorLibres = (pctLibre) =>
   pctLibre >= UMBRAL_RIESGO_ALTO ? 'riesgo' : pctLibre >= UMBRAL_ATENCION ? 'atencion' : 'estable';
 
 function Materias({ 
+  estadoDatos,
+  puedeCargar,
+  onReintentar,
   listaMateriasExcel, 
   periodo, 
   setPeriodo, 
@@ -98,6 +102,10 @@ function Materias({
         </p>
       </header>
 
+      {estadoDatos !== 'ok' ? (
+        <EstadoVacio estado={estadoDatos} puedeCargar={puedeCargar} onReintentar={onReintentar} />
+      ) : (
+      <>
       {/* Filtros idénticos a Dashboard */}
       <Filters 
         materia={materia}
@@ -201,6 +209,8 @@ function Materias({
           </tbody>
         </table>
       </section>
+      </>
+      )}
     </div>
   );
 }

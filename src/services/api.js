@@ -149,6 +149,17 @@ export const getPeriodos = async () => {
 };
 
 /*
+ * De qué Excel salen los datos de un período + carrera (requiere login).
+ * Retorna { carga: { id_carga, fecha, nombre_archivo, cargado_por } | null }.
+ */
+export const getCargaActiva = async (periodo, carrera) =>
+  fetchProtegido(
+    `${API_URL}/api/carga-activa?periodo=${encodeURIComponent(periodo)}&carrera=${encodeURIComponent(carrera)}`,
+    { method: 'GET' },
+    'Error al obtener el origen de los datos.'
+  );
+
+/*
  * Historial de Excel cargados (requiere el permiso cargas:ver).
  * Admin y Directivo reciben todas las cargas; el Docente solo las suyas.
  * Cada fila trae id_periodo, id_carrera y puede_borrar (para el botón Borrar).

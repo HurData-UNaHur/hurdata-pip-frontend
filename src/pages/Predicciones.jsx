@@ -2,8 +2,12 @@ import { useState } from 'react';
 import styles from './Predicciones.module.css';
 import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
+import EstadoVacio from '../components/EstadoVacio';
 
 function Predicciones({ 
+  estadoDatos,
+  puedeCargar,
+  onReintentar,
   listaMateriasExcel, 
   materiaSeleccionada, 
   setMateriaSeleccionada, 
@@ -61,6 +65,10 @@ function Predicciones({
         </p>
       </header>
 
+      {estadoDatos !== 'ok' ? (
+        <EstadoVacio estado={estadoDatos} puedeCargar={puedeCargar} onReintentar={onReintentar} />
+      ) : (
+      <>
       {/* Filtros idénticos a Dashboard */}
       <Filters 
         materia={materiaSeleccionada}
@@ -190,6 +198,8 @@ function Predicciones({
           </div>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }
