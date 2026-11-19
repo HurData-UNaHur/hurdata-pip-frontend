@@ -1,4 +1,4 @@
-/* Misma base visual que Materias.module.css */
+/* Misma base visual que Materias.module.css (variables de tema de index.css) */
 .container {
   display: flex;
   flex-direction: column;
@@ -9,21 +9,153 @@
 
 .header {
   margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;                      /* aire entre el título y el subtítulo */
 }
 
 .title {
   font-size: 1.25rem;
   font-weight: 700;
+  margin: 0;
   color: var(--text-primary, #0f172a);
   transition: color 0.3s ease;
 }
 
 .subtitle {
   font-size: 0.8rem;
+  margin: 0;
   color: var(--text-secondary, #475569);
   transition: color 0.3s ease;
 }
 
+.cardHeader .subtitle {
+  margin-top: 4px;
+}
+
+/* ── Tarjetas de sección ──────────────────────────────────────────────── */
+.card {
+  background-color: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.05));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cardTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  margin: 0;
+}
+
+/* ── Subida de archivo ────────────────────────────────────────────────── */
+.dropzone {
+  border: 2px dashed var(--border-color, #cbd5e1);
+  border-radius: 8px;
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #475569);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.dropzone:hover,
+.dropzone:focus-visible {
+  border-color: #007A33;
+  outline: none;
+}
+
+.dropzoneActiva {
+  border-color: #007A33;
+  background-color: rgba(0, 122, 51, 0.08);
+}
+
+.inputOculto {
+  display: none;
+}
+
+.acciones {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ayuda {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #475569);
+  margin: 0;
+  flex: 1;
+  min-width: 220px;
+}
+
+.btnPrimario {
+  background-color: #007A33;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btnPrimario:hover:not(:disabled) {
+  background-color: #005e27;
+}
+
+.btnPrimario:disabled,
+.btnPeligro:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.msgOk,
+.msgError {
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+}
+
+.msgOk p,
+.msgError p {
+  margin: 0;
+}
+
+.msgOk {
+  background-color: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: var(--text-primary, #14532d);
+}
+
+.msgError {
+  background-color: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: var(--text-primary, #7f1d1d);
+}
+
+.msgAviso {
+  margin-top: 4px !important;
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+
+/* ── Historial ────────────────────────────────────────────────────────── */
 .toolbar {
   display: flex;
   align-items: center;
@@ -46,13 +178,7 @@
 }
 
 .tableContainer {
-  background-color: var(--bg-card, #ffffff);
-  border: 1px solid var(--border-color, #e2e8f0);
-  border-radius: 8px;
-  padding: 16px;
   overflow-x: auto;              /* scroll horizontal en móvil */
-  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.05));
-  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .table {
@@ -60,7 +186,7 @@
   border-collapse: collapse;
   text-align: left;
   font-size: 0.82rem;
-  min-width: 820px;              /* muchas columnas: scroll en pantallas chicas */
+  min-width: 900px;              /* muchas columnas: scroll en pantallas chicas */
 }
 
 .table th {
@@ -124,7 +250,125 @@
   border-color: rgba(239, 68, 68, 0.4);
 }
 
+/* Celdas que no deben partirse en dos renglones (fecha, período, estado, acciones) */
+.sinCorte {
+  white-space: nowrap;
+}
+
+/* Ícono (i) con tooltip: quién y cuándo se reemplazó o borró la carga */
+.info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: 6px;
+  border-radius: 50%;
+  border: 1px solid var(--text-secondary, #64748b);
+  color: var(--text-secondary, #64748b);
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-style: italic;
+  font-family: Georgia, serif;
+  cursor: help;
+  vertical-align: middle;
+}
+
+.info:hover,
+.info:focus-visible {
+  border-color: var(--text-primary, #0f172a);
+  color: var(--text-primary, #0f172a);
+  outline: none;
+}
+
+.info::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  z-index: 10;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: #0f172a;
+  color: #f8fafc;
+  border: 1px solid #334155;
+  font-family: inherit;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.info:hover::after,
+.info:focus-visible::after {
+  opacity: 1;
+}
+
+/* Acciones por fila: discretas en la tabla */
+.accionesFila {
+  display: flex;
+  gap: 6px;
+}
+
+.btnAccion {
+  background: transparent;
+  border: 1px solid var(--border-color, #cbd5e1);
+  color: var(--text-secondary, #475569);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btnAccion:hover:not(:disabled) {
+  border-color: #007A33;
+  color: #007A33;
+}
+
+.btnAccion:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Borrar: igual de discreto, pero rojo al pasar el mouse */
+.btnBorrar:hover:not(:disabled) {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
 .error {
   color: #ef4444;
   font-size: 0.85rem;
+  margin: 0;
+}
+
+/* ── Zona de peligro ──────────────────────────────────────────────────── */
+.zonaPeligro {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.zonaPeligro .cardTitle {
+  color: #ef4444;
+}
+
+.btnPeligro {
+  background-color: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btnPeligro:hover:not(:disabled) {
+  background-color: #b91c1c;
 }

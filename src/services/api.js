@@ -93,15 +93,21 @@ export const checkHealth = async () => {
 
 /*
  * Envía el archivo Excel del SIU al backend para ejecutar el pipeline ETL.
- * @param {File} file Archivo .xlsx seleccionado por el usuario
+ * @param {File} file              Archivo .xlsx seleccionado por el usuario
+ * @param {number|null} reemplaza  id_carga activa que se reemplaza ('Nueva versión').
+ *                                 El backend rechaza el Excel si no es del mismo
+ *                                 período y carrera que esa carga.
  */
-export const uploadSiuExcel = async (file) => {
+export const uploadSiuExcel = async (file, reemplaza = null) => {
   const formData = new FormData();
   formData.append('archivo', file);
+  const url = reemplaza != null
+    ? `${API_URL}/upload?reemplaza=${encodeURIComponent(reemplaza)}`
+    : `${API_URL}/upload`;
 
   try {
     return await fetchProtegido(
-      `${API_URL}/upload`,
+      url,
       { method: 'POST', body: formData },
       'Error al procesar el archivo Excel.'
     );
@@ -143,27 +149,9 @@ export const getPeriodos = async () => {
 };
 
 /*
- * Obtiene todas las combinaciones período + carrera cargadas en la DB.
- * Cada entrada representa un Excel individual identificable.
- * Usado por UploadModal para listar qué hay cargado.
- */
-export const getPeriodosConCarreras = async () => {
-  try {
-    // Requiere login: devuelve también cargado_por y puede_borrar por fila
-    return await fetchProtegido(
-      `${API_URL}/api/periodos-carreras`,
-      { method: 'GET' },
-      'Error al obtener los períodos cargados.'
-    );
-  } catch (error) {
-    console.error("Error en getPeriodosConCarreras:", error);
-    throw error;
-  }
-};
-
-/*
  * Historial de Excel cargados (requiere el permiso cargas:ver).
  * Admin y Directivo reciben todas las cargas; el Docente solo las suyas.
+ * Cada fila trae id_periodo, id_carrera y puede_borrar (para el botón Borrar).
  * @param {string|null} estado  'activa' | 'reemplazada' | 'borrada'; null = todas
  */
 export const getCargas = async (estado = null) => {

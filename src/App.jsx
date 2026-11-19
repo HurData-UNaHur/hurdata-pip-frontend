@@ -302,8 +302,6 @@ function App() {
       <Navbar
         theme={theme}
         toggleTheme={toggleTheme}
-        onUploadSuccess={handleUploadSuccess}
-        onResetSuccess={handleResetSuccess}
         usuario={usuario}
         onLogout={handleLogout}
       />
@@ -356,7 +354,16 @@ function App() {
             }
           />
           {tienePermiso(usuario, PERMISOS.VER_CARGAS) && (
-            <Route path="/cargas" element={<Cargas />} />
+            <Route
+              path="/cargas"
+              element={
+                <Cargas
+                  usuario={usuario}
+                  onUploadSuccess={handleUploadSuccess}
+                  onDatosBorrados={handleResetSuccess}
+                />
+              }
+            />
           )}
         </Routes>
       </main>

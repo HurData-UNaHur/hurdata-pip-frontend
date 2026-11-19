@@ -1,28 +1,13 @@
-import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import styles from './Navbar.module.css';
 import logoUnahur from '../assets/unahur.jpeg';
-import UploadModal from './UploadModal';
 import { PERMISOS, tienePermiso } from '../services/api';
 
-function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess, usuario, onLogout }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+function Navbar({ theme, toggleTheme, usuario, onLogout }) {
   // Usuario con login real (no invitado)
   const esAutorizado = Boolean(usuario) && usuario.role !== 'invitado';
-  // Subir Excel requiere el permiso datos:cargar (el backend lo valida en /upload)
-  const puedeCargar = tienePermiso(usuario, PERMISOS.CARGAR);
-  // Historial de cargas: Admin y Directivo (todas), Docente (las suyas)
+  // Página Cargas (subir, historial, borrar): Admin y Directivo (todas), Docente (las suyas)
   const puedeVerCargas = tienePermiso(usuario, PERMISOS.VER_CARGAS);
-
-  const handleUploadSuccess = (dataBackend) => {
-    // 1. Pasa los datos recibidos del backend al manejador global en App.jsx
-    if (onUploadSuccess) {
-      onUploadSuccess(dataBackend);
-    }
-    // 2. Cierra el modal sin recargar la página (window.location.reload eliminado)
-    setIsModalOpen(false);
-  };
 
   return (
     <>
@@ -67,22 +52,12 @@ function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess, usuario, 
           )}
         </div>
 
-        {/* Acciones a la derecha: Usuario + Carga de SIU (solo autorizados) + Toggle de Tema + Salir + Logo */}
+        {/* Acciones a la derecha: Usuario + Toggle de Tema + Salir + Logo (la carga de Excel está en /cargas) */}
         <div className={styles.rightActions}>
           {usuario && (
             <span className={styles.userBadge} title={usuario.cargo}>
               {esAutorizado ? '🎓' : '👤'} {usuario.nombre}
             </span>
-          )}
-
-          {puedeCargar && (
-            <button 
-              className={styles.themeToggleBtn} 
-              onClick={() => setIsModalOpen(true)} 
-              title="Cargar o gestionar archivos SIU (.xlsx)"
-            >
-              📁 
-            </button>
           )}
 
           <button 
@@ -108,17 +83,6 @@ function Navbar({ theme, toggleTheme, onUploadSuccess, onResetSuccess, usuario, 
           </div>
         </div>
       </nav>
-
-      {/* Modal de carga montado solo para usuarios que pueden cargar */}
-      {puedeCargar && (
-        <UploadModal 
-          usuario={usuario}
-          isOpen={isModalOpen} 
-          onClose={() => setIsModalOpen(false)} 
-          onSuccess={handleUploadSuccess}
-          onResetSuccess={onResetSuccess}
-        />
-      )}
     </>
   );
 }
