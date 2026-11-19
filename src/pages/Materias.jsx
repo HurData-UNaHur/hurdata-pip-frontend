@@ -2,6 +2,20 @@ import { useState } from 'react';
 import styles from './Materias.module.css';
 import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
+import { formatearPeriodo } from '../utils/texto';
+
+// Umbrales de % de libres: los usan la columna Indicador y el color de las tarjetas
+const UMBRAL_RIESGO_ALTO = 70;
+const UMBRAL_ATENCION = 45;
+
+const COLOR_POR_NIVEL = {
+  riesgo: '#ef4444',   // rojo
+  atencion: '#f59e0b', // ámbar
+  estable: '#22c55e',  // verde
+};
+
+const nivelPorLibres = (pctLibre) =>
+  pctLibre >= UMBRAL_RIESGO_ALTO ? 'riesgo' : pctLibre >= UMBRAL_ATENCION ? 'atencion' : 'estable';
 
 function Materias({ 
   listaMateriasExcel, 
@@ -31,7 +45,7 @@ function Materias({
 
   // Ordenamos de mayor a menor deserción para detectar cuellos de botella
   const rankingCritico = [...materiasProcesadas].sort((a, b) => b.pctLibre - a.pctLibre);
-  const materiaMasCritica = rankingCritico[0] || { nombre: 'Sin datos', pctLibre: 0 };
+  const materiaMasCritica = rankingCritico[0] || null;
 
   // Orden de la tabla: por defecto, mayor deserción primero (igual que antes).
   // Hacer clic en un encabezado ordena por esa columna; otro clic invierte el orden.
@@ -44,7 +58,10 @@ function Materias({
     // Sin "(%)" en el título: las celdas ya muestran "62% (54)"; la aclaración va en el tooltip
     { clave: 'promo', campo: 'pctPromo', titulo: 'Promoción', ayuda: '% sobre inscriptos (cantidad)' },
     { clave: 'libres', campo: 'pctLibre', titulo: 'Libres / Abandono', ayuda: '% sobre inscriptos (cantidad)' },
-    { clave: 'indicador', campo: 'pctLibre', titulo: 'Indicador', ayuda: 'Según el % de libres: Riesgo alto ≥ 70 %, Atención ≥ 45 %' },
+    {
+      clave: 'indicador', campo: 'pctLibre', titulo: 'Indicador',
+      ayuda: `Según el % de libres: Riesgo alto ≥ ${UMBRAL_RIESGO_ALTO} %, Atención ≥ ${UMBRAL_ATENCION} %`,
+    },
   ];
 
   const [orden, setOrden] = useState({ clave: 'libres', direccion: 'desc' });
@@ -67,7 +84,8 @@ function Materias({
   });
 
   // Promedio general del porcentaje de libres entre todas las materias
-  const promedioLibres = materiasProcesadas.length > 0
+  const hayMaterias = materiasProcesadas.length > 0;
+  const promedioLibres = hayMaterias
     ? Math.round(materiasProcesadas.reduce((acc, m) => acc + m.pctLibre, 0) / materiasProcesadas.length)
     : 0;
 
@@ -106,21 +124,22 @@ function Materias({
         }}
       >
         <KpiCard
-          titulo="MATERIA MÁS CRÍTICA"
-          valor={materiaMasCritica.nombre}
-          subtitulo={`${materiaMasCritica.pctLibre}% de deserción`}
-          colorBorde="#ef4444"
-        />
-        <KpiCard
           titulo="TOTAL MATERIAS EVALUADAS"
           valor={materiasFuente.length}
-          subtitulo="En el período actual"
+          subtitulo={periodo ? formatearPeriodo(periodo) : 'Sin período seleccionado'}
         />
         <KpiCard
           titulo="PROMEDIO GENERAL LIBRES"
-          valor={`${promedioLibres}%`}
+          valor={hayMaterias ? `${promedioLibres}%` : '—'}
           subtitulo="Tasa media de abandono"
-          colorBorde="#3b82f6"
+          colorBorde={hayMaterias ? COLOR_POR_NIVEL[nivelPorLibres(promedioLibres)] : undefined}
+        />
+        <KpiCard
+          titulo="MATERIA MÁS CRÍTICA"
+          valor={materiaMasCritica ? `${materiaMasCritica.pctLibre}%` : '—'}
+          subtitulo={materiaMasCritica ? materiaMasCritica.nombre : 'Sin datos'}
+          subtituloCompleto={materiaMasCritica?.nombre}
+          colorBorde={materiaMasCritica ? COLOR_POR_NIVEL[nivelPorLibres(materiaMasCritica.pctLibre)] : undefined}
         />
       </section>
 
@@ -169,9 +188,9 @@ function Materias({
                 <td style={{ color: '#10b981' }}>{m.pctPromo}% ({m.promo})</td>
                 <td style={{ color: '#ef4444' }}>{m.pctLibre}% ({m.libre})</td>
                 <td>
-                  {m.pctLibre >= 70 ? (
+                  {nivelPorLibres(m.pctLibre) === 'riesgo' ? (
                     <span className={styles.badgeCritico}>Riesgo alto</span>
-                  ) : m.pctLibre >= 45 ? (
+                  ) : nivelPorLibres(m.pctLibre) === 'atencion' ? (
                     <span className={styles.badgeAtencion}>Atención</span>
                   ) : (
                     <span className={styles.badgeNormal}>Estable</span>
