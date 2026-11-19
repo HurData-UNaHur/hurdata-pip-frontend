@@ -3,7 +3,9 @@ import styles from './Materias.module.css';
 import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
 import EstadoVacio from '../components/EstadoVacio';
+import BotonesExportar from '../components/BotonesExportar';
 import { formatearPeriodo } from '../utils/texto';
+import { slug } from '../utils/exportar';
 // Los umbrales de % de libres (Indicador, colores de tarjetas, comparación de períodos) están en un solo lugar
 import {
   COLOR_POR_NIVEL, UMBRAL_ATENCION, UMBRAL_RIESGO_ALTO, nivelPorLibres,
@@ -84,6 +86,26 @@ function Materias({
     ? Math.round(materiasProcesadas.reduce((acc, m) => acc + m.pctLibre, 0) / materiasProcesadas.length)
     : 0;
 
+  // Lo que se exporta: la tabla tal como está ordenada en pantalla
+  const etiquetaIndicador = (pctLibre) => {
+    const nivel = nivelPorLibres(pctLibre);
+    return nivel === 'riesgo' ? 'Riesgo alto' : nivel === 'atencion' ? 'Atención' : 'Estable';
+  };
+  const datosParaExportar = () => ({
+    nombreArchivo: `materias-${slug(carreraActiva)}-${slug(periodo)}`,
+    titulo: 'Rendimiento por materia',
+    subtitulo: `${carreraActiva} · ${periodo ? formatearPeriodo(periodo) : ''}`,
+    columnas: [
+      'Materia', 'Código', 'Comisiones', 'Inscriptos',
+      'Promoción (%)', 'Promoción (alumnos)', 'Libres (%)', 'Libres (alumnos)', 'Indicador',
+    ],
+    filas: materiasOrdenadas.map((m) => [
+      m.nombre, m.id, m.comisiones, m.inscriptos,
+      m.pctPromo, m.promo, m.pctLibre, m.libre, etiquetaIndicador(m.pctLibre),
+    ]),
+    horizontal: true,
+  });
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -144,7 +166,10 @@ function Materias({
 
       {/* Tabla Comparativa de Materias */}
       <section className={styles.tableContainer}>
-        <h2 className={styles.tableTitle}>Rendimiento por Materia</h2>
+        <div className={styles.tableHeader}>
+          <h2 className={styles.tableTitle}>Rendimiento por Materia</h2>
+          <BotonesExportar obtener={datosParaExportar} deshabilitado={materiasOrdenadas.length === 0} />
+        </div>
         <table className={styles.table}>
           <thead>
             <tr>

@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, Minus, Search, TriangleAlert } from 'lucide-react';
 import styles from './TablaComparativa.module.css';
+import BotonesExportar from './BotonesExportar';
+import { slug } from '../utils/exportar';
 import { formatearNumero, formatearPeriodoCorto, plural } from '../utils/texto';
 import { UMBRAL_RIESGO_ALTO, UMBRAL_SALTO_LIBRES } from '../utils/umbrales';
 
@@ -62,7 +64,7 @@ const valorDeOrden = (f, clave) => (clave === 'nombre' ? f.nombre : f[clave]);
  * filas: resultado de compararMaterias (utils/comparar.js).
  * Por defecto: primero las materias cuyos libres más subieron.
  */
-export default function TablaComparativa({ filas, periodoA, periodoB }) {
+export default function TablaComparativa({ filas, periodoA, periodoB, carrera = '' }) {
   const etiquetaA = formatearPeriodoCorto(periodoA);
   const etiquetaB = formatearPeriodoCorto(periodoB);
 
@@ -112,6 +114,25 @@ export default function TablaComparativa({ filas, periodoA, periodoB }) {
     });
   }, [filas, soloAmbas, busqueda, orden]);
 
+  // Exporta lo que se ve: respeta el buscador, el filtro y el orden
+  const ESTADOS = { ambas: 'En ambos períodos', nueva: 'Nueva', discontinuada: 'Dejó de dictarse' };
+  const datosParaExportar = () => ({
+    nombreArchivo: `comparativa-${slug(carrera)}-${slug(periodoA)}-vs-${slug(periodoB)}`,
+    titulo: 'Comparación de períodos por materia',
+    subtitulo: `${carrera} · ${etiquetaA} vs ${etiquetaB}`,
+    columnas: [
+      'Materia', 'Código', 'Situación',
+      `Inscriptos ${etiquetaA}`, `Inscriptos ${etiquetaB}`, 'Var. inscriptos (%)',
+      `Libres ${etiquetaA} (%)`, `Libres ${etiquetaB} (%)`, 'Var. libres (pp)', 'Alertas',
+    ],
+    filas: visibles.map((f) => [
+      f.nombre, f.id, ESTADOS[f.estado],
+      f.inscriptosA, f.inscriptosB, f.cambioInscr,
+      f.libresA, f.libresB, f.cambio, motivosDe(f).join('. '),
+    ]),
+    horizontal: true,
+  });
+
   return (
     <div className={styles.contenedor}>
       {/* Resumen de lo que cambió */}
@@ -141,6 +162,7 @@ export default function TablaComparativa({ filas, periodoA, periodoB }) {
           <input type="checkbox" checked={soloAmbas} onChange={(e) => setSoloAmbas(e.target.checked)} />
           Solo materias dictadas en ambos períodos
         </label>
+        <BotonesExportar obtener={datosParaExportar} deshabilitado={visibles.length === 0} />
       </div>
 
       {/* Referencias de la distribución */}
