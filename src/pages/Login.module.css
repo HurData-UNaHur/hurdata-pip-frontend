@@ -1,450 +1,347 @@
-
-.pageWrapper {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background-color: #e2e8f0; /* un tono más oscuro que la tarjeta blanca para que se despegue y no encandile */
+/*
+ * Login: pantalla dividida. A la izquierda la identidad y el contexto del sistema;
+ * a la derecha el formulario. En celular, la identidad pasa a ser una cabecera compacta.
+ * Color principal: verde institucional #007A33. Los acentos (rojo, naranja, azul) se usan
+ * solo en la barra superior y en el esquema de datos.
+ */
+.pagina {
+  --verde: #007a33;
+  --verde-oscuro: #005e27;
+  --texto: #0f172a;
+  --texto-suave: #475569;
+  --borde: #cbd5e1;
+  --fondo-form: #ffffff;
+  --fondo-identidad: #f8fafc;
+  --foco: rgba(0, 122, 51, 0.2);
   position: relative;
-  transition: background-color 0.3s ease;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  font-family: Roboto, Arial, sans-serif;
+  color: var(--texto);
+  background-color: var(--fondo-form);
 }
 
-.themeBtn {
+:global([data-theme='dark']) .pagina {
+  --verde-oscuro: #22c55e;
+  --texto: #f8fafc;
+  --texto-suave: #a3b1c6;
+  --borde: #475569;
+  --fondo-form: #0f172a;
+  --fondo-identidad: #0b1220;
+  --foco: rgba(34, 197, 94, 0.28);
+}
+
+/* ── Barra institucional ──────────────────────────────────── */
+.barra {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    #ef4444 0 25%,
+    #f59e0b 25% 50%,
+    #007a33 50% 75%,
+    #3b82f6 75% 100%
+  );
+}
+
+.temaBtn {
   position: absolute;
   top: 20px;
   right: 24px;
-  background-color: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 50%;
-  width: 42px;
-  height: 42px;
+  z-index: 5;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--borde);
+  border-radius: 50%;
+  background-color: var(--fondo-form);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, background-color 0.3s ease;
+  transition: border-color 0.2s ease;
+}
+.temaBtn:hover {
+  border-color: var(--verde);
 }
 
-.themeBtn:hover {
-  transform: scale(1.08);
-}
-
-.card {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 32px 28px;
-  width: 100%;
-  max-width: 440px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-.header {
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.logoWrapper {
-  display: inline-flex;
-  padding: 6px;
-  background-color: #ffffff;
-  border-radius: 14px;
-  border: 1px solid #e2e8f0;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+/* ── Panel de identidad ───────────────────────────────────── */
+.identidad {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: clamp(40px, 6vw, 72px) clamp(32px, 5vw, 72px);
+  background-color: var(--fondo-identidad);
+  border-right: 1px solid var(--borde);
 }
 
 .logo {
-  width: 56px;
-  height: 56px;
-  object-fit: contain;
-  border-radius: 8px;
+  align-self: flex-start;
+  height: 52px;
+  width: auto;
+}
+/* El logo es gris oscuro sobre transparente: en modo oscuro se invierte la luminosidad y se conserva el tono */
+:global([data-theme='dark']) .logo {
+  filter: invert(1) hue-rotate(180deg);
 }
 
-.title {
-  margin: 0 0 6px;
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #0f172a;
-}
-
-.subtitle {
-  margin: 0;
-  font-size: 0.88rem;
-  color: #64748b;
-  line-height: 1.4;
-}
-
-/* Antetítulo: la institución, chica y en mayúsculas espaciadas, arriba del título */
-.antetitulo {
-  margin: 0 0 4px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #64748b;
-}
-
-:global([data-theme='dark']) .antetitulo {
-  color: #94a3b8;
-}
-
-/* ── Separador entre el formulario y el acceso como invitado ──────────── */
-.divider {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  color: #64748b;               /* 4.8:1 sobre blanco (antes #94a3b8: 2.6:1, no pasaba WCAG AA) */
-  font-size: 0.82rem;
-  margin: 20px 0 14px;
-}
-
-.divider::before,
-.divider::after {
-  content: '';
-  flex: 1;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.divider span {
-  padding: 0 10px;
-}
-
-/* Acceso secundario: una línea, borde fino y sin relleno, para no competir con "Ingresar" */
-.btnInvitado {
-  width: 100%;
-  background-color: transparent;
-  color: #334155;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  padding: 10px 16px;
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.btnInvitado:hover {
-  background-color: #f1f5f9;
-  border-color: #94a3b8;
-}
-
-.btnInvitado:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.btnSubtextInvitado {
-  font-weight: 400;
-  color: #64748b;
-}
-
-/* ── Formulario de ingreso ────────────────────────────────────────────── */
-.form {
+.titulos {
+  margin: auto 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
+  max-width: 30rem;
 }
-
-.fieldGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.fieldGroup label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #334155;
-}
-
-.fieldGroup input {
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  font-size: 0.95rem;
-  background-color: #ffffff;
-  color: #0f172a;
-  outline: none;
-  transition: border-color 0.2s ease;
-}
-
-.fieldGroup input:focus {
-  border-color: #007A33;
-}
-
-.forgotWrapper {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 2px;
-}
-
-.btnForgotLink {
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #007A33;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.btnForgotLink:hover {
-  color: #005e27;
-}
-
-.errorMsg {
+.titulo {
   margin: 0;
-  font-size: 0.85rem;
-  color: #dc2626;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  padding: 8px 10px;
-  border-radius: 6px;
-}
-
-.btnSubmit {
-  width: 100%;
-  margin-top: 4px;
-  background-color: #007A33;
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 16px;
-  font-size: 0.98rem;
+  font-size: clamp(1.7rem, 2.6vw, 2.25rem);
   font-weight: 700;
-  cursor: pointer;
+  line-height: 1.18;
+  letter-spacing: -0.015em;
+  color: var(--texto);
+}
+.subtitulo {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--texto-suave);
 }
 
-.btnSubmit:hover {
-  background-color: #005e27;
-}
-
-.btnSubmit:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* ── Registro visual (futuro alta en DB) ──────────────────────────────── */
-.registerPrompt {
+/* ── Panel del formulario ─────────────────────────────────── */
+.panelForm {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  margin-top: 2px;
-  font-size: 0.85rem;
-  color: #475569;
-  flex-wrap: wrap;
+  padding: 72px clamp(24px, 5vw, 64px) 48px;
+  background-color: var(--fondo-form);
 }
-
-/* Mismo estilo de link que "¿Olvidaste tu contraseña?" */
-.btnRegisterLink {
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: inherit;
-  font-weight: 600;
-  color: #007A33;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.btnRegisterLink:hover {
-  color: #005e27;
-}
-
-.registerNotice {
-  background-color: #eff6ff;
-  border: 1px solid #bfdbfe;
-  color: #1e40af;
-  padding: 9px 12px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  line-height: 1.4;
-  text-align: center;
-}
-
-/* ── Caja Mock Temporal ───────────────────────────────────────────────── */
-.mockBox {
-  margin-top: 8px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background-color: #f8fafc;
-  border: 1px dashed #94a3b8;
-  text-align: center;
-}
-
-.mockTitle {
-  margin: 0 0 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #475569;
-}
-
-.mockChips {
+.form {
+  width: 100%;
+  max-width: 24rem;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+}
+.encabezadoForm {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.tituloForm {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--texto);
+}
+.ayuda {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--texto-suave);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
-  margin-bottom: 6px;
-  flex-wrap: wrap;
 }
-
-.mockChips button {
-  background-color: #e2e8f0;
-  color: #1e293b;
-  border: none;
+.campo label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--texto);
+}
+.campo input {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--borde);
   border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
+  background-color: var(--fondo-form);
+  color: var(--texto);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-
-.mockChips button:hover {
-  background-color: #cbd5e1;
+.campo input::placeholder {
+  color: #7b8aa0;
 }
-
-.mockBox small {
-  color: #64748b;
-  font-size: 0.75rem;
+.campo input:focus {
+  outline: none;
+  border-color: var(--verde);
+  box-shadow: 0 0 0 3px var(--foco);
 }
-
-/* ── MODO OSCURO ([data-theme='dark']) ─────────────────────────────────── */
-:global([data-theme='dark']) .pageWrapper {
-  background-color: #0f172a;
-}
-
-:global([data-theme='dark']) .themeBtn {
-  background-color: #1e293b;
-  border-color: #334155;
-}
-
-:global([data-theme='dark']) .card {
-  background-color: #1e293b;
-  border-color: #334155;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-}
-
-:global([data-theme='dark']) .title {
-  color: #f8fafc;
-}
-
-:global([data-theme='dark']) .subtitle {
-  color: #94a3b8;
-}
-
-:global([data-theme='dark']) .divider::before,
-:global([data-theme='dark']) .divider::after {
-  border-bottom-color: #334155;
-}
-
-:global([data-theme='dark']) .btnInvitado {
-  background-color: transparent;
-  color: #e2e8f0;
-  border-color: #475569;
-}
-
-:global([data-theme='dark']) .btnInvitado:hover {
-  background-color: #334155;
-  border-color: #64748b;
-}
-
-:global([data-theme='dark']) .btnSubtextInvitado {
-  color: #94a3b8;
-}
-
-:global([data-theme='dark']) .fieldGroup label {
-  color: #e2e8f0;
-}
-
-:global([data-theme='dark']) .fieldGroup input {
-  background-color: #0f172a;
-  border-color: #334155;
-  color: #f8fafc;
-}
-
-:global([data-theme='dark']) .fieldGroup input:focus {
+:global([data-theme='dark']) .campo input:focus {
   border-color: #22c55e;
 }
+.campo input:disabled {
+  opacity: 0.65;
+}
 
-:global([data-theme='dark']) .btnForgotLink {
+.conBoton {
+  position: relative;
+}
+.conBoton input {
+  padding-right: 48px;
+}
+.ojo {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+.ojo:hover {
+  color: var(--texto);
+}
+.ojo:focus-visible,
+.enlace:focus-visible,
+.ingresar:focus-visible,
+.temaBtn:focus-visible {
+  outline: 2px solid var(--verde);
+  outline-offset: 2px;
+}
+:global([data-theme='dark']) .ojo:focus-visible,
+:global([data-theme='dark']) .enlace:focus-visible,
+:global([data-theme='dark']) .ingresar:focus-visible,
+:global([data-theme='dark']) .temaBtn:focus-visible {
+  outline-color: #22c55e;
+}
+
+.olvido {
+  display: flex;
+  justify-content: flex-end;
+}
+.enlace {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--verde);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+:global([data-theme='dark']) .enlace {
   color: #4ade80;
 }
-
-:global([data-theme='dark']) .btnForgotLink:hover {
-  color: #86efac;
+.enlace:hover {
+  color: var(--verde-oscuro);
+}
+.enlace:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-:global([data-theme='dark']) .errorMsg {
-  background-color: rgba(127, 29, 29, 0.3);
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  background-color: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+.error svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+:global([data-theme='dark']) .error {
   border-color: #991b1b;
+  background-color: rgba(127, 29, 29, 0.3);
   color: #fca5a5;
 }
 
-:global([data-theme='dark']) .registerPrompt {
-  color: #94a3b8;
+.ingresar {
+  height: 48px;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--verde);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.ingresar:hover:not(:disabled) {
+  background-color: var(--verde-oscuro);
+}
+:global([data-theme='dark']) .ingresar:hover:not(:disabled) {
+  background-color: #00924c;
+}
+.ingresar:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
-:global([data-theme='dark']) .btnRegisterLink {
-  color: #4ade80;
+.registro {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
 }
 
-:global([data-theme='dark']) .btnRegisterLink:hover {
-  color: #86efac;
-}
-
-:global([data-theme='dark']) .registerNotice {
-  background-color: rgba(30, 58, 138, 0.3);
-  border-color: #1d4ed8;
-  color: #bfdbfe;
-}
-
-:global([data-theme='dark']) .mockBox {
-  background-color: #0f172a;
-  border-color: #475569;
-}
-
-:global([data-theme='dark']) .mockTitle {
-  color: #cbd5e1;
-}
-
-:global([data-theme='dark']) .mockChips button {
-  background-color: #334155;
-  color: #f1f5f9;
-}
-
-:global([data-theme='dark']) .mockChips button:hover {
-  background-color: #475569;
-}
-
-:global([data-theme='dark']) .mockBox small {
-  color: #94a3b8;
-}
-
-/* ── Responsive ───────────────────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .card {
-    padding: 24px 18px;
+/* ── Tablet y celular ─────────────────────────────────────── */
+@media (max-width: 900px) {
+  .pagina {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
   }
-
-  .title {
-    font-size: 1.3rem;
+  .identidad {
+    gap: 16px;
+    padding: 28px 24px 24px;
+    border-right: none;
+    border-bottom: 1px solid var(--borde);
   }
+  .logo {
+    height: 40px;
+  }
+  .titulos {
+    margin: 0;
+  }
+  .titulo {
+    font-size: 1.35rem;
+  }
+  .subtitulo {
+    font-size: 0.95rem;
+  }
+  .panelForm {
+    align-items: flex-start;
+    padding: 32px 24px 48px;
+  }
+  .temaBtn {
+    top: 16px;
+    right: 16px;
+  }
+}
 
-  .themeBtn {
-    top: 12px;
-    right: 14px;
-    width: 36px;
-    height: 36px;
-    font-size: 1.05rem;
+@media (prefers-reduced-motion: reduce) {
+  .campo input,
+  .ingresar,
+  .temaBtn {
+    transition: none;
   }
 }

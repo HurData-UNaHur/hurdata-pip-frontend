@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { Eye, EyeOff, TriangleAlert } from 'lucide-react';
+import '@fontsource/roboto/latin-400.css';
+import '@fontsource/roboto/latin-500.css';
+import '@fontsource/roboto/latin-700.css';
 import { loginUnahur } from '../services/api';
 import RecuperarPassword from './RecuperarPassword';
 import Registro from './Registro';
-import { TriangleAlert, User } from 'lucide-react';
-import logoUnahur from '../assets/unahur.jpeg';
+import logoUnahur from '../assets/logo-hurlingham.png';
 import styles from './Login.module.css';
 import IconoTema from '../components/IconoTema';
 
@@ -12,6 +15,7 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
   const [mostrarRegistro, setMostrarRegistro] = useState(false);
   const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
+  const [verPassword, setVerPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -41,22 +45,12 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
     );
   }
 
-  const handleAccesoInvitado = () => {
-    const sesionInvitado = {
-      nombre: 'Invitado',
-      cargo: 'Acceso Temporal',
-      role: 'invitado',
-    };
-    onLoginSuccess(sesionInvitado);
-  };
-
-  const handleSubmitAutorizado = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!usuario.trim() || !password.trim()) {
-      setError('Por favor, completá tu usuario institucional y contraseña.');
+      setError('Completá tu correo institucional y tu contraseña.');
       return;
     }
-
     setLoading(true);
     setError(null);
     try {
@@ -70,108 +64,116 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
   };
 
   return (
-    <div className={styles.pageWrapper}>
-      {/* Botón flotante para cambiar Modo Día / Modo Oscuro en el Login */}
+    <div className={styles.pagina}>
+      {/* Barra institucional con los cuatro colores de la UNaHur */}
+      <div className={styles.barra} aria-hidden="true" />
+
       <button
         type="button"
-        className={styles.themeBtn}
+        className={styles.temaBtn}
         onClick={toggleTheme}
-        title="Cambiar Tema"
+        title="Cambiar tema"
+        aria-label="Cambiar tema"
       >
         <IconoTema theme={theme} />
       </button>
 
-      <div className={styles.card}>
-        <div className={styles.header}>
-          <div className={styles.logoWrapper}>
-            <img src={logoUnahur} alt="UNaHur" className={styles.logo} />
-          </div>
-          {/* Quién (antetítulo) → qué (título) → para qué (descripción) */}
-          <p className={styles.antetitulo}>Universidad Nacional de Hurlingham</p>
-          <h1 className={styles.title}>HurData Académico</h1>
-          <p className={styles.subtitle}>Análisis y seguimiento de cursadas</p>
+      {/* ── Identidad y contexto ── */}
+      <aside className={styles.identidad}>
+        <img src={logoUnahur} alt="UNaHur, Universidad Nacional de Hurlingham" className={styles.logo} />
+
+        <div className={styles.titulos}>
+          <h1 className={styles.titulo}>HurData: Dashboard Analítico de Gestión Académica</h1>
+          <p className={styles.subtitulo}>Universidad Nacional de Hurlingham</p>
         </div>
 
-        {/* ── Formulario de ingreso (se muestra directo: la mayoría entra con su cuenta) ── */}
-        <form onSubmit={handleSubmitAutorizado} className={styles.form}>
-            <div className={styles.fieldGroup}>
-              <label htmlFor="usuario">Correo institucional</label>
-              <input
-                id="usuario"
-                type="text"
-                placeholder="ejemplo@unahur.edu.ar"
-                value={usuario}
-                onChange={(e) => setUsuario(e.target.value)}
-                disabled={loading}
-                autoFocus
-              />
-            </div>
 
-            <div className={styles.fieldGroup}>
-              <label htmlFor="password">Contraseña</label>
+      </aside>
+
+      {/* ── Formulario ── */}
+      <main className={styles.panelForm}>
+        <form onSubmit={handleSubmit} className={styles.form} noValidate>
+          <div className={styles.encabezadoForm}>
+            <h2 className={styles.tituloForm}>Ingresá a tu cuenta</h2>
+            <p className={styles.ayuda}>Usá tu correo institucional de la UNaHur.</p>
+          </div>
+
+          <div className={styles.campo}>
+            <label htmlFor="usuario">Correo institucional</label>
+            <input
+              id="usuario"
+              type="text"
+              inputMode="email"
+              autoComplete="username"
+              placeholder="nombre@unahur.edu.ar"
+              value={usuario}
+              onChange={(e) => setUsuario(e.target.value)}
+              disabled={loading}
+              autoFocus
+            />
+          </div>
+
+          <div className={styles.campo}>
+            <label htmlFor="password">Contraseña</label>
+            <div className={styles.conBoton}>
               <input
                 id="password"
-                type="password"
-                placeholder="••••••••"
+                type={verPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                placeholder="Tu contraseña"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
               />
-              <div className={styles.forgotWrapper}>
-                <button
-                  type="button"
-                  className={styles.btnForgotLink}
-                  onClick={() => setMostrarRecuperar(true)}
-                  disabled={loading}
-                >
-                  ¿Olvidaste tu contraseña?
-                </button>
-              </div>
-            </div>
-
-            {error && (
-              <p className={styles.errorMsg}>
-                <TriangleAlert size={14} className="icono-inline" aria-hidden="true" />{error}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              className={styles.btnSubmit}
-              disabled={loading}
-            >
-              {loading ? 'Verificando...' : 'Ingresar'}
-            </button>
-
-            <div className={styles.registerPrompt}>
-              <span>¿No tenés cuenta?</span>
               <button
                 type="button"
-                className={styles.btnRegisterLink}
-                onClick={() => setMostrarRegistro(true)}
+                className={styles.ojo}
+                onClick={() => setVerPassword((v) => !v)}
+                aria-label={verPassword ? 'Ocultar la contraseña' : 'Mostrar la contraseña'}
+                aria-pressed={verPassword}
                 disabled={loading}
               >
-                Solicitar acceso
+                {verPassword
+                  ? <EyeOff size={18} aria-hidden="true" />
+                  : <Eye size={18} aria-hidden="true" />}
               </button>
             </div>
+            <div className={styles.olvido}>
+              <button
+                type="button"
+                className={styles.enlace}
+                onClick={() => setMostrarRecuperar(true)}
+                disabled={loading}
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            </div>
+          </div>
+
+          {error && (
+            <p className={styles.error} role="alert">
+              <TriangleAlert size={16} aria-hidden="true" />
+              <span>{error}</span>
+            </p>
+          )}
+
+          <button type="submit" className={styles.ingresar} disabled={loading}>
+            {loading ? 'Verificando…' : 'Ingresar'}
+          </button>
+
+          <p className={styles.registro}>
+            ¿No tenés cuenta?
+            <button
+              type="button"
+              className={styles.enlace}
+              onClick={() => setMostrarRegistro(true)}
+              disabled={loading}
+            >
+              Solicitar acceso
+            </button>
+          </p>
         </form>
-
-        {/* ── Acceso secundario: invitado de solo lectura ── */}
-        <div className={styles.divider}>
-          <span>o</span>
-        </div>
-
-        <button
-          type="button"
-          className={styles.btnInvitado}
-          onClick={handleAccesoInvitado}
-          disabled={loading}
-        >
-          <User size={16} aria-hidden="true" />
-          Entrar como invitado
-          <span className={styles.btnSubtextInvitado}>· solo lectura</span>
-        </button>
-      </div>
+      </main>
     </div>
   );
 }
