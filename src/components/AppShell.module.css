@@ -199,6 +199,186 @@
   background-color: #dc2626;
 }
 
+/* Campanita y contador de notificaciones */
+.campanaWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.badgeNotif {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background-color: #ef4444;
+  color: #ffffff;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  line-height: 1.2;
+}
+
+/* ── Modal de aprobación de solicitudes ───────────────────── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+.modalCard {
+  background-color: var(--bg-card, #ffffff);
+  color: var(--text-primary, #0f172a);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 14px;
+  padding: 24px;
+  width: 100%;
+  max-width: 620px;
+  max-height: 82vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+}
+.modalCerrar {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary, #475569);
+  display: inline-flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 6px;
+}
+.modalCerrar:hover {
+  color: var(--text-primary, #0f172a);
+}
+.modalTitulo {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  color: var(--text-primary, #0f172a);
+}
+.modalSubtitulo {
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #475569);
+}
+.modalError {
+  color: #ef4444;
+  font-size: 0.88rem;
+  margin-bottom: 12px;
+}
+.modalVacio {
+  color: var(--text-secondary, #475569);
+  font-size: 0.92rem;
+}
+.listaSolicitudes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.itemSolicitud {
+  background-color: var(--bg-main, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+[data-theme="dark"] .itemSolicitud {
+  background-color: rgba(15, 23, 42, 0.65);
+}
+.infoSolicitud {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 240px;
+}
+.nombreSolicitud {
+  font-size: 0.96rem;
+  color: var(--text-primary, #0f172a);
+}
+.emailSolicitud {
+  font-size: 0.84rem;
+  color: var(--text-secondary, #475569);
+}
+.institutoSolicitud {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #475569);
+  margin-top: 2px;
+}
+
+/* Bloquesito selector de rol */
+.bloqueRol {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background-color: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #cbd5e1);
+}
+.labelRol {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
+}
+.selectRol {
+  background-color: var(--bg-main, #f8fafc);
+  color: var(--text-primary, #0f172a);
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+[data-theme="dark"] .selectRol {
+  background-color: #0b1220;
+}
+
+.accionesSolicitud {
+  display: flex;
+  gap: 8px;
+}
+.btnAprobar,
+.btnRechazar {
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: opacity 0.15s ease;
+}
+.btnAprobar {
+  background-color: #007A33;
+}
+.btnRechazar {
+  background-color: #ef4444;
+}
+.btnAprobar:disabled,
+.btnRechazar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ── Contenido ────────────────────────────────────────────── */
 .contenido {
   grid-area: contenido;

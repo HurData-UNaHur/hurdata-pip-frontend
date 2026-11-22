@@ -14,6 +14,29 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [touched, setTouched] = useState({ usuario: false, password: false });
+
+  // Validaciones en tiempo real
+  const validarUsuario = (valor) => {
+    const limpio = valor.trim();
+    if (!limpio) return 'El correo institucional es obligatorio.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(limpio)) return 'Ingresá un formato de correo válido.';
+    if (!limpio.toLowerCase().endsWith('@unahur.edu.ar')) {
+      return 'Debe ser un correo institucional (@unahur.edu.ar).';
+    }
+    return '';
+  };
+
+  const validarPassword = (valor) => {
+    if (!valor.trim()) return 'La contraseña es obligatoria.';
+    if (valor.length < 4) return 'La contraseña debe tener al menos 4 caracteres.';
+    return '';
+  };
+
+  const erroresCampo = {
+    usuario: validarUsuario(usuario),
+    password: validarPassword(password),
+  };
 
   if (mostrarRecuperar) {
     return (
@@ -52,8 +75,9 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
 
   const handleSubmitAutorizado = async (e) => {
     e.preventDefault();
-    if (!usuario.trim() || !password.trim()) {
-      setError('Por favor, completá tu usuario institucional y contraseña.');
+    setTouched({ usuario: true, password: true });
+
+    if (erroresCampo.usuario || erroresCampo.password) {
       return;
     }
 
@@ -101,10 +125,19 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
                 type="text"
                 placeholder="ejemplo@unahur.edu.ar"
                 value={usuario}
-                onChange={(e) => setUsuario(e.target.value)}
+                onChange={(e) => {
+                  setUsuario(e.target.value);
+                  setTouched((prev) => ({ ...prev, usuario: true }));
+                }}
+                onBlur={() => setTouched((prev) => ({ ...prev, usuario: true }))}
                 disabled={loading}
                 autoFocus
               />
+              {touched.usuario && erroresCampo.usuario && (
+                <span style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: '2px' }}>
+                  {erroresCampo.usuario}
+                </span>
+              )}
             </div>
 
             <div className={styles.fieldGroup}>
@@ -114,9 +147,18 @@ export default function Login({ theme, toggleTheme, onLoginSuccess }) {
                 type="password"
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setTouched((prev) => ({ ...prev, password: true }));
+                }}
+                onBlur={() => setTouched((prev) => ({ ...prev, password: true }))}
                 disabled={loading}
               />
+              {touched.password && erroresCampo.password && (
+                <span style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: '2px' }}>
+                  {erroresCampo.password}
+                </span>
+              )}
               <div className={styles.forgotWrapper}>
                 <button
                   type="button"
