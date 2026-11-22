@@ -38,6 +38,7 @@ export const PERMISOS = {
   RESETEAR_DB: 'db:resetear',
   VER_CARGAS: 'cargas:ver',
   VER_TODAS_LAS_CARGAS: 'cargas:ver_todas',
+  APROBAR_REGISTROS: 'registros:aprobar',
 };
 
 export const tienePermiso = (usuario, permiso) =>
@@ -279,6 +280,11 @@ export const loginUnahur = async (usuario, password) => {
  * RECUPERACIÓN DE CONTRASEÑA
  * ============================================================================
  */
+/*
+
+POR AHORA ESTA PARTE QUEDA AFUERA HASTA QUE SEPAMOS SI ES NECESARIO MANDAR MAIL CON UN CODIGO DE RECUPERACION.
+SI ESTA PARTE SE QUEDA; BORRAR LO QUE ESTA MÁS ABAJO, AFUERA DEL COMENTARIO.
+
 export const solicitarCodigoRecuperacion = async (usuario) => {
   const usuarioLimpio = usuario.trim().toLowerCase();
 
@@ -316,6 +322,44 @@ export const confirmarNuevaPassword = async (usuario, codigo, nuevaPassword) => 
   const errData = await response.json().catch(() => ({}));
   throw new Error(errData.detail || 'Código inválido o expirado.');
 };
+*/
+
+export const verificarUsuarioRecuperacion = async (usuario) => {
+  const usuarioLimpio = usuario.trim().toLowerCase();
+
+  const response = await fetch(`${API_URL}/api/recuperar-password/verificar`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ usuario: usuarioLimpio }),
+  });
+
+  if (response.ok) {
+    return await response.json();
+  }
+
+  const errData = await response.json().catch(() => ({}));
+  throw new Error(errData.detail || 'El correo no figura como personal autorizado de UNAHUR.');
+};
+
+export const confirmarNuevaPassword = async (usuario, nuevaPassword) => {
+  const usuarioLimpio = usuario.trim().toLowerCase();
+
+  const response = await fetch(`${API_URL}/api/recuperar-password/cambiar`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      usuario: usuarioLimpio,
+      nueva_password: nuevaPassword,
+    }),
+  });
+
+  if (response.ok) {
+    return await response.json();
+  }
+
+  const errData = await response.json().catch(() => ({}));
+  throw new Error(errData.detail || 'No se pudo actualizar la contraseña.');
+};
 
 
 /*
@@ -338,7 +382,7 @@ export const obtenerInstitutos = async () => {
 
 /*
  * ============================================================================
- * REGISTRO CON APROBACIÓN DE DIRECTIVO
+ * REGISTRO CON APROBACIÓN DE USUARIO
  * ============================================================================
  */
 /*
@@ -376,3 +420,32 @@ export const solicitarRegistroUsuario = async ({
     errData.detail || 'Ese correo ya se encuentra registrado o tiene una solicitud pendiente.'
   );
 };
+
+/* Solicitudes y Registros: */
+
+export const getSolicitudesRegistro = async () => {
+  return fetchProtegido(
+    `${API_URL}/api/registro/solicitudes`,
+    { method: 'GET' },
+    'Error al obtener solicitudes pendientes.'
+  );
+};
+
+export const resolverSolicitudRegistro = async (idSolicitud, accion, rol = null) => {
+  const options = { method: 'POST' };
+  if (rol) {
+    options.headers = { 'Content-Type': 'application/json' };
+    options.body = JSON.stringify({ rol });
+  }
+  return fetchProtegido(
+    `${API_URL}/api/registro/solicitudes/${idSolicitud}/${accion}`,
+    options,
+    `Error al ${accion} la solicitud.`
+  );
+};
+
+export const aprobarSolicitudRegistro = (idSolicitud, rol = null) =>
+  resolverSolicitudRegistro(idSolicitud, 'aprobar', rol);
+
+export const rechazarSolicitudRegistro = (idSolicitud) =>
+  resolverSolicitudRegistro(idSolicitud, 'rechazar');

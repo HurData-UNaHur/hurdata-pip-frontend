@@ -1,13 +1,25 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  BookOpen, Calculator, ChartLine, ChevronLeft, ChevronRight, GraduationCap, House, LogOut, Menu, Upload, User, X,
+  Bell, BookOpen, Calculator, ChartLine, Check, ChevronLeft, ChevronRight, GraduationCap, House, LogOut, Menu, Upload, User, X,
 } from 'lucide-react';
 import styles from './AppShell.module.css';
 import logo from '../assets/logo-hurlingham.png';
 import logoGris from '../assets/logo-hurlingham-grisado.png';
 import IconoTema from './IconoTema';
-import { PERMISOS, tienePermiso } from '../services/api';
+import {
+  PERMISOS,
+  tienePermiso,
+  getSolicitudesRegistro,
+  aprobarSolicitudRegistro,
+  rechazarSolicitudRegistro,
+} from '../services/api';
+
+const ROLES_DISPONIBLES = [
+  { id: 'directivo', nombre: 'Directivo' },
+  { id: 'docente', nombre: 'Docente' },
+  { id: 'no_docente', nombre: 'No Docente' },
+];
 
 /*
  * Marco de la aplicación: cabecera con el logo, barra lateral con las secciones (y, al pie,
@@ -19,6 +31,14 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
   // Barra lateral comprimida (solo íconos, en escritorio). Se recuerda entre sesiones.
   const [comprimida, setComprimida] = useState(() => localStorage.getItem('hurdata_sidebar_comprimida') === '1');
 
+  // Estado para solicitudes de registro pendientes (Directivo / Admin)
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [solicitudes, setSolicitudes] = useState([]);
+  const [rolesEditados, setRolesEditados] = useState({});
+  const [loadingNotif, setLoadingNotif] = useState(false);
+  const [procesandoId, setProcesandoId] = useState(null);
+  const [notifError, setNotifError] = useState(null);
+
   const alternarCompresion = () => {
     setComprimida((v) => {
       localStorage.setItem('hurdata_sidebar_comprimida', v ? '0' : '1');
@@ -29,6 +49,7 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
   // Usuario con login real (no invitado)
   const esAutorizado = Boolean(usuario) && usuario.role !== 'invitado';
   const puedeVerCargas = tienePermiso(usuario, PERMISOS.VER_CARGAS);
+  const puedeAprobar = tienePermiso(usuario, PERMISOS.APROBAR_REGISTROS);
 
   const secciones = [
     { to: '/', texto: 'Inicio', Icono: House, end: true },
@@ -38,9 +59,69 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
     ...(puedeVerCargas ? [{ to: '/cargas', texto: 'Cargas', Icono: Upload }] : []),
   ];
 
-  // Cerrar el menú del celular con Escape
+  // Cargar solicitudes pendientes cuando puedeAprobar es true y al abrir el modal
   useEffect(() => {
-    const alTeclear = (e) => { if (e.key === 'Escape') setMenuAbierto(false); };
+    if (!puedeAprobar) return;
+
+    let cancelado = false;
+
+    getSolicitudesRegistro()
+      .then((data) => {
+        if (!cancelado) {
+          const lista = Array.isArray(data) ? data : data.solicitudes || [];
+          setSolicitudes(lista);
+          setNotifError(null);
+        }
+      })
+      .catch((err) => {
+        if (!cancelado && isNotifOpen) {
+          setNotifError(err.message);
+        }
+      })
+      .finally(() => {
+        if (!cancelado) setLoadingNotif(false);
+      });
+
+    return () => {
+      cancelado = true;
+    };
+  }, [puedeAprobar, isNotifOpen]);
+
+  const handleAprobar = async (id, rolOriginal) => {
+    const rolFinal = rolesEditados[id] || rolOriginal;
+    setProcesandoId(id);
+    setNotifError(null);
+    try {
+      await aprobarSolicitudRegistro(id, rolFinal);
+      setSolicitudes((prev) => prev.filter((s) => (s.id ?? s.id_solicitud) !== id));
+    } catch (err) {
+      setNotifError(err.message);
+    } finally {
+      setProcesandoId(null);
+    }
+  };
+
+  const handleRechazar = async (id) => {
+    setProcesandoId(id);
+    setNotifError(null);
+    try {
+      await rechazarSolicitudRegistro(id);
+      setSolicitudes((prev) => prev.filter((s) => (s.id ?? s.id_solicitud) !== id));
+    } catch (err) {
+      setNotifError(err.message);
+    } finally {
+      setProcesandoId(null);
+    }
+  };
+
+  // Cerrar el menú del celular o el modal con Escape
+  useEffect(() => {
+    const alTeclear = (e) => {
+      if (e.key === 'Escape') {
+        setMenuAbierto(false);
+        setIsNotifOpen(false);
+      }
+    };
     document.addEventListener('keydown', alTeclear);
     return () => document.removeEventListener('keydown', alTeclear);
   }, []);
@@ -112,6 +193,30 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
                 </span>
               </div>
             )}
+
+            {puedeAprobar && (
+              <button
+                type="button"
+                className={styles.item}
+                onClick={() => {
+                  setMenuAbierto(false);
+                  setLoadingNotif(true);
+                  setIsNotifOpen(true);
+                }}
+                title="Solicitudes de registro pendientes"
+              >
+                <span className={styles.campanaWrap}>
+                  <Bell size={19} aria-hidden="true" />
+                  {solicitudes.length > 0 && (
+                    <span className={styles.badgeNotif}>{solicitudes.length}</span>
+                  )}
+                </span>
+                <span className={styles.textoItem}>
+                  Solicitudes{solicitudes.length > 0 ? ` (${solicitudes.length})` : ''}
+                </span>
+              </button>
+            )}
+
             <button
               type="button"
               className={styles.item}
@@ -121,6 +226,7 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
               <IconoTema theme={theme} size={19} sobreVerde />
               <span className={styles.textoItem}>{textoTema}</span>
             </button>
+
             {onLogout && (
               <button
                 type="button"
@@ -153,6 +259,101 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
         <span>© {new Date().getFullYear()} HurData · Proyecto Integrador de Programación · Universidad Nacional de Hurlingham</span>
         <img src={logoGris} alt="Universidad Nacional de Hurlingham" className={styles.logoFooter} />
       </footer>
+
+      {/* ── Modal de aprobación de solicitudes de registro ── */}
+      {puedeAprobar && isNotifOpen && (
+        <div className={styles.modalOverlay} onClick={() => setIsNotifOpen(false)}>
+          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className={styles.modalCerrar}
+              onClick={() => setIsNotifOpen(false)}
+              title="Cerrar"
+              aria-label="Cerrar"
+            >
+              <X size={20} aria-hidden="true" />
+            </button>
+
+            <h3 className={styles.modalTitulo}>Solicitudes de registro pendientes</h3>
+            <p className={styles.modalSubtitulo}>
+              Revisá los datos, modificá el rol asignado si corresponde y aprobá o rechazá la solicitud.
+            </p>
+
+            {notifError && <p className={styles.modalError}>{notifError}</p>}
+
+            {loadingNotif ? (
+              <p className={styles.modalVacio}>Cargando solicitudes...</p>
+            ) : solicitudes.length === 0 ? (
+              <p className={styles.modalVacio}>No hay solicitudes pendientes en este momento.</p>
+            ) : (
+              <div className={styles.listaSolicitudes}>
+                {solicitudes.map((sol) => {
+                  const idSol = sol.id ?? sol.id_solicitud;
+                  const rolActual = rolesEditados[idSol] ?? sol.rol;
+                  const institutoNombre = sol.nombre_instituto || sol.instituto;
+
+                  return (
+                    <div key={idSol} className={styles.itemSolicitud}>
+                      <div className={styles.infoSolicitud}>
+                        <strong className={styles.nombreSolicitud}>{sol.nombre}</strong>
+                        <span className={styles.emailSolicitud}>{sol.email}</span>
+                        {institutoNombre && (
+                          <span className={styles.institutoSolicitud}>
+                            Instituto: {institutoNombre}
+                          </span>
+                        )}
+
+                        {/* Bloquesito para modificar el rol antes de aprobar */}
+                        <div className={styles.bloqueRol}>
+                          <label htmlFor={`rol-sol-${idSol}`} className={styles.labelRol}>
+                            Rol a asignar:
+                          </label>
+                          <select
+                            id={`rol-sol-${idSol}`}
+                            className={styles.selectRol}
+                            value={rolActual}
+                            disabled={procesandoId === idSol}
+                            onChange={(e) =>
+                              setRolesEditados((prev) => ({ ...prev, [idSol]: e.target.value }))
+                            }
+                          >
+                            {ROLES_DISPONIBLES.map((r) => (
+                              <option key={r.id} value={r.id}>
+                                {r.nombre}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className={styles.accionesSolicitud}>
+                        <button
+                          type="button"
+                          className={styles.btnAprobar}
+                          disabled={procesandoId === idSol}
+                          onClick={() => handleAprobar(idSol, sol.rol)}
+                        >
+                          <Check size={15} aria-hidden="true" />
+                          Aprobar
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.btnRechazar}
+                          disabled={procesandoId === idSol}
+                          onClick={() => handleRechazar(idSol)}
+                        >
+                          <X size={15} aria-hidden="true" />
+                          Rechazar
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

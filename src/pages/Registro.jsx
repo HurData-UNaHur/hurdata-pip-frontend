@@ -25,6 +25,49 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
   const [enviado, setEnviado] = useState(false);
+  const [touched, setTouched] = useState({
+    email: false,
+    nombre: false,
+    password: false,
+    confirmPassword: false,
+  });
+
+  // Validaciones en tiempo real
+  const validarEmail = (valor) => {
+    const limpio = valor.trim();
+    if (!limpio) return 'El correo es obligatorio.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(limpio)) return 'Ingresá un formato de correo válido.';
+    if (!limpio.toLowerCase().endsWith('@unahur.edu.ar')) {
+      return 'Debe ser un correo institucional (@unahur.edu.ar).';
+    }
+    return '';
+  };
+
+  const validarNombre = (valor) => {
+    const limpio = valor.trim();
+    if (!limpio) return 'El nombre es obligatorio.';
+    if (limpio.length < 3) return 'El nombre debe tener al menos 3 caracteres.';
+    return '';
+  };
+
+  const validarPassword = (valor) => {
+    if (!valor.trim()) return 'La contraseña es obligatoria.';
+    if (valor.length < 4) return 'La contraseña debe tener al menos 4 caracteres.';
+    return '';
+  };
+
+  const validarConfirmPassword = (valor, passOriginal) => {
+    if (!valor) return 'Confirmá tu contraseña.';
+    if (valor !== passOriginal) return 'Las contraseñas no coinciden.';
+    return '';
+  };
+
+  const erroresCampo = {
+    email: validarEmail(email),
+    nombre: validarNombre(nombre),
+    password: validarPassword(password),
+    confirmPassword: validarConfirmPassword(confirmPassword, password),
+  };
 
   useEffect(() => {
     obtenerInstitutos()
@@ -43,19 +86,22 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setTouched({
+      email: true,
+      nombre: true,
+      password: true,
+      confirmPassword: true,
+    });
 
-    if (!email.trim() || !nombre.trim() || !password.trim() || !confirmPassword.trim()) {
-      setError('Por favor, completá todos los campos.');
+    if (
+      erroresCampo.email ||
+      erroresCampo.nombre ||
+      erroresCampo.password ||
+      erroresCampo.confirmPassword
+    ) {
       return;
     }
-    if (password.length < 4) {
-      setError('La contraseña debe tener al menos 4 caracteres.');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
-      return;
-    }
+
     if (!rol) {
       setError('Seleccioná un rol.');
       return;
@@ -114,10 +160,19 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
                 type="email"
                 placeholder="ejemplo@unahur.edu.ar"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setTouched((prev) => ({ ...prev, email: true }));
+                }}
+                onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
                 disabled={loading}
                 autoFocus
               />
+              {touched.email && erroresCampo.email && (
+                <span style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: '2px' }}>
+                  {erroresCampo.email}
+                </span>
+              )}
             </div>
 
             <div className={styles.fieldGroup}>
@@ -127,9 +182,18 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
                 type="text"
                 placeholder="Ej: Apellido, Nombre SegundoNombre"
                 value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
+                onChange={(e) => {
+                  setNombre(e.target.value);
+                  setTouched((prev) => ({ ...prev, nombre: true }));
+                }}
+                onBlur={() => setTouched((prev) => ({ ...prev, nombre: true }))}
                 disabled={loading}
               />
+              {touched.nombre && erroresCampo.nombre && (
+                <span style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: '2px' }}>
+                  {erroresCampo.nombre}
+                </span>
+              )}
             </div>
 
             <div className={styles.twoCols}>
@@ -140,9 +204,18 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
                   type="password"
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setTouched((prev) => ({ ...prev, password: true }));
+                  }}
+                  onBlur={() => setTouched((prev) => ({ ...prev, password: true }))}
                   disabled={loading}
                 />
+                {touched.password && erroresCampo.password && (
+                  <span style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: '2px' }}>
+                    {erroresCampo.password}
+                  </span>
+                )}
               </div>
 
               <div className={styles.fieldGroup}>
@@ -152,9 +225,18 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
                   type="password"
                   placeholder="••••••••"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    setTouched((prev) => ({ ...prev, confirmPassword: true }));
+                  }}
+                  onBlur={() => setTouched((prev) => ({ ...prev, confirmPassword: true }))}
                   disabled={loading}
                 />
+                {touched.confirmPassword && erroresCampo.confirmPassword && (
+                  <span style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: '2px' }}>
+                    {erroresCampo.confirmPassword}
+                  </span>
+                )}
               </div>
             </div>
 

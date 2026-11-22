@@ -1,7 +1,6 @@
-
 import { useState } from 'react';
 import {
-  solicitarCodigoRecuperacion,
+  verificarUsuarioRecuperacion,
   confirmarNuevaPassword,
 } from '../services/api';
 import logoUnahur from '../assets/unahur.jpeg';
@@ -9,7 +8,7 @@ import styles from './RecuperarPassword.module.css';
 import { CircleCheck, TriangleAlert } from 'lucide-react';
 import IconoTema from '../components/IconoTema';
 
-// Mensaje de error del formulario (se repite en los 3 pasos)
+// Mensaje de error del formulario
 function ErrorMsg({ texto }) {
   return (
     <p className={styles.errorMsg}>
@@ -19,17 +18,15 @@ function ErrorMsg({ texto }) {
 }
 
 export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin }) {
-  const [paso, setPaso]                       = useState(1); // 1: Email | 2: Código | 3: Nueva clave | 4: Éxito
+  const [paso, setPaso]                       = useState(1); // 1: Usuario | 2: Nueva clave | 3: Éxito
   const [usuario, setUsuario]                 = useState('');
-  const [codigo, setCodigo]                   = useState('');
-  const [codigoMockHint, setCodigoMockHint]   = useState(null);
   const [nuevaPassword, setNuevaPassword]     = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading]                 = useState(false);
   const [error, setError]                     = useState(null);
 
-  // ── Paso 1: Solicitar código al correo institucional ──────────────────────
-  const handleEnviarCodigo = async (e) => {
+  // ── Paso 1: Verificar que el usuario exista ───────────────────────────────
+  const handleVerificarUsuario = async (e) => {
     e.preventDefault();
     if (!usuario.trim()) {
       setError('Ingresá tu usuario o correo institucional.');
@@ -39,10 +36,7 @@ export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin })
     setLoading(true);
     setError(null);
     try {
-      const res = await solicitarCodigoRecuperacion(usuario);
-      if (res?.codigoMock) {
-        setCodigoMockHint(res.codigoMock);
-      }
+      await verificarUsuarioRecuperacion(usuario);
       setPaso(2);
     } catch (err) {
       setError(err.message);
@@ -51,18 +45,7 @@ export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin })
     }
   };
 
-  // ── Paso 2: Validar código ingresado ──────────────────────────────────────
-  const handleValidarCodigo = (e) => {
-    e.preventDefault();
-    if (codigo.trim().length < 6) {
-      setError('Ingresá el código de 6 dígitos enviado a tu correo.');
-      return;
-    }
-    setError(null);
-    setPaso(3);
-  };
-
-  // ── Paso 3: Guardar nueva contraseña ──────────────────────────────────────
+  // ── Paso 2: Guardar y confirmar nueva contraseña ──────────────────────────
   const handleGuardarPassword = async (e) => {
     e.preventDefault();
     if (nuevaPassword.length < 4) {
@@ -77,8 +60,8 @@ export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin })
     setLoading(true);
     setError(null);
     try {
-      await confirmarNuevaPassword(usuario, codigo, nuevaPassword);
-      setPaso(4);
+      await confirmarNuevaPassword(usuario, nuevaPassword);
+      setPaso(3);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -109,21 +92,19 @@ export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin })
         </div>
 
         {/* Indicador visual de pasos */}
-        {paso < 4 && (
+        {paso < 3 && (
           <div className={styles.stepsBar}>
-            <span className={paso >= 1 ? styles.stepActive : styles.step}>1. Correo</span>
+            <span className={paso >= 1 ? styles.stepActive : styles.step}>1. Usuario</span>
             <span className={styles.stepLine} />
-            <span className={paso >= 2 ? styles.stepActive : styles.step}>2. Código</span>
-            <span className={styles.stepLine} />
-            <span className={paso >= 3 ? styles.stepActive : styles.step}>3. Nueva Clave</span>
+            <span className={paso >= 2 ? styles.stepActive : styles.step}>2. Nueva Clave</span>
           </div>
         )}
 
         {/* ── PASO 1: Correo Institucional ── */}
         {paso === 1 && (
-          <form onSubmit={handleEnviarCodigo} className={styles.form}>
+          <form onSubmit={handleVerificarUsuario} className={styles.form}>
             <p className={styles.helperText}>
-              Ingresá tu correo institucional registrado y te enviaremos un código de verificación para crear una nueva contraseña.
+              Ingresá tu correo institucional registrado para establecer una nueva contraseña.
             </p>
 
             <div className={styles.fieldGroup}>
@@ -155,69 +136,19 @@ export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin })
                 className={styles.btnSubmit}
                 disabled={loading}
               >
-                {loading ? 'Enviando...' : 'Enviar código'}
+                {loading ? 'Verificando...' : 'Continuar'}
               </button>
             </div>
           </form>
         )}
 
-        {/* ── PASO 2: Código de Verificación ── */}
+        {/* ── PASO 2: Nueva Contraseña y Confirmación ── */}
         {paso === 2 && (
-          <form onSubmit={handleValidarCodigo} className={styles.form}>
-            <div className={styles.infoBanner}>
-              Enviamos un código de 6 dígitos a <strong>{usuario}</strong>.
-            </div>
-
-            {codigoMockHint && (
-              <div className={styles.mockBox}>
-                🧪 <strong>Modo Prueba:</strong> Tu código simulado es{' '}
-                <code>{codigoMockHint}</code>{' '}
-                <button
-                  type="button"
-                  className={styles.mockFillBtn}
-                  onClick={() => setCodigo(codigoMockHint)}
-                >
-                  Autocompletar
-                </button>
-              </div>
-            )}
-
-            <div className={styles.fieldGroup}>
-              <label htmlFor="rec-codigo">Código de verificación</label>
-              <input
-                id="rec-codigo"
-                type="text"
-                maxLength={6}
-                placeholder="000000"
-                value={codigo}
-                onChange={(e) => setCodigo(e.target.value)}
-                autoFocus
-              />
-            </div>
-
-            {error && <ErrorMsg texto={error} />}
-
-            <div className={styles.formActions}>
-              <button
-                type="button"
-                className={styles.btnVolver}
-                onClick={() => {
-                  setPaso(1);
-                  setError(null);
-                }}
-              >
-                ← Cambiar correo
-              </button>
-              <button type="submit" className={styles.btnSubmit}>
-                Verificar código
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* ── PASO 3: Nueva Contraseña ── */}
-        {paso === 3 && (
           <form onSubmit={handleGuardarPassword} className={styles.form}>
+            <div className={styles.infoBanner}>
+              Creando nueva contraseña para <strong>{usuario.trim().toLowerCase()}</strong>.
+            </div>
+
             <div className={styles.fieldGroup}>
               <label htmlFor="rec-pass1">Nueva Contraseña</label>
               <input
@@ -250,26 +181,28 @@ export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin })
                 type="button"
                 className={styles.btnVolver}
                 onClick={() => {
-                  setPaso(2);
+                  setPaso(1);
+                  setNuevaPassword('');
+                  setConfirmPassword('');
                   setError(null);
                 }}
                 disabled={loading}
               >
-                ← Atrás
+                ← Cambiar usuario
               </button>
               <button
                 type="submit"
                 className={styles.btnSubmit}
                 disabled={loading}
               >
-                {loading ? 'Guardando...' : 'Crear contraseña'}
+                {loading ? 'Guardando...' : 'Confirmar contraseña'}
               </button>
             </div>
           </form>
         )}
 
-        {/* ── PASO 4: Confirmación Exitosa ── */}
-        {paso === 4 && (
+        {/* ── PASO 3: Confirmación Exitosa ── */}
+        {paso === 3 && (
           <div className={styles.successBox}>
             <div className={styles.successIcon}>
               <CircleCheck size={44} color="#16a34a" aria-hidden="true" />
