@@ -36,6 +36,14 @@
   border-radius: 8px;
   padding: 4px 8px;
 }
+a.logoCaja {
+  text-decoration: none;
+  cursor: pointer;
+}
+a.logoCaja:focus-visible {
+  outline: 2px solid #007a33;
+  outline-offset: 3px;
+}
 .logoCabecera {
   height: 40px;
   width: auto;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import {
   Bell, BookOpen, Calculator, ChartLine, Check, ChevronLeft, ChevronRight, GraduationCap, House, KeyRound, LogOut, Menu, Upload, User, X,
 } from 'lucide-react';
@@ -165,9 +165,10 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
           {menuAbierto ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
         </button>
 
-        <span className={styles.logoCaja}>
+        {/* El logo lleva a Inicio */}
+        <Link to="/" className={styles.logoCaja} onClick={() => setMenuAbierto(false)} aria-label="Ir a Inicio">
           <img src={logo} alt="Universidad Nacional de Hurlingham" className={styles.logoCabecera} />
-        </span>
+        </Link>
       </header>
 
       {/* ── Barra lateral ── */}

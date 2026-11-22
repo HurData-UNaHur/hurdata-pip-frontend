@@ -79,8 +79,16 @@
   border-right: 1px solid var(--borde);
 }
 
-.logo {
+.logoEnlace {
   align-self: flex-start;
+  display: inline-flex;
+  border-radius: 6px;
+}
+.logoEnlace:focus-visible {
+  outline: 2px solid var(--verde);
+  outline-offset: 4px;
+}
+.logo {
   height: 52px;
   width: auto;
 }
@@ -487,4 +495,17 @@
   border-color: #166534;
   background-color: rgba(22, 101, 52, 0.25);
   color: #bbf7d0;
+}
+
+/* Dos campos a la misma altura (nombre y apellido); en pantallas muy chicas pasan a una columna */
+.dosColumnas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+@media (max-width: 420px) {
+  .dosColumnas {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

@@ -18,6 +18,7 @@ const ROLES = [
 export default function Registro({ theme, toggleTheme, onVolverLogin }) {
   const [email, setEmail] = useState('');
   const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
   const [password, setPassword] = useState('');
   const [confirmacion, setConfirmacion] = useState('');
   const [rol, setRol] = useState('docente');
@@ -40,7 +41,8 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
 
   const errores = {
     email: validarEmailInstitucional(email),
-    nombre: validarNombre(nombre),
+    nombre: validarNombre(nombre, 'nombre'),
+    apellido: validarNombre(apellido, 'apellido'),
     password: validarPasswordNueva(password),
     confirmacion: validarConfirmacion(confirmacion, password),
   };
@@ -49,7 +51,7 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setTocados({ email: true, nombre: true, password: true, confirmacion: true });
+    setTocados({ email: true, nombre: true, apellido: true, password: true, confirmacion: true });
     if (Object.values(errores).some(Boolean)) return;
     if (!instituto) {
       setError('Elegí tu instituto para enviar la solicitud.');
@@ -59,7 +61,9 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
     setLoading(true);
     setError(null);
     try {
-      await solicitarRegistroUsuario({ email, nombre, password, rol, idInstituto: instituto.id });
+      // Se guarda como "Apellido, Nombre" (el formato que usa la universidad)
+      const nombreCompleto = `${apellido.trim()}, ${nombre.trim()}`;
+      await solicitarRegistroUsuario({ email, nombre: nombreCompleto, password, rol, idInstituto: instituto.id });
       setEnviado(true);
     } catch (err) {
       setError(err.message);
@@ -104,15 +108,22 @@ export default function Registro({ theme, toggleTheme, onVolverLogin }) {
           inputMode="email" autoComplete="username" placeholder="nombre@unahur.edu.ar"
           disabled={loading} autoFocus
         />
-        <Campo
-          id="reg-nombre" etiqueta="Nombre y apellido" valor={nombre} onChange={setNombre}
-          onBlur={() => marcar('nombre')} error={errores.nombre} tocado={tocados.nombre}
-          autoComplete="name" placeholder="Apellido, Nombre" disabled={loading}
-        />
+        <div className={styles.dosColumnas}>
+          <Campo
+            id="reg-nombre" etiqueta="Nombre" valor={nombre} onChange={setNombre}
+            onBlur={() => marcar('nombre')} error={errores.nombre} tocado={tocados.nombre}
+            autoComplete="given-name" disabled={loading}
+          />
+          <Campo
+            id="reg-apellido" etiqueta="Apellido" valor={apellido} onChange={setApellido}
+            onBlur={() => marcar('apellido')} error={errores.apellido} tocado={tocados.apellido}
+            autoComplete="family-name" disabled={loading}
+          />
+        </div>
         <Campo
           id="reg-password" etiqueta="Contraseña" tipo="password" valor={password} onChange={setPassword}
           onBlur={() => marcar('password')} error={errores.password} tocado={tocados.password}
-          autoComplete="new-password" disabled={loading}
+          autoComplete="new-password" maxLength={72} disabled={loading}
         >
           <ReglasPassword password={password} />
         </Campo>

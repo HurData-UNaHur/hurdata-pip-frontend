@@ -143,7 +143,7 @@ export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin })
           <Campo
             id="can-password" etiqueta="Contraseña nueva" tipo="password" valor={password} onChange={setPassword}
             onBlur={() => marcar('password')} error={errores.password} tocado={tocados.password}
-            autoComplete="new-password" disabled={loading}
+            autoComplete="new-password" maxLength={72} disabled={loading}
           >
             <ReglasPassword password={password} />
           </Campo>

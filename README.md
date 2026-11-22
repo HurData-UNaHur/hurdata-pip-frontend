@@ -91,7 +91,7 @@ La sesión (token y datos del usuario) se guarda en `localStorage` y dura 8 hora
 
 **Solicitudes de acceso y de recuperación.** Quien tiene permiso para aprobar registros (Directivo y Admin) ve una campana "Solicitudes" al pie de la barra lateral. Desde ahí aprueba o rechaza las altas (pudiendo cambiar el rol) y los pedidos de recuperación. Al aprobar una recuperación, la pantalla muestra un código de un solo uso que hay que pasarle a la persona; vale 60 minutos y no se vuelve a mostrar. Las cuentas Admin y Directivo solo las restablece un Admin, y nadie aprueba la propia solicitud.
 
-**Reglas de los formularios.** El correo debe ser `nombre@unahur.edu.ar`. La contraseña nueva tiene entre 8 y 72 caracteres, con mayúscula, minúscula, número y símbolo, y distinta de la anterior. Los errores aparecen al salir de un campo y se actualizan mientras se escribe; el ingreso solo pide que los campos no estén vacíos. Las reglas están en `src/utils/validaciones.js` y se repiten en el backend, que es quien las hace cumplir.
+**Reglas de los formularios.** El correo debe ser `nombre@unahur.edu.ar`. La contraseña nueva tiene al menos 8 caracteres, con mayúscula, minúscula, número y símbolo, y distinta de la anterior. Los errores aparecen al salir de un campo y se actualizan mientras se escribe; el ingreso solo pide que los campos no estén vacíos. Las reglas están en `src/utils/validaciones.js` y se repiten en el backend, que es quien las hace cumplir.
 
 ## Scripts Disponibles
 

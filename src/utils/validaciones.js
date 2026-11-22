@@ -18,16 +18,17 @@ export const validarEmailInstitucional = (valor) => {
   return '';
 };
 
-export const validarNombre = (valor) => {
-  const nombre = valor.trim();
-  if (!nombre) return 'Ingresá tu nombre.';
-  if (nombre.length < 3) return 'El nombre debe tener al menos 3 caracteres.';
+// `que` es lo que se está pidiendo ('nombre' o 'apellido'), para que el mensaje sea claro
+export const validarNombre = (valor, que = 'nombre') => {
+  const texto = valor.trim();
+  if (!texto) return `Ingresá tu ${que}.`;
+  if (texto.length < 2) return `Tu ${que} debe tener al menos 2 letras.`;
   return '';
 };
 
 // Contraseña nueva: se muestra como checklist mientras se escribe
 export const REGLAS_PASSWORD = [
-  { id: 'largo', texto: 'Entre 8 y 72 caracteres', cumple: (p) => p.length >= 8 && p.length <= 72 },
+  { id: 'largo', texto: 'Al menos 8 caracteres', cumple: (p) => p.length >= 8 && p.length <= 72 },
   { id: 'mayuscula', texto: 'Una mayúscula', cumple: (p) => /[A-Z]/.test(p) },
   { id: 'minuscula', texto: 'Una minúscula', cumple: (p) => /[a-z]/.test(p) },
   { id: 'numero', texto: 'Un número', cumple: (p) => /\d/.test(p) },

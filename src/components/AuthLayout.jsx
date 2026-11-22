@@ -26,7 +26,10 @@ export default function AuthLayout({ theme, toggleTheme, children }) {
       </button>
 
       <aside className={styles.identidad}>
-        <img src={logoUnahur} alt="UNaHur, Universidad Nacional de Hurlingham" className={styles.logo} />
+        {/* Sin sesión, el logo recarga la página y vuelve al inicio de sesión */}
+        <a href="/" className={styles.logoEnlace} aria-label="Volver al inicio de sesión">
+          <img src={logoUnahur} alt="UNaHur, Universidad Nacional de Hurlingham" className={styles.logo} />
+        </a>
         <div className={styles.titulos}>
           <p className={styles.titulo}>HurData: Dashboard Analítico de Gestión Académica</p>
           <p className={styles.subtitulo}>Universidad Nacional de Hurlingham</p>
