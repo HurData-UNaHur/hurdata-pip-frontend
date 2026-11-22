@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  Bell, BookOpen, Calculator, ChartLine, Check, ChevronLeft, ChevronRight, GraduationCap, House, LogOut, Menu, Upload, User, X,
+  Bell, BookOpen, Calculator, ChartLine, Check, ChevronLeft, ChevronRight, GraduationCap, House, KeyRound, LogOut, Menu, Upload, User, X,
 } from 'lucide-react';
 import styles from './AppShell.module.css';
 import logo from '../assets/logo-hurlingham.png';
@@ -13,6 +13,8 @@ import {
   getSolicitudesRegistro,
   aprobarSolicitudRegistro,
   rechazarSolicitudRegistro,
+  getSolicitudesRecuperacion,
+  resolverSolicitudRecuperacion,
 } from '../services/api';
 
 const ROLES_DISPONIBLES = [
@@ -34,6 +36,8 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
   // Estado para solicitudes de registro pendientes (Directivo / Admin)
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [solicitudes, setSolicitudes] = useState([]);
+  const [recuperaciones, setRecuperaciones] = useState([]);     // pedidos de recuperación de contraseña
+  const [codigosGenerados, setCodigosGenerados] = useState([]); // códigos recién aprobados (se ven una sola vez)
   const [rolesEditados, setRolesEditados] = useState({});
   const [loadingNotif, setLoadingNotif] = useState(false);
   const [procesandoId, setProcesandoId] = useState(null);
@@ -65,11 +69,11 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
 
     let cancelado = false;
 
-    getSolicitudesRegistro()
-      .then((data) => {
+    Promise.all([getSolicitudesRegistro(), getSolicitudesRecuperacion()])
+      .then(([altas, recuperacion]) => {
         if (!cancelado) {
-          const lista = Array.isArray(data) ? data : data.solicitudes || [];
-          setSolicitudes(lista);
+          setSolicitudes(Array.isArray(altas) ? altas : altas.solicitudes || []);
+          setRecuperaciones(recuperacion.solicitudes || []);
           setNotifError(null);
         }
       })
@@ -113,6 +117,25 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
       setProcesandoId(null);
     }
   };
+
+  const handleRecuperacion = async (sol, accion) => {
+    setProcesandoId(`rec-${sol.id_solicitud}`);
+    setNotifError(null);
+    try {
+      const resp = await resolverSolicitudRecuperacion(sol.id_solicitud, accion);
+      setRecuperaciones((prev) => prev.filter((r) => r.id_solicitud !== sol.id_solicitud));
+      if (accion === 'aprobar') {
+        setCodigosGenerados((prev) => [...prev, { id: sol.id_solicitud, usuario: sol.usuario, codigo: resp.codigo }]);
+      }
+    } catch (err) {
+      setNotifError(err.message);
+    } finally {
+      setProcesandoId(null);
+    }
+  };
+
+  const pendientes = solicitudes.length + recuperaciones.length;
+  const hayRecuperaciones = recuperaciones.length > 0 || codigosGenerados.length > 0;
 
   // Cerrar el menú del celular o el modal con Escape
   useEffect(() => {
@@ -207,12 +230,12 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
               >
                 <span className={styles.campanaWrap}>
                   <Bell size={19} aria-hidden="true" />
-                  {solicitudes.length > 0 && (
-                    <span className={styles.badgeNotif}>{solicitudes.length}</span>
+                  {pendientes > 0 && (
+                    <span className={styles.badgeNotif}>{pendientes}</span>
                   )}
                 </span>
                 <span className={styles.textoItem}>
-                  Solicitudes{solicitudes.length > 0 ? ` (${solicitudes.length})` : ''}
+                  Solicitudes{pendientes > 0 ? ` (${pendientes})` : ''}
                 </span>
               </button>
             )}
@@ -284,7 +307,7 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
             {loadingNotif ? (
               <p className={styles.modalVacio}>Cargando solicitudes...</p>
             ) : solicitudes.length === 0 ? (
-              <p className={styles.modalVacio}>No hay solicitudes pendientes en este momento.</p>
+              hayRecuperaciones ? null : <p className={styles.modalVacio}>No hay solicitudes pendientes en este momento.</p>
             ) : (
               <div className={styles.listaSolicitudes}>
                 {solicitudes.map((sol) => {
@@ -350,6 +373,70 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
                   );
                 })}
               </div>
+            )}
+
+            {/* ── Recuperación de contraseña: se aprueba y se le pasa el código a la persona ── */}
+            {!loadingNotif && hayRecuperaciones && (
+              <section className={styles.seccionModal} aria-label="Recuperación de contraseña">
+                <h4 className={styles.modalSeccion}>
+                  <KeyRound size={16} aria-hidden="true" />
+                  Recuperación de contraseña
+                </h4>
+
+                {codigosGenerados.map((c) => (
+                  <div key={c.id} className={styles.cajaCodigo} role="status">
+                    <p>
+                      Código para <strong>{c.usuario}</strong>. Pasáselo en persona o por un canal de confianza.
+                      Vale 60 minutos, se usa una sola vez y no se vuelve a mostrar.
+                    </p>
+                    <code className={styles.codigoTexto}>{c.codigo}</code>
+                    <button
+                      type="button"
+                      className={styles.btnRechazar}
+                      onClick={() => setCodigosGenerados((prev) => prev.filter((x) => x.id !== c.id))}
+                    >
+                      Listo, ya lo anoté
+                    </button>
+                  </div>
+                ))}
+
+                <div className={styles.listaSolicitudes}>
+                  {recuperaciones.map((sol) => {
+                    const ocupado = procesandoId === `rec-${sol.id_solicitud}`;
+                    return (
+                      <div key={sol.id_solicitud} className={styles.itemSolicitud}>
+                        <div className={styles.infoSolicitud}>
+                          <strong className={styles.nombreSolicitud}>{sol.nombre}</strong>
+                          <span className={styles.emailSolicitud}>{sol.usuario}</span>
+                          <span className={styles.institutoSolicitud}>
+                            Pide restablecer su contraseña. Confirmá que es la persona antes de aprobar.
+                          </span>
+                        </div>
+                        <div className={styles.accionesSolicitud}>
+                          <button
+                            type="button"
+                            className={styles.btnAprobar}
+                            disabled={ocupado}
+                            onClick={() => handleRecuperacion(sol, 'aprobar')}
+                          >
+                            <Check size={15} aria-hidden="true" />
+                            Aprobar
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.btnRechazar}
+                            disabled={ocupado}
+                            onClick={() => handleRecuperacion(sol, 'rechazar')}
+                          >
+                            <X size={15} aria-hidden="true" />
+                            Rechazar
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
             )}
           </div>
         </div>

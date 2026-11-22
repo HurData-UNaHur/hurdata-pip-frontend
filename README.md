@@ -10,7 +10,7 @@ Este repositorio es el frontend: una aplicación React que consume la API del [b
 * **Evolución entre períodos:** gráfico de tendencia de una carrera o materia, con selector de períodos, y tabla comparativa de dos períodos con variaciones y alertas.
 * **Exportación:** las tablas de Materias y de la comparativa de Evolución se descargan como CSV (se abre en Excel) o PDF, respetando el filtro y el orden que se ven en pantalla.
 * **Carga de Excel e historial:** los usuarios con permiso suben los reportes del SIU y consultan quién cargó cada uno.
-* **Sesión y roles:** login con JWT; lo que se puede hacer depende del rol (ver más abajo). Sin sesión se puede consultar en modo invitado.
+* **Sesión y roles:** login con JWT; lo que se puede hacer depende del rol (ver más abajo). Hay que iniciar sesión para usar la aplicación. Las personas nuevas piden acceso y un directivo o administrador lo aprueba; para recuperar la contraseña piden un código que también aprueba un directivo o administrador.
 * **Tema claro y oscuro.**
 
 ---
@@ -25,7 +25,6 @@ Los permisos vienen en el token que entrega el backend y definen qué botones se
 | Directivo | Cargar, borrar cualquier carga y ver todo el historial |
 | Docente | Cargar, y borrar o reemplazar solo lo que cargó él. Ve su propio historial |
 | No Docente | Solo consulta |
-| Invitado (sin sesión) | Solo consulta de períodos, carreras, datos y evolución |
 
 La definición completa está en `app/api/permisos.py` del backend.
 
@@ -90,7 +89,9 @@ El backend precarga cuatro usuarios, uno por rol: `admin@`, `directivo@`, `docen
 
 La sesión (token y datos del usuario) se guarda en `localStorage` y dura 8 horas. Al vencer, se vuelve al login.
 
-> El registro de usuarios y la recuperación de contraseña tienen pantalla, pero el backend todavía no tiene esos endpoints.
+**Solicitudes de acceso y de recuperación.** Quien tiene permiso para aprobar registros (Directivo y Admin) ve una campana "Solicitudes" al pie de la barra lateral. Desde ahí aprueba o rechaza las altas (pudiendo cambiar el rol) y los pedidos de recuperación. Al aprobar una recuperación, la pantalla muestra un código de un solo uso que hay que pasarle a la persona; vale 60 minutos y no se vuelve a mostrar. Las cuentas Admin y Directivo solo las restablece un Admin, y nadie aprueba la propia solicitud.
+
+**Reglas de los formularios.** El correo debe ser `nombre@unahur.edu.ar`. La contraseña nueva tiene entre 8 y 72 caracteres, con mayúscula, minúscula, número y símbolo, y distinta de la anterior. Los errores aparecen al salir de un campo y se actualizan mientras se escribe; el ingreso solo pide que los campos no estén vacíos. Las reglas están en `src/utils/validaciones.js` y se repiten en el backend, que es quien las hace cumplir.
 
 ## Scripts Disponibles
 
@@ -127,5 +128,9 @@ Todas las pantallas leen datos reales de la API: no quedan datos de ejemplo. Los
 | `DELETE /api/periodos/{id}` | Borrar una carga |
 | `DELETE /api/limpiar-db` | Vaciar la base (solo Admin) |
 | `GET /api/institutos` | Selector de instituto en el registro |
+| `POST /api/registro/solicitar` | Pedir acceso |
+| `GET /api/registro/solicitudes`, `POST /api/registro/solicitudes/{id}/{aprobar\|rechazar}` | Campana de solicitudes de alta (Directivo y Admin) |
+| `POST /api/recuperar-password/solicitar`, `POST /api/recuperar-password/canjear` | Recuperación de contraseña con código |
+| `GET /api/recuperacion/solicitudes`, `POST /api/recuperacion/solicitudes/{id}/{aprobar\|rechazar}` | Campana de solicitudes de recuperación (Directivo y Admin) |
 
 La documentación completa de la API está en el README del backend y en `http://localhost:8000/docs`.

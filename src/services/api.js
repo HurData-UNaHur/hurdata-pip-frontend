@@ -277,89 +277,51 @@ export const loginUnahur = async (usuario, password) => {
 
 /*
  * ============================================================================
- * RECUPERACIÓN DE CONTRASEÑA
+ * RECUPERACIÓN DE CONTRASEÑA (por solicitud)
  * ============================================================================
+ * 1. La persona pide la recuperación con su correo.
+ * 2. Un Directivo o Admin la aprueba y recibe un código de un solo uso.
+ * 3. Se lo pasa a la persona, que lo canjea y elige su nueva contraseña.
  */
-/*
-
-POR AHORA ESTA PARTE QUEDA AFUERA HASTA QUE SEPAMOS SI ES NECESARIO MANDAR MAIL CON UN CODIGO DE RECUPERACION.
-SI ESTA PARTE SE QUEDA; BORRAR LO QUE ESTA MÁS ABAJO, AFUERA DEL COMENTARIO.
-
-export const solicitarCodigoRecuperacion = async (usuario) => {
-  const usuarioLimpio = usuario.trim().toLowerCase();
-
-  const response = await fetch(`${API_URL}/api/recuperar-password/solicitar`, {
+const postPublico = async (ruta, cuerpo, mensajeError) => {
+  const response = await fetch(`${API_URL}${ruta}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ usuario: usuarioLimpio }),
+    body: JSON.stringify(cuerpo),
   });
-
-  if (response.ok) {
-    return await response.json();
-  }
-
+  if (response.ok) return response.json();
   const errData = await response.json().catch(() => ({}));
-  throw new Error(errData.detail || 'El correo no figura como personal autorizado de UNAHUR.');
+  throw new Error(errData.detail || mensajeError);
 };
 
-export const confirmarNuevaPassword = async (usuario, codigo, nuevaPassword) => {
-  const usuarioLimpio = usuario.trim().toLowerCase();
+export const solicitarRecuperacion = (usuario) =>
+  postPublico(
+    '/api/recuperar-password/solicitar',
+    { usuario: usuario.trim().toLowerCase() },
+    'No se pudo enviar la solicitud. Probá de nuevo.',
+  );
 
-  const response = await fetch(`${API_URL}/api/recuperar-password/confirmar`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      usuario: usuarioLimpio,
-      codigo: codigo.trim(),
-      nueva_password: nuevaPassword,
-    }),
-  });
+export const canjearCodigoRecuperacion = (usuario, codigo, nuevaPassword) =>
+  postPublico(
+    '/api/recuperar-password/canjear',
+    { usuario: usuario.trim().toLowerCase(), codigo, nueva_password: nuevaPassword },
+    'No se pudo cambiar la contraseña. Probá de nuevo.',
+  );
 
-  if (response.ok) {
-    return await response.json();
-  }
+export const getSolicitudesRecuperacion = () =>
+  fetchProtegido(
+    `${API_URL}/api/recuperacion/solicitudes`,
+    { method: 'GET' },
+    'Error al obtener las solicitudes de recuperación.',
+  );
 
-  const errData = await response.json().catch(() => ({}));
-  throw new Error(errData.detail || 'Código inválido o expirado.');
-};
-*/
-
-export const verificarUsuarioRecuperacion = async (usuario) => {
-  const usuarioLimpio = usuario.trim().toLowerCase();
-
-  const response = await fetch(`${API_URL}/api/recuperar-password/verificar`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ usuario: usuarioLimpio }),
-  });
-
-  if (response.ok) {
-    return await response.json();
-  }
-
-  const errData = await response.json().catch(() => ({}));
-  throw new Error(errData.detail || 'El correo no figura como personal autorizado de UNAHUR.');
-};
-
-export const confirmarNuevaPassword = async (usuario, nuevaPassword) => {
-  const usuarioLimpio = usuario.trim().toLowerCase();
-
-  const response = await fetch(`${API_URL}/api/recuperar-password/cambiar`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      usuario: usuarioLimpio,
-      nueva_password: nuevaPassword,
-    }),
-  });
-
-  if (response.ok) {
-    return await response.json();
-  }
-
-  const errData = await response.json().catch(() => ({}));
-  throw new Error(errData.detail || 'No se pudo actualizar la contraseña.');
-};
+/* accion: 'aprobar' (devuelve { codigo, expira_en, message }) o 'rechazar' */
+export const resolverSolicitudRecuperacion = (idSolicitud, accion) =>
+  fetchProtegido(
+    `${API_URL}/api/recuperacion/solicitudes/${idSolicitud}/${accion}`,
+    { method: 'POST' },
+    `Error al ${accion} la solicitud.`,
+  );
 
 
 /*

@@ -1,227 +1,183 @@
 import { useState } from 'react';
+import { CircleCheck, Info, TriangleAlert } from 'lucide-react';
+import { canjearCodigoRecuperacion, solicitarRecuperacion } from '../services/api';
+import AuthLayout from '../components/AuthLayout';
+import Campo, { ReglasPassword } from '../components/Campo';
 import {
-  verificarUsuarioRecuperacion,
-  confirmarNuevaPassword,
-} from '../services/api';
-import logoUnahur from '../assets/unahur.jpeg';
-import styles from './RecuperarPassword.module.css';
-import { CircleCheck, TriangleAlert } from 'lucide-react';
-import IconoTema from '../components/IconoTema';
+  validarCodigo, validarConfirmacion, validarEmailInstitucional, validarPasswordNueva,
+} from '../utils/validaciones';
+import styles from './Login.module.css';
 
-// Mensaje de error del formulario
-function ErrorMsg({ texto }) {
-  return (
-    <p className={styles.errorMsg}>
-      <TriangleAlert size={14} className="icono-inline" aria-hidden="true" />{texto}
+/*
+ * Recuperación por solicitud (no hay servidor de mail):
+ *   pedir → enviada → canjear → listo
+ * Un directivo o administrador aprueba el pedido y le pasa a la persona un código de un solo uso.
+ */
+export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin }) {
+  const [paso, setPaso] = useState('pedir');
+  const [email, setEmail] = useState('');
+  const [codigo, setCodigo] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmacion, setConfirmacion] = useState('');
+  const [tocados, setTocados] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const errores = {
+    email: validarEmailInstitucional(email),
+    codigo: validarCodigo(codigo),
+    password: validarPasswordNueva(password),
+    confirmacion: validarConfirmacion(confirmacion, password),
+  };
+  const marcar = (campo) => setTocados((t) => ({ ...t, [campo]: true }));
+  const ir = (siguiente) => {
+    setPaso(siguiente);
+    setError(null);
+    setTocados({});
+  };
+
+  const enviar = (campos, accion, siguiente) => async (e) => {
+    e.preventDefault();
+    setTocados(Object.fromEntries(campos.map((c) => [c, true])));
+    if (campos.some((c) => errores[c])) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      await accion();
+      ir(siguiente);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const bloqueError = error && (
+    <p className={styles.error} role="alert">
+      <TriangleAlert size={16} aria-hidden="true" />
+      <span>{error}</span>
     </p>
   );
-}
-
-export default function RecuperarPassword({ theme, toggleTheme, onVolverLogin }) {
-  const [paso, setPaso]                       = useState(1); // 1: Usuario | 2: Nueva clave | 3: Éxito
-  const [usuario, setUsuario]                 = useState('');
-  const [nuevaPassword, setNuevaPassword]     = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading]                 = useState(false);
-  const [error, setError]                     = useState(null);
-
-  // ── Paso 1: Verificar que el usuario exista ───────────────────────────────
-  const handleVerificarUsuario = async (e) => {
-    e.preventDefault();
-    if (!usuario.trim()) {
-      setError('Ingresá tu usuario o correo institucional.');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    try {
-      await verificarUsuarioRecuperacion(usuario);
-      setPaso(2);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ── Paso 2: Guardar y confirmar nueva contraseña ──────────────────────────
-  const handleGuardarPassword = async (e) => {
-    e.preventDefault();
-    if (nuevaPassword.length < 4) {
-      setError('La nueva contraseña debe tener al menos 4 caracteres.');
-      return;
-    }
-    if (nuevaPassword !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    try {
-      await confirmarNuevaPassword(usuario, nuevaPassword);
-      setPaso(3);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
-    <div className={styles.pageWrapper}>
-      <button
-        type="button"
-        className={styles.themeBtn}
-        onClick={toggleTheme}
-        title="Cambiar Tema"
-      >
-        <IconoTema theme={theme} />
-      </button>
-
-      <div className={styles.card}>
-        <div className={styles.header}>
-          <div className={styles.logoWrapper}>
-            <img src={logoUnahur} alt="UNaHur" className={styles.logo} />
+    <AuthLayout theme={theme} toggleTheme={toggleTheme}>
+      {paso === 'pedir' && (
+        <form
+          className={styles.form} noValidate
+          onSubmit={enviar(['email'], () => solicitarRecuperacion(email), 'enviada')}
+        >
+          <div className={styles.encabezadoForm}>
+            <h1 className={styles.tituloForm}>Recuperar contraseña</h1>
+            <p className={styles.ayuda}>
+              Un directivo o administrador revisa tu pedido y te da un código para elegir una contraseña nueva.
+            </p>
           </div>
-          <h1 className={styles.title}>Recuperar Contraseña</h1>
-          <p className={styles.subtitle}>
-            Restablecimiento de credenciales para Personal Autorizado UNAHUR
+          <Campo
+            id="rec-email" etiqueta="Correo institucional" valor={email} onChange={setEmail}
+            onBlur={() => marcar('email')} error={errores.email} tocado={tocados.email}
+            inputMode="email" autoComplete="username" placeholder="nombre@unahur.edu.ar"
+            disabled={loading} autoFocus
+          />
+          {bloqueError}
+          <button type="submit" className={styles.ingresar} disabled={loading}>
+            {loading ? 'Enviando…' : 'Pedir recuperación'}
+          </button>
+          <p className={styles.registro}>
+            <button type="button" className={styles.enlace} onClick={() => ir('canjear')} disabled={loading}>
+              Ya tengo un código
+            </button>
+          </p>
+          <p className={styles.registro}>
+            <button type="button" className={styles.enlace} onClick={onVolverLogin} disabled={loading}>
+              Volver al ingreso
+            </button>
+          </p>
+        </form>
+      )}
+
+      {paso === 'enviada' && (
+        <div className={styles.form}>
+          <div className={styles.encabezadoForm}>
+            <h1 className={styles.tituloForm}>Pedido enviado</h1>
+          </div>
+          <p className={styles.exito} role="status">
+            <Info size={18} aria-hidden="true" />
+            <span>
+              Si el correo está registrado, tu pedido quedó en revisión. Pedile el código a un directivo o
+              administrador de tu instituto. El código vale 60 minutos y se usa una sola vez.
+            </span>
+          </p>
+          <button type="button" className={styles.ingresar} onClick={() => ir('canjear')}>
+            Ingresar el código
+          </button>
+          <p className={styles.registro}>
+            <button type="button" className={styles.enlace} onClick={onVolverLogin}>Volver al ingreso</button>
           </p>
         </div>
+      )}
 
-        {/* Indicador visual de pasos */}
-        {paso < 3 && (
-          <div className={styles.stepsBar}>
-            <span className={paso >= 1 ? styles.stepActive : styles.step}>1. Usuario</span>
-            <span className={styles.stepLine} />
-            <span className={paso >= 2 ? styles.stepActive : styles.step}>2. Nueva Clave</span>
+      {paso === 'canjear' && (
+        <form
+          className={styles.form} noValidate
+          onSubmit={enviar(
+            ['email', 'codigo', 'password', 'confirmacion'],
+            () => canjearCodigoRecuperacion(email, codigo, password),
+            'listo',
+          )}
+        >
+          <div className={styles.encabezadoForm}>
+            <h1 className={styles.tituloForm}>Elegí tu nueva contraseña</h1>
+            <p className={styles.ayuda}>Ingresá el código que te dieron.</p>
           </div>
-        )}
-
-        {/* ── PASO 1: Correo Institucional ── */}
-        {paso === 1 && (
-          <form onSubmit={handleVerificarUsuario} className={styles.form}>
-            <p className={styles.helperText}>
-              Ingresá tu correo institucional registrado para establecer una nueva contraseña.
-            </p>
-
-            <div className={styles.fieldGroup}>
-              <label htmlFor="rec-usuario">Usuario / Correo Institucional</label>
-              <input
-                id="rec-usuario"
-                type="text"
-                placeholder="docente@unahur.edu.ar"
-                value={usuario}
-                onChange={(e) => setUsuario(e.target.value)}
-                disabled={loading}
-                autoFocus
-              />
-            </div>
-
-            {error && <ErrorMsg texto={error} />}
-
-            <div className={styles.formActions}>
-              <button
-                type="button"
-                className={styles.btnVolver}
-                onClick={onVolverLogin}
-                disabled={loading}
-              >
-                ← Volver al Login
-              </button>
-              <button
-                type="submit"
-                className={styles.btnSubmit}
-                disabled={loading}
-              >
-                {loading ? 'Verificando...' : 'Continuar'}
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* ── PASO 2: Nueva Contraseña y Confirmación ── */}
-        {paso === 2 && (
-          <form onSubmit={handleGuardarPassword} className={styles.form}>
-            <div className={styles.infoBanner}>
-              Creando nueva contraseña para <strong>{usuario.trim().toLowerCase()}</strong>.
-            </div>
-
-            <div className={styles.fieldGroup}>
-              <label htmlFor="rec-pass1">Nueva Contraseña</label>
-              <input
-                id="rec-pass1"
-                type="password"
-                placeholder="••••••••"
-                value={nuevaPassword}
-                onChange={(e) => setNuevaPassword(e.target.value)}
-                disabled={loading}
-                autoFocus
-              />
-            </div>
-
-            <div className={styles.fieldGroup}>
-              <label htmlFor="rec-pass2">Confirmar Nueva Contraseña</label>
-              <input
-                id="rec-pass2"
-                type="password"
-                placeholder="••••••••"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={loading}
-              />
-            </div>
-
-            {error && <ErrorMsg texto={error} />}
-
-            <div className={styles.formActions}>
-              <button
-                type="button"
-                className={styles.btnVolver}
-                onClick={() => {
-                  setPaso(1);
-                  setNuevaPassword('');
-                  setConfirmPassword('');
-                  setError(null);
-                }}
-                disabled={loading}
-              >
-                ← Cambiar usuario
-              </button>
-              <button
-                type="submit"
-                className={styles.btnSubmit}
-                disabled={loading}
-              >
-                {loading ? 'Guardando...' : 'Confirmar contraseña'}
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* ── PASO 3: Confirmación Exitosa ── */}
-        {paso === 3 && (
-          <div className={styles.successBox}>
-            <div className={styles.successIcon}>
-              <CircleCheck size={44} color="#16a34a" aria-hidden="true" />
-            </div>
-            <h3>¡Contraseña actualizada!</h3>
-            <p>
-              Ya podés iniciar sesión en <strong>HurData Académico</strong> con tu nueva clave.
-            </p>
-            <button
-              type="button"
-              className={styles.btnSubmit}
-              style={{ width: '100%', marginTop: '8px' }}
-              onClick={onVolverLogin}
-            >
-              Ir a Iniciar Sesión
+          <Campo
+            id="can-email" etiqueta="Correo institucional" valor={email} onChange={setEmail}
+            onBlur={() => marcar('email')} error={errores.email} tocado={tocados.email}
+            inputMode="email" autoComplete="username" placeholder="nombre@unahur.edu.ar" disabled={loading}
+          />
+          <Campo
+            id="can-codigo" etiqueta="Código" valor={codigo} onChange={(v) => setCodigo(v.toUpperCase())}
+            onBlur={() => marcar('codigo')} error={errores.codigo} tocado={tocados.codigo}
+            autoComplete="one-time-code" placeholder="K7M2-9QXP" maxLength={9} disabled={loading}
+          />
+          <Campo
+            id="can-password" etiqueta="Contraseña nueva" tipo="password" valor={password} onChange={setPassword}
+            onBlur={() => marcar('password')} error={errores.password} tocado={tocados.password}
+            autoComplete="new-password" disabled={loading}
+          >
+            <ReglasPassword password={password} />
+          </Campo>
+          <Campo
+            id="can-confirmacion" etiqueta="Repetí la contraseña" tipo="password" valor={confirmacion}
+            onChange={setConfirmacion} onBlur={() => marcar('confirmacion')} error={errores.confirmacion}
+            tocado={tocados.confirmacion} autoComplete="new-password" disabled={loading}
+          />
+          {bloqueError}
+          <button type="submit" className={styles.ingresar} disabled={loading}>
+            {loading ? 'Guardando…' : 'Cambiar contraseña'}
+          </button>
+          <p className={styles.registro}>
+            <button type="button" className={styles.enlace} onClick={() => ir('pedir')} disabled={loading}>
+              Todavía no pedí un código
             </button>
+          </p>
+        </form>
+      )}
+
+      {paso === 'listo' && (
+        <div className={styles.form}>
+          <div className={styles.encabezadoForm}>
+            <h1 className={styles.tituloForm}>Contraseña actualizada</h1>
           </div>
-        )}
-      </div>
-    </div>
+          <p className={styles.exito} role="status">
+            <CircleCheck size={18} aria-hidden="true" />
+            <span>Ya podés ingresar con tu contraseña nueva.</span>
+          </p>
+          <button type="button" className={styles.ingresar} onClick={onVolverLogin}>
+            Ir al ingreso
+          </button>
+        </div>
+      )}
+    </AuthLayout>
   );
 }
