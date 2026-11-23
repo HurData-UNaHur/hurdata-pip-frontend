@@ -1,0 +1,146 @@
+.dialogo {
+  /* El reset global (* { margin: 0 }) le saca al <dialog> el margin: auto con el que el navegador lo centra */
+  margin: auto;
+  width: calc(100% - 32px);
+  max-width: 28rem;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--c-black) 30%, transparent);
+  animation: aparecer 0.15s ease-out;
+}
+.dialogo::backdrop {
+  background-color: color-mix(in srgb, var(--c-slate-900) 55%, transparent);
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 22px 18px;
+}
+.titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.cuerpo p {
+  margin: 0;
+}
+.cuerpo strong {
+  color: var(--text-primary);
+}
+
+.palabra {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+.palabra input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+.palabra input:focus-visible {
+  outline: 2px solid var(--c-red-600);
+  outline-offset: 1px;
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+.cancelar,
+.confirmar {
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cancelar {
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-primary);
+}
+.cancelar:hover {
+  background-color: var(--bg-subtle);
+}
+.confirmar {
+  border: 1px solid transparent;
+  background-color: var(--c-unahur);
+  color: var(--c-white);
+}
+.confirmar:hover:not(:disabled) {
+  background-color: var(--c-unahur-dark);
+}
+.peligro {
+  background-color: var(--c-red-600);
+}
+.peligro:hover:not(:disabled) {
+  background-color: var(--c-red-700);
+}
+.confirmar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.cancelar:focus-visible,
+.confirmar:focus-visible {
+  outline: 2px solid var(--c-unahur);
+  outline-offset: 2px;
+}
+.peligro:focus-visible {
+  outline-color: var(--c-red-600);
+}
+:global([data-theme='dark']) .confirmar:not(.peligro):focus-visible,
+:global([data-theme='dark']) .cancelar:focus-visible {
+  outline-color: var(--c-green-500);
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dialogo {
+    animation: none;
+  }
+}
+@media (max-width: 420px) {
+  .acciones {
+    flex-direction: column-reverse;
+  }
+  .cancelar,
+  .confirmar {
+    width: 100%;
+  }
+}

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CircleCheck, CloudUpload, FileSpreadsheet, Info, TriangleAlert } from 'lucide-react';
 import styles from './Cargas.module.css';
 import Tooltip from '../components/Tooltip';
+import ModalConfirmar from '../components/ModalConfirmar';
 import {
   getCargas, uploadSiuExcel, deletePeriodo, resetDatabase, PERMISOS, tienePermiso,
 } from '../services/api';
@@ -78,6 +79,7 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
 
   // ── Acciones por fila del historial ──────────────────────────────────────
   const [filaNuevaVersion, setFilaNuevaVersion] = useState(null); // carga a reemplazar
+  const [confirmacion, setConfirmacion] = useState(null);       // acción que espera confirmación
   const [resultadoAccion, setResultadoAccion] = useState(null);   // { ok, texto, aviso? }
   const inputNuevaVersion = useRef(null);
 
@@ -164,19 +166,19 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
     }
   };
 
-  const handleNuevaVersion = async (file) => {
+  // Las tres acciones que modifican datos piden confirmación con un modal propio.
+  // `confirmacion` guarda qué se está por hacer; ejecutar* corre la acción ya confirmada.
+  const handleNuevaVersion = (file) => {
     const c = filaNuevaVersion;
     if (!file || !c) return;
     if (!file.name.toLowerCase().endsWith('.xlsx')) {
       setResultadoAccion({ ok: false, texto: 'Solo se aceptan archivos .xlsx del SIU Guaraní.' });
       return;
     }
-    const confirmado = window.confirm(
-      `¿Reemplazar los datos de ${formatearPeriodo(c.periodo_label)} — ${c.nombre_carrera}\n` +
-      `con el archivo "${file.name}"?\n\nLa carga actual queda como "Reemplazada" en el historial.`
-    );
-    if (!confirmado) return;
+    setConfirmacion({ tipo: 'nueva-version', carga: c, archivo: file });
+  };
 
+  const ejecutarNuevaVersion = async (file, c) => {
     setOcupado(true);
     setResultadoAccion(null);
     try {
@@ -197,13 +199,9 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
   };
 
   // ── Borrar una carga activa ──────────────────────────────────────────────
-  const handleBorrar = async (c) => {
-    const confirmado = window.confirm(
-      `¿Borrar los datos de ${formatearPeriodo(c.periodo_label)} — ${c.nombre_carrera}?\n\n` +
-      `Se eliminan del dashboard. En el historial la carga queda como "Borrada".`
-    );
-    if (!confirmado) return;
+  const handleBorrar = (c) => setConfirmacion({ tipo: 'borrar', carga: c });
 
+  const ejecutarBorrado = async (c) => {
     setOcupado(true);
     setError(null);
     setResultadoAccion(null);
@@ -219,13 +217,9 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
   };
 
   // ── Resetear la DB (solo Admin) ──────────────────────────────────────────
-  const handleResetear = async () => {
-    const confirmado = window.confirm(
-      '⚠️ ¿Borrar TODOS los datos cargados?\n\nLa base de datos queda vacía. ' +
-      'El historial de cargas se conserva. Esta acción no se puede deshacer.'
-    );
-    if (!confirmado) return;
+  const handleResetear = () => setConfirmacion({ tipo: 'resetear' });
 
+  const ejecutarReset = async () => {
     setOcupado(true);
     setError(null);
     try {
@@ -237,6 +231,19 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
     } finally {
       setOcupado(false);
     }
+  };
+
+  const confirmar = () => {
+    const pedido = confirmacion;
+    setConfirmacion(null);
+    if (pedido.tipo === 'nueva-version') ejecutarNuevaVersion(pedido.archivo, pedido.carga);
+    else if (pedido.tipo === 'borrar') ejecutarBorrado(pedido.carga);
+    else ejecutarReset();
+  };
+
+  const cancelarConfirmacion = () => {
+    if (confirmacion?.tipo === 'nueva-version') setFilaNuevaVersion(null);
+    setConfirmacion(null);
   };
 
   return (
@@ -461,6 +468,50 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
             </button>
           </div>
         </section>
+      )}
+      {/* ── Confirmación de las acciones que modifican datos ── */}
+      {confirmacion?.tipo === 'nueva-version' && (
+        <ModalConfirmar
+          titulo="Reemplazar los datos"
+          textoConfirmar="Reemplazar"
+          onConfirmar={confirmar}
+          onCancelar={cancelarConfirmacion}
+        >
+          <p>
+            Vas a reemplazar los datos de{' '}
+            <strong>{formatearPeriodo(confirmacion.carga.periodo_label)}, {confirmacion.carga.nombre_carrera}</strong>{' '}
+            con el archivo <strong>{confirmacion.archivo.name}</strong>.
+          </p>
+          <p>La carga actual queda como "Reemplazada" en el historial.</p>
+        </ModalConfirmar>
+      )}
+      {confirmacion?.tipo === 'borrar' && (
+        <ModalConfirmar
+          titulo="Borrar estos datos"
+          textoConfirmar="Borrar"
+          peligro
+          onConfirmar={confirmar}
+          onCancelar={cancelarConfirmacion}
+        >
+          <p>
+            Se eliminan del dashboard los datos de{' '}
+            <strong>{formatearPeriodo(confirmacion.carga.periodo_label)}, {confirmacion.carga.nombre_carrera}</strong>.
+          </p>
+          <p>En el historial la carga queda como "Borrada".</p>
+        </ModalConfirmar>
+      )}
+      {confirmacion?.tipo === 'resetear' && (
+        <ModalConfirmar
+          titulo="Borrar todos los datos"
+          textoConfirmar="Borrar todo"
+          peligro
+          palabraClave="BORRAR"
+          onConfirmar={confirmar}
+          onCancelar={cancelarConfirmacion}
+        >
+          <p>La base de datos queda vacía: se pierden los datos de todos los períodos y carreras.</p>
+          <p>El historial de cargas se conserva. Esta acción no se puede deshacer.</p>
+        </ModalConfirmar>
       )}
     </div>
   );
