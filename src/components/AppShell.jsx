@@ -8,6 +8,7 @@ import logo from '../assets/logo-hurlingham.png';
 import logoGris from '../assets/logo-hurlingham-grisado.png';
 import IconoTema from './IconoTema';
 import Tooltip from './Tooltip';
+import { useToast } from './contextoToast';
 import {
   PERMISOS,
   tienePermiso,
@@ -30,6 +31,7 @@ const ROLES_DISPONIBLES = [
  * es un menú deslizable; en escritorio se puede comprimir a solo íconos.
  */
 function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
+  const { avisar } = useToast();
   const [menuAbierto, setMenuAbierto] = useState(false); // barra lateral (celular)
   // Barra lateral comprimida (solo íconos, en escritorio). Se recuerda entre sesiones.
   const [comprimida, setComprimida] = useState(() => localStorage.getItem('hurdata_sidebar_comprimida') === '1');
@@ -97,8 +99,14 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
     setProcesandoId(id);
     setNotifError(null);
     try {
+      const sol = solicitudes.find((s) => (s.id ?? s.id_solicitud) === id);
       await aprobarSolicitudRegistro(id, rolFinal);
       setSolicitudes((prev) => prev.filter((s) => (s.id ?? s.id_solicitud) !== id));
+      const nombreRol = ROLES_DISPONIBLES.find((r) => r.id === rolFinal)?.nombre;
+      avisar({
+        tipo: 'exito',
+        texto: `Se aprobó el acceso de ${sol?.nombre ?? 'la persona'}${nombreRol ? ` como ${nombreRol}` : ''}.`,
+      });
     } catch (err) {
       setNotifError(err.message);
     } finally {
@@ -110,8 +118,10 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
     setProcesandoId(id);
     setNotifError(null);
     try {
+      const sol = solicitudes.find((s) => (s.id ?? s.id_solicitud) === id);
       await rechazarSolicitudRegistro(id);
       setSolicitudes((prev) => prev.filter((s) => (s.id ?? s.id_solicitud) !== id));
+      avisar({ tipo: 'info', texto: `Se rechazó la solicitud de ${sol?.nombre ?? 'la persona'}.` });
     } catch (err) {
       setNotifError(err.message);
     } finally {
@@ -126,7 +136,10 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
       const resp = await resolverSolicitudRecuperacion(sol.id_solicitud, accion);
       setRecuperaciones((prev) => prev.filter((r) => r.id_solicitud !== sol.id_solicitud));
       if (accion === 'aprobar') {
+        // El código se muestra en el propio panel y no se repite en un aviso
         setCodigosGenerados((prev) => [...prev, { id: sol.id_solicitud, usuario: sol.usuario, codigo: resp.codigo }]);
+      } else {
+        avisar({ tipo: 'info', texto: `Se rechazó el pedido de recuperación de ${sol.usuario}.` });
       }
     } catch (err) {
       setNotifError(err.message);

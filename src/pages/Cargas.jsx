@@ -3,6 +3,7 @@ import { CircleCheck, CloudUpload, FileSpreadsheet, Info, TriangleAlert } from '
 import styles from './Cargas.module.css';
 import Tooltip from '../components/Tooltip';
 import ModalConfirmar from '../components/ModalConfirmar';
+import { useToast } from '../components/contextoToast';
 import {
   getCargas, uploadSiuExcel, deletePeriodo, resetDatabase, PERMISOS, tienePermiso,
 } from '../services/api';
@@ -24,11 +25,11 @@ const BADGE_POR_ESTADO = {
 // Fechas del backend (UTC) en hora local y en una línea: '18/11/26 19:14'
 const formatearFecha = formatearFechaCorta;
 
-// Texto del resultado de una subida (resumen que devuelve POST /upload)
-const textoResumen = (r = {}) =>
-  `${formatearPeriodo(r.periodo)} · ${r.nombre_carrera} · ` +
-  `${plural(r.actividades_cargadas ?? 0, 'materia', 'materias')}, ` +
-  `${plural(r.comisiones_cargadas ?? 0, 'comisión', 'comisiones')}.`;
+// Texto del aviso de una subida (resumen que devuelve POST /upload)
+const textoCarga = (r = {}) =>
+  `${formatearPeriodo(r.periodo)}, ${r.nombre_carrera}: ` +
+  `${plural(r.actividades_cargadas ?? 0, 'materia', 'materias')} y ` +
+  `${plural(r.comisiones_cargadas ?? 0, 'comisión', 'comisiones')} cargadas.`;
 
 const avisoOmitidas = (r = {}) => {
   const omitidas = r.actividades_omitidas || [];
@@ -58,6 +59,7 @@ const IconoResultado = ({ ok }) => (ok
 function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
   const puedeCargar = tienePermiso(usuario, PERMISOS.CARGAR);
   const puedeResetear = tienePermiso(usuario, PERMISOS.RESETEAR_DB);
+  const { avisar } = useToast();
 
   // ── Historial ────────────────────────────────────────────────────────────
   const [estado, setEstado] = useState('');
@@ -138,11 +140,10 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
     setResultado(null);
     try {
       const data = await uploadSiuExcel(archivo);
-      setResultado({
-        ok: true,
-        texto: `Archivo procesado: ${textoResumen(data.resumen)}`,
-        aviso: avisoOmitidas(data.resumen),
-      });
+      avisar({ tipo: 'exito', texto: `Archivo procesado. ${textoCarga(data.resumen)}` });
+      // El detalle de lo que no se cargó se queda en la página, para leerlo con calma
+      const omitidas = avisoOmitidas(data.resumen);
+      setResultado(omitidas ? { ok: true, texto: 'El archivo se procesó, pero quedaron actividades sin cargar.', aviso: omitidas } : null);
       setArchivo(null);
       if (inputArchivo.current) inputArchivo.current.value = '';
       if (onUploadSuccess) onUploadSuccess(data);
@@ -183,11 +184,9 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
     setResultadoAccion(null);
     try {
       const data = await uploadSiuExcel(file, c.id_carga);
-      setResultadoAccion({
-        ok: true,
-        texto: `Nueva versión cargada: ${textoResumen(data.resumen)}`,
-        aviso: avisoOmitidas(data.resumen),
-      });
+      avisar({ tipo: 'exito', texto: `Nueva versión cargada. ${textoCarga(data.resumen)}` });
+      const omitidas = avisoOmitidas(data.resumen);
+      setResultadoAccion(omitidas ? { ok: true, texto: 'La nueva versión se cargó, pero quedaron actividades sin cargar.', aviso: omitidas } : null);
       if (onUploadSuccess) onUploadSuccess(data);
       recargarHistorial();
     } catch (err) {
@@ -207,6 +206,7 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
     setResultadoAccion(null);
     try {
       await deletePeriodo(c.id_periodo, c.id_carrera);
+      avisar({ tipo: 'exito', texto: `Se borraron los datos de ${formatearPeriodo(c.periodo_label)}, ${c.nombre_carrera}.` });
       if (onDatosBorrados) onDatosBorrados(); // App vuelve a cargar períodos y datos
       recargarHistorial();
     } catch (err) {
@@ -224,6 +224,7 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
     setError(null);
     try {
       await resetDatabase();
+      avisar({ tipo: 'exito', texto: 'Se borraron todos los datos. El historial de cargas se conserva.' });
       if (onDatosBorrados) onDatosBorrados();
       recargarHistorial();
     } catch (err) {

@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import AppShell from './components/AppShell';
+import ToastProvider from './components/ToastProvider';
 import Dashboard from './pages/Dashboard';
 import Materias from './pages/Materias';
 import Predicciones from './pages/Predicciones';
@@ -327,6 +328,9 @@ function App() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
+    // El proveedor de avisos va por fuera del router: al resetear la base la app se vuelve a montar
+    // (resetKey) y el aviso de "se borraron los datos" no tiene que perderse en ese momento.
+    <ToastProvider>
     <BrowserRouter key={resetKey}>
       <AppShell
         theme={theme}
@@ -419,6 +423,7 @@ function App() {
         </Routes>
       </AppShell>
     </BrowserRouter>
+    </ToastProvider>
   );
 }
 

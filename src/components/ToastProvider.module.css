@@ -1,0 +1,103 @@
+.contenedor {
+  position: fixed;
+  top: 76px; /* debajo de la cabecera de 64 px */
+  right: 16px;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 24rem;
+  max-width: calc(100% - 32px); /* en un elemento fixed, el 100% es el ancho de la ventana */
+  pointer-events: none; /* solo los avisos reciben clics, no el espacio entre ellos */
+}
+
+.aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 10px 12px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--c-black) 18%, transparent);
+  pointer-events: auto;
+  animation: entrar 0.2s ease-out;
+}
+.icono {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.exito .icono {
+  color: var(--c-green-700);
+}
+.error .icono {
+  color: var(--c-red-600);
+}
+.info .icono {
+  color: var(--c-blue-500);
+}
+:global([data-theme='dark']) .exito .icono {
+  color: var(--c-green-400);
+}
+:global([data-theme='dark']) .error .icono {
+  color: var(--c-red-300);
+}
+
+.texto {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.cerrar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-top: -4px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.cerrar:hover {
+  background-color: var(--bg-subtle);
+  color: var(--text-primary);
+}
+.cerrar:focus-visible {
+  outline: 2px solid var(--c-unahur);
+  outline-offset: 1px;
+}
+:global([data-theme='dark']) .cerrar:focus-visible {
+  outline-color: var(--c-green-500);
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aviso {
+    animation: none;
+  }
+}
+@media (max-width: 480px) {
+  .contenedor {
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+}

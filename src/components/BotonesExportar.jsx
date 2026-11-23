@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FileDown, FileSpreadsheet } from 'lucide-react';
 import styles from './BotonesExportar.module.css';
 import Tooltip from './Tooltip';
+import { useToast } from './contextoToast';
 import { exportarCSV, exportarPDF } from '../utils/exportar';
 
 /*
@@ -11,15 +12,22 @@ import { exportarCSV, exportarPDF } from '../utils/exportar';
  */
 function BotonesExportar({ obtener, deshabilitado = false }) {
   const [generando, setGenerando] = useState(false);
-  const [error, setError] = useState(null);
+  const { avisar } = useToast();
+
+  const csv = () => {
+    const datos = obtener();
+    exportarCSV(datos);
+    avisar({ tipo: 'exito', texto: `Se descargó ${datos.nombreArchivo}.csv` });
+  };
 
   const pdf = async () => {
     setGenerando(true);
-    setError(null);
     try {
-      await exportarPDF(obtener());
+      const datos = obtener();
+      await exportarPDF(datos);
+      avisar({ tipo: 'exito', texto: `Se descargó ${datos.nombreArchivo}.pdf` });
     } catch {
-      setError('No se pudo generar el PDF.');
+      avisar({ tipo: 'error', texto: 'No se pudo generar el PDF. Probá de nuevo.' });
     } finally {
       setGenerando(false);
     }
@@ -28,7 +36,7 @@ function BotonesExportar({ obtener, deshabilitado = false }) {
   return (
     <div className={styles.grupo}>
       <Tooltip texto="Descargar la tabla como CSV (se abre en Excel)">
-        <button type="button" disabled={deshabilitado} onClick={() => exportarCSV(obtener())}>
+        <button type="button" disabled={deshabilitado} onClick={csv}>
           <FileSpreadsheet size={14} aria-hidden="true" /> CSV
         </button>
       </Tooltip>
@@ -37,7 +45,6 @@ function BotonesExportar({ obtener, deshabilitado = false }) {
           <FileDown size={14} aria-hidden="true" /> {generando ? 'Generando…' : 'PDF'}
         </button>
       </Tooltip>
-      {error && <span role="alert" className={styles.error}>{error}</span>}
     </div>
   );
 }
