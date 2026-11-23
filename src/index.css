@@ -69,6 +69,9 @@ body {
   --shadow: 0 1px 3px color-mix(in srgb, var(--c-black) 5%, transparent);
   --skeleton-base: var(--c-slate-200);
   --skeleton-brillo: var(--c-slate-100);
+  --bg-track: var(--c-slate-200);      /* pista de los controles segmentados */
+  --border-strong: var(--c-slate-300);
+  --bg-franja: var(--c-slate-100);     /* franja de filtros dentro de una tarjeta */
 }
 
 /* Override de variables: MODO OSCURO */
@@ -83,6 +86,9 @@ body {
   --shadow: 0 1px 3px color-mix(in srgb, var(--c-black) 30%, transparent);
   --skeleton-base: var(--c-slate-700);
   --skeleton-brillo: var(--c-slate-600);
+  --bg-track: var(--c-slate-700);
+  --border-strong: var(--c-slate-700);
+  --bg-franja: color-mix(in srgb, var(--c-slate-700) 55%, var(--c-slate-800));
 }
 
 body {

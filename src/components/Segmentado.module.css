@@ -1,0 +1,62 @@
+/*
+ * Control segmentado: pista gris con borde fino y una pastilla clara para la opción activa.
+ * El verde de la marca queda para las acciones principales, no para las opciones de un filtro.
+ */
+.segmentado {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  max-width: 100%;
+  padding: 3px;
+  border-radius: 8px;
+  background-color: var(--bg-track);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+.boton {
+  min-height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.boton:hover:not([aria-disabled='true']):not(.activo) {
+  background-color: color-mix(in srgb, var(--text-primary) 8%, transparent);
+  color: var(--text-primary);
+}
+.activo,
+.activo:hover {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  font-weight: 700;
+  box-shadow:
+    0 0 0 1px var(--border-strong),
+    0 1px 2px color-mix(in srgb, var(--c-black) 14%, transparent);
+}
+/* En modo oscuro la pista es clara respecto de la tarjeta: la pastilla va más oscura que la pista */
+:global([data-theme='dark']) .activo,
+:global([data-theme='dark']) .activo:hover {
+  background-color: var(--bg-main);
+}
+.boton:focus-visible {
+  outline: 2px solid var(--c-unahur);
+  outline-offset: 2px;
+}
+:global([data-theme='dark']) .boton:focus-visible {
+  outline-color: var(--c-green-500);
+}
+.boton[aria-disabled='true'] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+@media (prefers-reduced-motion: reduce) {
+  .boton {
+    transition: none;
+  }
+}

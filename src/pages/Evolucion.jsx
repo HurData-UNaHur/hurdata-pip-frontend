@@ -4,18 +4,20 @@ import EstadoVacio from '../components/EstadoVacio';
 import GraficoEvolucion from '../components/GraficoEvolucion';
 import TablaComparativa from '../components/TablaComparativa';
 import AvisoParcial from '../components/AvisoParcial';
-import SelectorPeriodos from '../components/SelectorPeriodos';
+import FiltroPeriodos from '../components/FiltroPeriodos';
 import { compararMaterias } from '../utils/comparar';
 import { getCarrerasTodas, getDatos, getEvolucion } from '../services/api';
 import { transformarDatosBackend } from '../utils/transformData';
-import { aPunto, periodosParciales, periodosPorDefecto } from '../utils/evolucion';
-import { formatearPeriodo } from '../utils/texto';
+import {
+  aPunto, ajustarAlCuatrimestre, ajustarRango, esDeCuatrimestre, modoPorDefecto, periodosParciales,
+  periodosPorDefecto, ventanaDePeriodos,
+} from '../utils/evolucion';
+import { formatearPeriodo, formatearPeriodoCorto, plural } from '../utils/texto';
 
-const CUATRIMESTRES = [
-  { value: 'todos', label: 'Todos los cuatrimestres' },
-  { value: 'PRIMER', label: 'Solo primer cuatrimestre' },
-  { value: 'SEGUNDO', label: 'Solo segundo cuatrimestre' },
-];
+const NOMBRE_CUATRIMESTRE = { PRIMER: '1C', SEGUNDO: '2C' };
+
+// Sin rango elegido: el filtro decide según cuántos períodos hay
+const RANGO_INICIAL = { modo: null, desde: '', hasta: '' };
 
 // Respuesta vacía de /api/evolucion
 const SIN_EVOLUCION = { materias: [], periodos: [] };
@@ -35,7 +37,7 @@ function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, the
   const [materia, setMateria] = useState('');               // '' = toda la carrera
   const [periodoAElegido, setPeriodoAElegido] = useState('');
   const [periodoBElegido, setPeriodoBElegido] = useState('');
-  const [excluidos, setExcluidos] = useState([]);        // períodos destildados del gráfico
+  const [rango, setRango] = useState(RANGO_INICIAL);       // qué períodos muestra el gráfico
   const [error, setError] = useState(null);
 
   // Cada respuesta se guarda junto con la consulta que la pidió ('clave'):
@@ -87,18 +89,66 @@ function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, the
   const datosBase = base.clave === carrera ? base.datos : SIN_EVOLUCION;
   const cargandoGrafico = base.clave !== carrera || (claveMateria !== null && deMateria.clave !== claveMateria);
 
-  const coincideCuatrimestre = (p) =>
-    cuatrimestre === 'todos' || p.cuatrimestre.toUpperCase().startsWith(cuatrimestre);
-
   // Períodos con muy pocas comisiones frente al resto de la carrera (se calculan sobre todos, sin filtro)
   const parciales = periodosParciales(datosBase.periodos);
 
-  const periodosGrafico = claveMateria ? deMateria.periodos : datosBase.periodos;
-  const periodosElegibles = periodosGrafico.filter(coincideCuatrimestre);
-  const puntos = periodosElegibles.filter((p) => !excluidos.includes(p.label)).map((p) => aPunto(p, parciales));
+  // Rango elegido: primero se recorta por años o por "Desde / Hasta" y después por cuatrimestre
+  const modo = rango.modo ?? modoPorDefecto(datosBase.periodos.length);
+  const ventana = ventanaDePeriodos(datosBase.periodos, { modo, desde: rango.desde, hasta: rango.hasta });
+  const enVentana = new Set(ventana.map((p) => p.label));
+  const conteos = {
+    PRIMER: ventana.filter((p) => esDeCuatrimestre(p, 'PRIMER')).length,
+    SEGUNDO: ventana.filter((p) => esDeCuatrimestre(p, 'SEGUNDO')).length,
+  };
 
-  // Comparativa: por defecto, los dos períodos más recientes que no sean parciales
-  const labels = datosBase.periodos.filter(coincideCuatrimestre).map((p) => p.label);
+  const periodosGrafico = claveMateria ? deMateria.periodos : datosBase.periodos;
+  const puntos = periodosGrafico
+    .filter((p) => enVentana.has(p.label) && esDeCuatrimestre(p, cuatrimestre))
+    .map((p) => aPunto(p, parciales));
+
+  const sinDatosEnRango = !cargandoGrafico && puntos.length === 0;
+  let resumen = '';
+  if (!cargandoGrafico && puntos.length > 0) {
+    resumen = puntos.length === 1
+      ? `Mostrando 1 período: ${formatearPeriodoCorto(puntos[0].label)}.`
+      : `Mostrando ${plural(puntos.length, 'período', 'períodos')}, de ${formatearPeriodoCorto(puntos[0].label)} a ${formatearPeriodoCorto(puntos[puntos.length - 1].label)}.`;
+  } else if (sinDatosEnRango) {
+    resumen = cuatrimestre !== 'todos' && ventana.length > 0
+      ? `No hay períodos de ${NOMBRE_CUATRIMESTRE[cuatrimestre]} en este rango. Probá con otro rango o con Ambos.`
+      : 'No hay períodos para mostrar en este rango.';
+  }
+
+  const elegirModo = (nuevo) => {
+    // Al pasar a "Personalizado" se parte de lo que ya se estaba viendo, para que el gráfico no salte
+    if (nuevo === 'personalizado') {
+      const base = ventana.length > 0 ? ventana : datosBase.periodos;
+      const inicial = { desde: base[0]?.label ?? '', hasta: base[base.length - 1]?.label ?? '' };
+      setRango({ modo: nuevo, ...ajustarAlCuatrimestre(datosBase.periodos, inicial, cuatrimestre) });
+    } else {
+      setRango((r) => ({ ...r, modo: nuevo }));
+    }
+  };
+  // "Desde / Hasta" solo ofrecen períodos del cuatrimestre elegido; si un extremo deja de estar, se corre
+  const opcionesRango = datosBase.periodos.filter((p) => esDeCuatrimestre(p, cuatrimestre));
+  const elegirCuatrimestre = (nuevo) => {
+    setCuatrimestre(nuevo);
+    if (modo === 'personalizado') {
+      setRango((r) => ({ ...r, ...ajustarAlCuatrimestre(datosBase.periodos, r, nuevo) }));
+    }
+  };
+  // Vuelve todo al valor inicial; así nunca se queda uno atrapado en una combinación sin datos
+  const hayCambios = modo !== modoPorDefecto(datosBase.periodos.length) || cuatrimestre !== 'todos' || materia !== '';
+  const restablecerFiltros = () => {
+    setRango(RANGO_INICIAL);
+    setCuatrimestre('todos');
+    setMateria('');
+  };
+  const cambiarExtremo = (cambio) =>
+    setRango((r) => ({ ...r, ...ajustarRango(datosBase.periodos, r, cambio) }));
+
+  // Comparativa: por defecto, los dos períodos más recientes que no sean parciales.
+  // Se puede comparar cualquier par de períodos de la carrera, sin depender del filtro del gráfico.
+  const labels = datosBase.periodos.map((p) => p.label);
   const [defectoA, defectoB] = periodosPorDefecto(labels, parciales);
   const periodoA = labels.includes(periodoAElegido) ? periodoAElegido : defectoA;
   const periodoB = labels.includes(periodoBElegido) ? periodoBElegido : defectoB;
@@ -132,7 +182,7 @@ function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, the
   const cambiarCarrera = (nueva) => {
     setCarreraElegida(nueva);
     setMateria('');
-    setExcluidos([]);
+    setRango(RANGO_INICIAL);
     setPeriodoAElegido('');
     setPeriodoBElegido('');
   };
@@ -160,12 +210,6 @@ function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, the
                 {carreras.map((c) => <option key={c.id} value={c.nombre}>{c.nombre}</option>)}
               </select>
             </div>
-            <div className={styles.filtro}>
-              <label htmlFor="evo-cuatrimestre">Cuatrimestre</label>
-              <select id="evo-cuatrimestre" value={cuatrimestre} onChange={(e) => setCuatrimestre(e.target.value)}>
-                {CUATRIMESTRES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
-            </div>
           </section>
 
           {error && <p className={styles.error}>{error}</p>}
@@ -176,23 +220,36 @@ function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, the
               <h2 className={styles.cardTitle}>
                 {nombreMateria ? `Evolución de ${nombreMateria}` : 'Evolución de la carrera'}
               </h2>
-              <div className={styles.filtroInline}>
-                <label htmlFor="evo-materia">Materia</label>
-                <select id="evo-materia" value={materia} onChange={(e) => setMateria(e.target.value)}>
-                  <option value="">Toda la carrera</option>
-                  {datosBase.materias.map((m) => <option key={m.codigo} value={m.codigo}>{m.nombre}</option>)}
-                </select>
-              </div>
             </div>
 
-            {!cargandoGrafico && (
-              <SelectorPeriodos periodos={periodosElegibles} excluidos={excluidos} onChange={setExcluidos} />
+            {!cargandoGrafico && datosBase.periodos.length > 1 && (
+              <FiltroPeriodos
+                periodos={opcionesRango}
+                parciales={parciales}
+                materias={datosBase.materias}
+                materia={materia}
+                onMateria={setMateria}
+                modo={modo}
+                desde={rango.desde}
+                hasta={rango.hasta}
+                onModo={elegirModo}
+                onRango={cambiarExtremo}
+                cuatrimestre={cuatrimestre}
+                onCuatrimestre={elegirCuatrimestre}
+                conteos={conteos}
+                resumen={resumen}
+                sinDatos={sinDatosEnRango}
+                hayCambios={hayCambios}
+                onRestablecer={restablecerFiltros}
+              />
             )}
 
             {cargandoGrafico ? (
               <div className={`skeleton ${styles.skGrafico}`} aria-label="Cargando gráfico" />
             ) : puntos.length === 0 ? (
-              <p className={styles.aviso}>No hay períodos para mostrar. Revisá el cuatrimestre y los períodos tildados.</p>
+              <p className={styles.aviso}>
+                No hay datos para mostrar con este rango y cuatrimestre. Cambialos en el filtro de arriba.
+              </p>
             ) : (
               <>
                 {puntos.length === 1 && (
