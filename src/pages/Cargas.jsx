@@ -467,7 +467,7 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
               onClick={handleResetear}
               disabled={ocupado || procesando}
             >
-              Resetear DB
+              Reiniciar base de datos
             </button>
           </div>
         </section>

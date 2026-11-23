@@ -6,7 +6,7 @@ function StackedBarChart({ comisiones }) {
   return (
     <div className={styles.panel}>
       <div className={styles.panelTitle}>
-        <span>Rendimiento por Comisión</span>
+        <span>Rendimiento por comisión</span>
         <div className={styles.legend}>
           <span className={styles.legendItem}>
             <i className={styles.dot} style={{ background: 'var(--c-emerald-500)' }}></i> Promocionados
@@ -62,8 +62,8 @@ function StackedBarChart({ comisiones }) {
                   {numReg > 10 ? `${pctReg}%` : ''}
                 </div>
               </Tooltip>
-              <Tooltip texto={`Desaprobados / Sin Condición: ${c.desap} (${pctDesap}%)`} enfocable>
-                <div className={styles.barSeg} role="img" aria-label={`Desaprobados / Sin Condición: ${c.desap} (${pctDesap}%)`} style={{ width: `${numDesap}%`, background: 'var(--c-amber-500)', color: 'var(--c-slate-900)' }}>
+              <Tooltip texto={`Desaprobados / Sin condición: ${c.desap} (${pctDesap}%)`} enfocable>
+                <div className={styles.barSeg} role="img" aria-label={`Desaprobados / Sin condición: ${c.desap} (${pctDesap}%)`} style={{ width: `${numDesap}%`, background: 'var(--c-amber-500)', color: 'var(--c-slate-900)' }}>
                   {numDesap > 10 ? `${pctDesap}%` : ''}
                 </div>
               </Tooltip>

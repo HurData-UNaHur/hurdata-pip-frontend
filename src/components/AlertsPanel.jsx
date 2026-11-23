@@ -13,7 +13,7 @@ function AlertsPanel({ comisiones }) {
   return (
     <div className={styles.panel}>
       <div className={styles.panelTitle}>
-        <span>Alertas Académicas</span>
+        <span>Alertas académicas</span>
       </div>
       {/* Avisen del Emoji aca */}
       {alertas.length > 0 ? (

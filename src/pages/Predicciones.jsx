@@ -61,7 +61,7 @@ function Predicciones({
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Simulador de Vacantes y Planificación de Aulas</h1>
+        <h1 className={styles.title}>Simulador de vacantes y planificación de aulas</h1>
         <p className={styles.subtitle}>
           Proyección de recursantes y cálculo estimado de comisiones necesarias para el próximo período
         </p>
@@ -122,10 +122,10 @@ function Predicciones({
       <div className={styles.simulatorGrid}>
         {/* Formulario de Parámetros */}
         <div className={styles.card}>
-          <h2 className={styles.cardTitle}>Parámetros de Simulación</h2>
+          <h2 className={styles.cardTitle}>Parámetros de simulación</h2>
 
           <div className={styles.formGroup}>
-            <label htmlFor={`${idCampos}-materia`} className={styles.label}>Seleccionar Materia</label>
+            <label htmlFor={`${idCampos}-materia`} className={styles.label}>Seleccionar materia</label>
             <select
               id={`${idCampos}-materia`}
               className={styles.select}
@@ -179,7 +179,7 @@ function Predicciones({
 
           <div className={styles.resultsBox}>
             <div className={styles.resultItem}>
-              <span>Estudiantes Libres del Período:</span>
+              <span>Alumnos libres del período:</span>
               <span className={styles.resultValue}>{libresActuales}</span>
             </div>
             <div className={styles.resultItem}>
@@ -187,17 +187,17 @@ function Predicciones({
               <span className={styles.resultValue}>{recursantesEstimados}</span>
             </div>
             <div className={styles.resultItem}>
-              <span>Comisiones Actuales:</span>
+              <span>Comisiones actuales:</span>
               <span className={styles.resultValue}>{comisionesActuales}</span>
             </div>
             <div className={styles.resultItem}>
-              <span>Comisiones Recomendadas:</span>
+              <span>Comisiones recomendadas:</span>
               <span className={`${styles.resultValue} ${styles.highlight}`}>
                 {comisionesNecesarias}
               </span>
             </div>
             <div className={styles.resultItem}>
-              <span>Aulas Nuevas a Asignar:</span>
+              <span>Aulas nuevas a asignar:</span>
               <span
                 className={styles.resultValue}
                 style={{ color: aulasExtra > 0 ? 'var(--c-red-500)' : 'var(--c-emerald-500)' }}

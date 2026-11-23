@@ -112,7 +112,7 @@ function Materias({
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Análisis Comparativo de Materias Filtro</h1>
+        <h1 className={styles.title}>Análisis comparativo de materias filtro</h1>
         <p className={styles.subtitle}>
           Identificación de cuellos de botella académicos y materias con mayor tasa de deserción
         </p>
