@@ -1,6 +1,3 @@
-import '@fontsource/roboto/latin-400.css';
-import '@fontsource/roboto/latin-500.css';
-import '@fontsource/roboto/latin-700.css';
 import logoUnahur from '../assets/logo-hurlingham.png';
 import IconoTema from './IconoTema';
 import styles from '../pages/Login.module.css';

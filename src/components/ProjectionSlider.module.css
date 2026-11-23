@@ -1,29 +1,29 @@
 
 .panel {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
+  background-color: var(--c-white);
+  border: 1px solid var(--c-slate-200);
   border-radius: 10px;
   padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--c-black) 5%, transparent);
 }
 
 .panelTitle {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--c-slate-900);
   margin-bottom: 16px;
 }
 
 .sliderBox {
   padding: 14px;
-  background-color: #f8fafc;
+  background-color: var(--c-slate-50);
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--c-slate-200);
 }
 
 .label {
   font-size: 0.85rem;
-  color: #1e293b;
+  color: var(--c-slate-800);
   display: block;
 }
 
@@ -31,17 +31,17 @@
   width: 100%;
   margin: 12px 0;
   cursor: pointer;
-  accent-color: #007A33; /* Deslizador en Verde UNaHur */
+  accent-color: var(--c-unahur); /* Deslizador en Verde UNaHur */
 }
 
 .resultsText {
   font-size: 0.82rem;
-  color: #334155;
+  color: var(--c-slate-700);
   line-height: 1.6;
   margin-top: 8px;
 }
 
 .resultsText strong {
-  color: #007A33 !important; 
+  color: var(--c-unahur) !important; 
   font-weight: 800;
 }

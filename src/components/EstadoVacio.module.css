@@ -1,7 +1,7 @@
 /* Caja centrada que reemplaza filtros, tarjetas y gráficos sin datos */
 .caja {
-  background-color: var(--bg-card, #ffffff);
-  border: 1px dashed var(--border-color, #cbd5e1);
+  background-color: var(--bg-card);
+  border: 1px dashed var(--border-color);
   border-radius: 8px;
   padding: 40px 24px;
   display: flex;
@@ -13,20 +13,20 @@
 
 .error {
   border-style: solid;
-  border-color: rgba(239, 68, 68, 0.5);
+  border-color: color-mix(in srgb, var(--c-red-500) 50%, transparent);
 }
 
 .titulo {
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary);
 }
 
 .texto {
   margin: 0;
   font-size: 0.88rem;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
 }
 
 .btnPrimario,
@@ -41,32 +41,32 @@
 }
 
 .btnPrimario {
-  background-color: #007A33;
-  color: #ffffff;
+  background-color: var(--c-unahur);
+  color: var(--c-white);
   border: none;
 }
 
 .btnPrimario:hover {
-  background-color: #005e27;
+  background-color: var(--c-unahur-dark);
 }
 
 .btnSecundario {
   background: transparent;
-  color: var(--text-primary, #0f172a);
-  border: 1px solid var(--border-color, #cbd5e1);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
 }
 
 .btnSecundario:hover {
-  border-color: #007A33;
-  color: #007A33;
+  border-color: var(--c-unahur);
+  color: var(--c-unahur);
 }
 
 .iconoVacio {
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
 }
 
 .iconoError {
-  color: #ef4444;
+  color: var(--c-red-500);
 }
 
 /* ── Skeleton de página (estado 'cargando') ───────────────────────────── */
@@ -82,8 +82,8 @@
   gap: 12px;
   padding: 16px;
   border-radius: 8px;
-  background-color: var(--bg-card, #ffffff);
-  border: 1px solid var(--border-color, #e2e8f0);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
 }
 
 .skFiltro {

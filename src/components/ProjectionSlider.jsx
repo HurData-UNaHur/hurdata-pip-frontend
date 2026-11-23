@@ -26,10 +26,10 @@ function ProjectionSlider({ totalLibres }) {
           className={styles.rangeInput}
         />
         <p className={styles.resultsText}>
-          Recursantes esperados: <strong style={{ color: '#fff' }}>{recursantes}</strong>
+          Recursantes esperados: <strong style={{ color: 'var(--c-white)' }}>{recursantes}</strong>
           <br />
           Comisiones a abrir sugeridas:{' '}
-          <strong style={{ color: '#6366f1' }}>
+          <strong style={{ color: 'var(--c-indigo-500)' }}>
             {comisionesSugeridas} (cupo base 35)
           </strong>
         </p>

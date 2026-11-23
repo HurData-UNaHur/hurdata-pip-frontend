@@ -1,25 +1,25 @@
 .panel {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
+  background-color: var(--c-white);
+  border: 1px solid var(--c-slate-200);
   border-radius: 10px;
   padding: 20px;
   height: 100%;
   box-sizing: border-box;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--c-black) 5%, transparent);
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .panelTitle {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--c-slate-900);
   margin-bottom: 16px;
   transition: color 0.3s ease;
 }
 
 .alertBox {
-  background-color: #fef2f2;
-  border: 1px solid #fca5a5;
+  background-color: var(--c-red-50);
+  border: 1px solid var(--c-red-300);
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 12px;
@@ -33,48 +33,48 @@
 .alertTitle {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #991b1b;
+  color: var(--c-red-800);
   margin-bottom: 4px;
   transition: color 0.3s ease;
 }
 
 .alertDesc {
   font-size: 0.8rem;
-  color: #450a0a;
+  color: var(--c-red-950);
   line-height: 1.4;
   transition: color 0.3s ease;
 }
 
 .noAlerts {
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--c-slate-500);
   transition: color 0.3s ease;
 }
 
 /* ── MODO OSCURO ([data-theme='dark']) ─────────────────────────────────── */
 :global([data-theme='dark']) .panel {
-  background-color: #1e293b;
-  border-color: #334155;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  background-color: var(--c-slate-800);
+  border-color: var(--c-slate-700);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--c-black) 30%, transparent);
 }
 
 :global([data-theme='dark']) .panelTitle {
-  color: #f8fafc;
+  color: var(--c-slate-50);
 }
 
 :global([data-theme='dark']) .alertBox {
-  background-color: rgba(127, 29, 29, 0.25); /* Rojo oscuro  */
-  border-color: #991b1b;
+  background-color: color-mix(in srgb, var(--c-red-900) 25%, transparent); /* Rojo oscuro  */
+  border-color: var(--c-red-800);
 }
 
 :global([data-theme='dark']) .alertTitle {
-  color: #fca5a5;
+  color: var(--c-red-300);
 }
 
 :global([data-theme='dark']) .alertDesc {
-  color: #fecaca;
+  color: var(--c-red-200);
 }
 
 :global([data-theme='dark']) .noAlerts {
-  color: #94a3b8;
+  color: var(--c-slate-400);
 }

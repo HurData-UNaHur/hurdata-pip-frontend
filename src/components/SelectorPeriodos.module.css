@@ -5,7 +5,7 @@
   gap: 8px 16px;
   margin: 0;
   padding: 8px 12px;
-  border: 1px solid var(--border-color, #e2e8f0);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   min-width: 0;
 }
@@ -13,8 +13,7 @@
   padding: 0 6px;
   font-size: 0.72rem;
   font-weight: 600;
-  text-transform: uppercase;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
 }
 .grupos {
   display: flex;
@@ -29,14 +28,14 @@
 .anio {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary);
 }
 .opcion {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: 0.8rem;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
   cursor: pointer;
 }
 .acciones {
@@ -48,11 +47,11 @@
   padding: 3px 10px;
   font-size: 0.75rem;
   border-radius: 6px;
-  border: 1px solid var(--border-color, #e2e8f0);
+  border: 1px solid var(--border-color);
   background: transparent;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary);
   cursor: pointer;
 }
 .acciones button:hover {
-  background-color: var(--bg-hover, rgba(148, 163, 184, 0.15));
+  background-color: var(--bg-hover, color-mix(in srgb, var(--c-slate-400) 15%, transparent));
 }

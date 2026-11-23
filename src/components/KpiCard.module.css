@@ -1,24 +1,23 @@
 
 /* Contenedor de la tarjeta */
 .card {
-  background-color: var(--bg-card, #ffffff); /* Fondo dinámico según el tema */
-  border: 1px solid var(--border-color, #e2e8f0); /* Borde adaptable */
+  background-color: var(--bg-card); /* Fondo dinámico según el tema */
+  border: 1px solid var(--border-color); /* Borde adaptable */
   /* Único acento: borde superior. El color lo pone KpiCard.jsx (verde UNaHur por defecto) */
-  border-top: 4px solid #007A33;
+  border-top: 4px solid var(--c-unahur);
   border-radius: 10px;
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.05));
+  box-shadow: var(--shadow, 0 1px 3px color-mix(in srgb, var(--c-black) 5%, transparent));
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 /* Etiqueta del título del KPI */
 .titulo {
   font-size: 0.8rem;
-  color: var(--text-secondary, #64748b); /* Texto secundario para el modo oscuro */
-  text-transform: uppercase;
+  color: var(--text-secondary); /* Texto secundario para el modo oscuro */
   font-weight: 600;
 }
 
@@ -26,14 +25,14 @@
 .valor {
   font-size: 1.8rem;
   margin: 0;
-  color: #007A33; /* Verde destacado UNaHur */
+  color: var(--c-unahur); /* Verde destacado UNaHur */
   font-weight: 700;
 }
 
 /* Subtítulo informativo: como máximo 2 líneas (el texto completo va en el tooltip) */
 .subtitulo {
   font-size: 0.75rem;
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;

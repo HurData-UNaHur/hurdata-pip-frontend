@@ -8,16 +8,16 @@ function StackedBarChart({ comisiones }) {
         <span>Rendimiento por Comisión</span>
         <div className={styles.legend}>
           <span className={styles.legendItem}>
-            <i className={styles.dot} style={{ background: '#10b981' }}></i> Promocionados
+            <i className={styles.dot} style={{ background: 'var(--c-emerald-500)' }}></i> Promocionados
           </span>
           <span className={styles.legendItem}>
-            <i className={styles.dot} style={{ background: '#3b82f6' }}></i> Regular
+            <i className={styles.dot} style={{ background: 'var(--c-blue-500)' }}></i> Regular
           </span>
           <span className={styles.legendItem}>
-            <i className={styles.dot} style={{ background: '#f59e0b' }}></i> Desaprobado
+            <i className={styles.dot} style={{ background: 'var(--c-amber-500)' }}></i> Desaprobado
           </span>
           <span className={styles.legendItem}>
-            <i className={styles.dot} style={{ background: '#ef4444' }}></i> Libre
+            <i className={styles.dot} style={{ background: 'var(--c-red-500)' }}></i> Libre
           </span>
         </div>
       </div>
@@ -53,28 +53,28 @@ function StackedBarChart({ comisiones }) {
             <div className={styles.stackedBar}>
               <div
                 className={styles.barSeg}
-                style={{ width: `${numPromo}%`, background: '#10b981' }}
+                style={{ width: `${numPromo}%`, background: 'var(--c-emerald-500)' }}
                 title={`Promo: ${c.promo} (${pctPromo}%)`}
               >
                 {numPromo > 10 ? `${pctPromo}%` : ''}
               </div>
               <div
                 className={styles.barSeg}
-                style={{ width: `${numReg}%`, background: '#3b82f6' }}
+                style={{ width: `${numReg}%`, background: 'var(--c-blue-500)' }}
                 title={`Regulares: ${c.reg} (${pctReg}%)`}
               >
                 {numReg > 10 ? `${pctReg}%` : ''}
               </div>
               <div
                 className={styles.barSeg}
-                style={{ width: `${numDesap}%`, background: '#f59e0b' }}
+                style={{ width: `${numDesap}%`, background: 'var(--c-amber-500)' }}
                 title={`Desaprobados / Sin Condición: ${c.desap} (${pctDesap}%)`}
               >
                 {numDesap > 10 ? `${pctDesap}%` : ''}
               </div>
               <div
                 className={styles.barSeg}
-                style={{ width: `${numLibre}%`, background: '#ef4444' }}
+                style={{ width: `${numLibre}%`, background: 'var(--c-red-500)' }}
                 title={`Libres: ${c.libre} (${pctLibre}%)`}
               >
                 {numLibre > 10 ? `${pctLibre}%` : ''}

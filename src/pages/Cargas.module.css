@@ -18,14 +18,14 @@
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary);
   transition: color 0.3s ease;
 }
 
 .subtitle {
   font-size: 0.8rem;
   margin: 0;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
   transition: color 0.3s ease;
 }
 
@@ -35,11 +35,11 @@
 
 /* ── Tarjetas de sección ──────────────────────────────────────────────── */
 .card {
-  background-color: var(--bg-card, #ffffff);
-  border: 1px solid var(--border-color, #e2e8f0);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 16px;
-  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.05));
+  box-shadow: var(--shadow, 0 1px 3px color-mix(in srgb, var(--c-black) 5%, transparent));
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -57,31 +57,31 @@
 .cardTitle {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary);
   margin: 0;
 }
 
 /* ── Subida de archivo ────────────────────────────────────────────────── */
 .dropzone {
-  border: 2px dashed var(--border-color, #cbd5e1);
+  border: 2px dashed var(--border-color);
   border-radius: 8px;
   padding: 24px 16px;
   text-align: center;
   font-size: 0.88rem;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
   cursor: pointer;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .dropzone:hover,
 .dropzone:focus-visible {
-  border-color: #007A33;
+  border-color: var(--c-unahur);
   outline: none;
 }
 
 .dropzoneActiva {
-  border-color: #007A33;
-  background-color: rgba(0, 122, 51, 0.08);
+  border-color: var(--c-unahur);
+  background-color: color-mix(in srgb, var(--c-unahur) 8%, transparent);
 }
 
 .inputOculto {
@@ -111,15 +111,15 @@
 
 .ayuda {
   font-size: 0.78rem;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
   margin: 0;
   flex: 1;
   min-width: 220px;
 }
 
 .btnPrimario {
-  background-color: #007A33;
-  color: #ffffff;
+  background-color: var(--c-unahur);
+  color: var(--c-white);
   border: none;
   border-radius: 8px;
   padding: 10px 18px;
@@ -129,7 +129,7 @@
 }
 
 .btnPrimario:hover:not(:disabled) {
-  background-color: #005e27;
+  background-color: var(--c-unahur-dark);
 }
 
 .btnPrimario:disabled,
@@ -151,15 +151,15 @@
 }
 
 .msgOk {
-  background-color: rgba(34, 197, 94, 0.12);
-  border: 1px solid rgba(34, 197, 94, 0.4);
-  color: var(--text-primary, #14532d);
+  background-color: color-mix(in srgb, var(--c-green-500) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c-green-500) 40%, transparent);
+  color: var(--text-primary);
 }
 
 .msgError {
-  background-color: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  color: var(--text-primary, #7f1d1d);
+  background-color: color-mix(in srgb, var(--c-red-500) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c-red-500) 40%, transparent);
+  color: var(--text-primary);
 }
 
 .msgAviso {
@@ -178,15 +178,15 @@
 
 .toolbar label {
   font-size: 0.8rem;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
 }
 
 .select {
   padding: 6px 10px;
   border-radius: 6px;
-  border: 1px solid var(--border-color, #cbd5e1);
-  background-color: var(--bg-card, #ffffff);
-  color: var(--text-primary, #0f172a);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  color: var(--text-primary);
   font-size: 0.82rem;
 }
 
@@ -203,18 +203,18 @@
 }
 
 .table th {
-  background-color: var(--bg-subtle, #f1f5f9);
-  color: var(--text-primary, #1e293b);
+  background-color: var(--bg-subtle);
+  color: var(--text-primary);
   padding: 8px 10px;
-  border-bottom: 2px solid var(--border-color, #cbd5e1);
+  border-bottom: 2px solid var(--border-color);
   font-weight: 700;
   white-space: nowrap;
 }
 
 .table td {
   padding: 8px 10px;
-  border-bottom: 1px solid var(--border-color, #e2e8f0);
-  color: var(--text-secondary, #334155);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
   vertical-align: top;
 }
 
@@ -244,23 +244,23 @@
 
 .badgeActiva {
   composes: badge;
-  background-color: rgba(34, 197, 94, 0.2);
-  color: #22c55e;
-  border-color: rgba(34, 197, 94, 0.4);
+  background-color: color-mix(in srgb, var(--c-green-500) 20%, transparent);
+  color: var(--c-green-500);
+  border-color: color-mix(in srgb, var(--c-green-500) 40%, transparent);
 }
 
 .badgeReemplazada {
   composes: badge;
-  background-color: rgba(59, 130, 246, 0.2);
-  color: #3b82f6;
-  border-color: rgba(59, 130, 246, 0.4);
+  background-color: color-mix(in srgb, var(--c-blue-500) 20%, transparent);
+  color: var(--c-blue-500);
+  border-color: color-mix(in srgb, var(--c-blue-500) 40%, transparent);
 }
 
 .badgeBorrada {
   composes: badge;
-  background-color: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-  border-color: rgba(239, 68, 68, 0.4);
+  background-color: color-mix(in srgb, var(--c-red-500) 20%, transparent);
+  color: var(--c-red-500);
+  border-color: color-mix(in srgb, var(--c-red-500) 40%, transparent);
 }
 
 /* Celdas que no deben partirse en dos renglones (fecha, período, estado, acciones) */
@@ -274,7 +274,7 @@
   display: inline-flex;
   align-items: center;
   margin-left: 6px;
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
   cursor: help;
   vertical-align: middle;
   border-radius: 50%;
@@ -282,12 +282,12 @@
 
 .info:hover,
 .info:focus-visible {
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary);
   outline: none;
 }
 
 .info:focus-visible {
-  box-shadow: 0 0 0 2px #007A33;
+  box-shadow: 0 0 0 2px var(--c-unahur);
 }
 
 .info::after {
@@ -298,15 +298,15 @@
   z-index: 10;
   padding: 4px 8px;
   border-radius: 4px;
-  background-color: #0f172a;
-  color: #f8fafc;
-  border: 1px solid #334155;
+  background-color: var(--c-slate-900);
+  color: var(--c-slate-50);
+  border: 1px solid var(--c-slate-700);
   font-family: inherit;
   font-style: normal;
   font-weight: 500;
   font-size: 0.72rem;
   white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--c-black) 25%, transparent);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s ease;
@@ -325,8 +325,8 @@
 
 .btnAccion {
   background: transparent;
-  border: 1px solid var(--border-color, #cbd5e1);
-  color: var(--text-secondary, #475569);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
   border-radius: 6px;
   padding: 3px 10px;
   font-size: 0.75rem;
@@ -336,8 +336,8 @@
 }
 
 .btnAccion:hover:not(:disabled) {
-  border-color: #007A33;
-  color: #007A33;
+  border-color: var(--c-unahur);
+  color: var(--c-unahur);
 }
 
 .btnAccion:disabled {
@@ -347,28 +347,28 @@
 
 /* Borrar: igual de discreto, pero rojo al pasar el mouse */
 .btnBorrar:hover:not(:disabled) {
-  border-color: #ef4444;
-  color: #ef4444;
+  border-color: var(--c-red-500);
+  color: var(--c-red-500);
 }
 
 .error {
-  color: #ef4444;
+  color: var(--c-red-500);
   font-size: 0.85rem;
   margin: 0;
 }
 
 /* ── Zona de peligro ──────────────────────────────────────────────────── */
 .zonaPeligro {
-  border-color: rgba(239, 68, 68, 0.5);
+  border-color: color-mix(in srgb, var(--c-red-500) 50%, transparent);
 }
 
 .zonaPeligro .cardTitle {
-  color: #ef4444;
+  color: var(--c-red-500);
 }
 
 .btnPeligro {
-  background-color: #dc2626;
-  color: #ffffff;
+  background-color: var(--c-red-600);
+  color: var(--c-white);
   border: none;
   border-radius: 8px;
   padding: 10px 18px;
@@ -378,5 +378,5 @@
 }
 
 .btnPeligro:hover:not(:disabled) {
-  background-color: #b91c1c;
+  background-color: var(--c-red-700);
 }

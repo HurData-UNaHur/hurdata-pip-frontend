@@ -1,35 +1,35 @@
 /*
  * Login: pantalla dividida. A la izquierda la identidad y el contexto del sistema;
  * a la derecha el formulario. En celular, la identidad pasa a ser una cabecera compacta.
- * Color principal: verde institucional #007A33. Los acentos (rojo, naranja, azul) se usan
+ * Color principal: verde institucional var(--c-unahur). Los acentos (rojo, naranja, azul) se usan
  * solo en la barra superior y en el esquema de datos.
  */
 .pagina {
-  --verde: #007a33;
-  --verde-oscuro: #005e27;
-  --texto: #0f172a;
-  --texto-suave: #475569;
-  --borde: #cbd5e1;
-  --fondo-form: #ffffff;
-  --fondo-identidad: #f8fafc;
-  --foco: rgba(0, 122, 51, 0.2);
+  --verde: var(--c-unahur);
+  --verde-oscuro: var(--c-unahur-dark);
+  --texto: var(--c-slate-900);
+  --texto-suave: var(--c-slate-600);
+  --borde: var(--c-slate-300);
+  --fondo-form: var(--c-white);
+  --fondo-identidad: var(--c-slate-50);
+  --foco: color-mix(in srgb, var(--c-unahur) 20%, transparent);
   position: relative;
   min-height: 100vh;
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-  font-family: Roboto, Arial, sans-serif;
+  font-family: var(--font-sans);
   color: var(--texto);
   background-color: var(--fondo-form);
 }
 
 :global([data-theme='dark']) .pagina {
-  --verde-oscuro: #22c55e;
-  --texto: #f8fafc;
-  --texto-suave: #a3b1c6;
-  --borde: #475569;
-  --fondo-form: #0f172a;
-  --fondo-identidad: #0b1220;
-  --foco: rgba(34, 197, 94, 0.28);
+  --verde-oscuro: var(--c-green-500);
+  --texto: var(--c-slate-50);
+  --texto-suave: var(--c-slate-soft);
+  --borde: var(--c-slate-600);
+  --fondo-form: var(--c-slate-900);
+  --fondo-identidad: var(--c-ink-950);
+  --foco: color-mix(in srgb, var(--c-green-500) 28%, transparent);
 }
 
 /* ── Barra institucional ──────────────────────────────────── */
@@ -42,10 +42,10 @@
   height: 4px;
   background: linear-gradient(
     90deg,
-    #ef4444 0 25%,
-    #f59e0b 25% 50%,
-    #007a33 50% 75%,
-    #3b82f6 75% 100%
+    var(--c-red-500) 0 25%,
+    var(--c-amber-500) 25% 50%,
+    var(--c-unahur) 50% 75%,
+    var(--c-blue-500) 75% 100%
   );
 }
 
@@ -176,18 +176,21 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .campo input::placeholder {
-  color: #7b8aa0;
+  color: var(--c-placeholder);
 }
 .campo input:focus {
-  outline: none;
+  outline: 2px solid var(--verde);
+  outline-offset: 1px;
   border-color: var(--verde);
-  box-shadow: 0 0 0 3px var(--foco);
+  box-shadow: 0 0 0 4px var(--foco);
 }
 :global([data-theme='dark']) .campo input:focus {
-  border-color: #22c55e;
+  outline-color: var(--c-green-500);
 }
 .campo input:disabled {
   opacity: 0.65;
+  background-color: var(--bg-subtle);
+  cursor: not-allowed;
 }
 
 .conBoton {
@@ -226,7 +229,7 @@
 :global([data-theme='dark']) .enlace:focus-visible,
 :global([data-theme='dark']) .ingresar:focus-visible,
 :global([data-theme='dark']) .temaBtn:focus-visible {
-  outline-color: #22c55e;
+  outline-color: var(--c-green-500);
 }
 
 .olvido {
@@ -234,6 +237,7 @@
   justify-content: flex-end;
 }
 .enlace {
+  white-space: nowrap;
   padding: 0;
   border: none;
   background: none;
@@ -246,7 +250,7 @@
   cursor: pointer;
 }
 :global([data-theme='dark']) .enlace {
-  color: #4ade80;
+  color: var(--c-green-400);
 }
 .enlace:hover {
   color: var(--verde-oscuro);
@@ -262,10 +266,10 @@
   gap: 8px;
   margin: 0;
   padding: 10px 12px;
-  border: 1px solid #fecaca;
+  border: 1px solid var(--c-red-200);
   border-radius: 6px;
-  background-color: #fef2f2;
-  color: #b91c1c;
+  background-color: var(--c-red-50);
+  color: var(--c-red-700);
   font-size: 0.875rem;
   line-height: 1.4;
 }
@@ -274,9 +278,9 @@
   margin-top: 1px;
 }
 :global([data-theme='dark']) .error {
-  border-color: #991b1b;
-  background-color: rgba(127, 29, 29, 0.3);
-  color: #fca5a5;
+  border-color: var(--c-red-800);
+  background-color: color-mix(in srgb, var(--c-red-900) 30%, transparent);
+  color: var(--c-red-300);
 }
 
 .ingresar {
@@ -284,7 +288,7 @@
   border: none;
   border-radius: 6px;
   background-color: var(--verde);
-  color: #ffffff;
+  color: var(--c-white);
   font-family: inherit;
   font-size: 1rem;
   font-weight: 700;
@@ -295,7 +299,7 @@
   background-color: var(--verde-oscuro);
 }
 :global([data-theme='dark']) .ingresar:hover:not(:disabled) {
-  background-color: #00924c;
+  background-color: var(--c-green-hover);
 }
 .ingresar:disabled {
   opacity: 0.7;
@@ -356,20 +360,20 @@
 
 /* ── Validación y formularios de Registro y Recuperación ──── */
 .campo .inputError {
-  border-color: #dc2626;
+  border-color: var(--c-red-600);
 }
 .campo .inputError:focus {
-  border-color: #dc2626;
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.18);
+  border-color: var(--c-red-600);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-red-600) 18%, transparent);
 }
 .errorCampo {
   margin: 0;
   font-size: 0.82rem;
   line-height: 1.35;
-  color: #b91c1c;
+  color: var(--c-red-700);
 }
 :global([data-theme='dark']) .errorCampo {
-  color: #fca5a5;
+  color: var(--c-red-300);
 }
 .ayudaCampo {
   margin: 0;
@@ -396,10 +400,10 @@
   flex-shrink: 0;
 }
 .reglaOk {
-  color: #15803d;
+  color: var(--c-green-700);
 }
 :global([data-theme='dark']) .reglaOk {
-  color: #4ade80;
+  color: var(--c-green-400);
 }
 .soloLector {
   position: absolute;
@@ -445,12 +449,12 @@
 .opcionActiva:hover:not(:disabled) {
   border-color: var(--verde);
   background-color: var(--verde);
-  color: #ffffff;
+  color: var(--c-white);
 }
 :global([data-theme='dark']) .opcionActiva,
 :global([data-theme='dark']) .opcionActiva:hover:not(:disabled) {
-  border-color: #16a34a;
-  background-color: #15803d;
+  border-color: var(--c-green-600);
+  background-color: var(--c-green-700);
 }
 .opcion:focus-visible {
   outline: 2px solid var(--verde);
@@ -480,10 +484,10 @@
   gap: 10px;
   margin: 0;
   padding: 12px 14px;
-  border: 1px solid #bbf7d0;
+  border: 1px solid var(--c-green-200);
   border-radius: 6px;
-  background-color: #f0fdf4;
-  color: #166534;
+  background-color: var(--c-green-50);
+  color: var(--c-green-800);
   font-size: 0.92rem;
   line-height: 1.45;
 }
@@ -492,9 +496,9 @@
   margin-top: 2px;
 }
 :global([data-theme='dark']) .exito {
-  border-color: #166534;
-  background-color: rgba(22, 101, 52, 0.25);
-  color: #bbf7d0;
+  border-color: var(--c-green-800);
+  background-color: color-mix(in srgb, var(--c-green-800) 25%, transparent);
+  color: var(--c-green-200);
 }
 
 /* Dos campos a la misma altura (nombre y apellido); en pantallas muy chicas pasan a una columna */

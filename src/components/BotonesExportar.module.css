@@ -11,13 +11,13 @@
   font-size: 0.78rem;
   font-weight: 600;
   border-radius: 6px;
-  border: 1px solid var(--border-color, #cbd5e1);
-  background-color: var(--bg-subtle, #f1f5f9);
-  color: var(--text-primary, #0f172a);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-subtle);
+  color: var(--text-primary);
   cursor: pointer;
 }
 .grupo button:hover:not(:disabled) {
-  border-color: #007A33;
+  border-color: var(--c-unahur);
 }
 .grupo button:disabled {
   opacity: 0.5;
@@ -25,5 +25,5 @@
 }
 .error {
   font-size: 0.75rem;
-  color: #ef4444;
+  color: var(--c-red-500);
 }

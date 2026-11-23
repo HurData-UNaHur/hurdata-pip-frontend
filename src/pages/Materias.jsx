@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import styles from './Materias.module.css';
 import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
@@ -145,18 +146,18 @@ function Materias({
         }}
       >
         <KpiCard
-          titulo="TOTAL MATERIAS EVALUADAS"
+          titulo="Total materias evaluadas"
           valor={materiasFuente.length}
           subtitulo={periodo ? formatearPeriodo(periodo) : 'Sin período seleccionado'}
         />
         <KpiCard
-          titulo="PROMEDIO GENERAL LIBRES"
+          titulo="Promedio general libres"
           valor={hayMaterias ? `${promedioLibres}%` : '—'}
           subtitulo="Tasa media de abandono"
           colorBorde={hayMaterias ? COLOR_POR_NIVEL[nivelPorLibres(promedioLibres)] : undefined}
         />
         <KpiCard
-          titulo="MATERIA MÁS CRÍTICA"
+          titulo="Materia más crítica"
           valor={materiaMasCritica ? `${materiaMasCritica.pctLibre}%` : '—'}
           subtitulo={materiaMasCritica ? materiaMasCritica.nombre : 'Sin datos'}
           subtituloCompleto={materiaMasCritica?.nombre}
@@ -184,11 +185,11 @@ function Materias({
                       type="button"
                       className={styles.sortBtn}
                       onClick={() => ordenarPor(col.clave)}
-                      title={`Ordenar por ${col.titulo}${col.ayuda ? ` — ${col.ayuda}` : ''}`}
+                      title={`Ordenar por ${col.titulo}${col.ayuda ? `. ${col.ayuda}` : ''}`}
                     >
                       {col.titulo}
                       <span className={activa ? styles.sortIconActive : styles.sortIcon} aria-hidden="true">
-                        {activa ? (orden.direccion === 'asc' ? '▲' : '▼') : '↕'}
+                        {activa ? (orden.direccion === 'asc' ? <ArrowUp size={13} /> : <ArrowDown size={13} />) : <ArrowUpDown size={13} />}
                       </span>
                     </button>
                   </th>
@@ -209,8 +210,8 @@ function Materias({
                 <td><strong>{m.nombre}</strong></td>
                 <td>{m.comisiones}</td>
                 <td>{m.inscriptos}</td>
-                <td style={{ color: '#10b981' }}>{m.pctPromo}% ({m.promo})</td>
-                <td style={{ color: '#ef4444' }}>{m.pctLibre}% ({m.libre})</td>
+                <td style={{ color: 'var(--c-emerald-500)' }}>{m.pctPromo}% ({m.promo})</td>
+                <td style={{ color: 'var(--c-red-500)' }}>{m.pctLibre}% ({m.libre})</td>
                 <td>
                   {nivelPorLibres(m.pctLibre) === 'riesgo' ? (
                     <span className={styles.badgeCritico}>Riesgo alto</span>

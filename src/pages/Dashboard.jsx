@@ -85,24 +85,24 @@ function Dashboard({
 
       <section className={styles.kpiSection}>
         <KpiCard
-          titulo="TOTAL INSCRIPTOS"
+          titulo="Total inscriptos"
           valor={totalAlumnos}
           subtitulo={plural(comisiones.length, 'comisión', 'comisiones')}
         />
         <KpiCard
-          titulo="PROMOCIONADOS"
+          titulo="Promocionados"
           valor={pctPromo}
           subtitulo={plural(totalPromo, 'alumno', 'alumnos')}
           colorBorde="#10b981"
         />
         <KpiCard
-          titulo="REGULARES"
+          titulo="Regulares"
           valor={pctReg}
           subtitulo={plural(totalReg, 'alumno', 'alumnos')}
           colorBorde="#3b82f6"
         />
         <KpiCard
-          titulo="LIBRES / ABANDONO"
+          titulo="Libres / abandono"
           valor={pctLibre}
           subtitulo={plural(totalLibre, 'alumno', 'alumnos')}
           colorBorde="#ef4444"

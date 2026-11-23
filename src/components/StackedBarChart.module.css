@@ -1,12 +1,12 @@
 /* Panel contenedor del gráfico */
 .panel {
-  background-color: var(--bg-card, #ffffff); /* Tarjeta con tema dinámico */
-  border: 1px solid var(--border-color, #e2e8f0);
+  background-color: var(--bg-card); /* Tarjeta con tema dinámico */
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 20px;
   height: 100%;
   box-sizing: border-box;
-  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.05));
+  box-shadow: var(--shadow, 0 1px 3px color-mix(in srgb, var(--c-black) 5%, transparent));
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -16,7 +16,7 @@
   align-items: center;
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--text-primary, #0f172a); /* Título en blanco/oscuro según tema */
+  color: var(--text-primary); /* Título en blanco/oscuro según tema */
   margin-bottom: 20px;
   flex-wrap: wrap;
   gap: 12px;
@@ -32,7 +32,7 @@
   align-items: center;
   gap: 6px;
   font-size: 0.78rem;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
@@ -56,24 +56,24 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.85rem;
-  color: var(--text-primary, #1e293b);
+  color: var(--text-primary);
   margin-bottom: 6px;
   font-weight: 600;
 }
 
 .comisionHeader span {
-  color: var(--text-secondary, #475569) !important; /* Porcentajes en gris claro u oscuro */
+  color: var(--text-secondary) !important; /* Porcentajes en gris claro u oscuro */
 }
 
 .comisionHeader strong {
-  color: #007A33; /* Resalta el nombre de la comisión en verde UNaHur */
+  color: var(--c-unahur); /* Resalta el nombre de la comisión en verde UNaHur */
 }
 
 /* Las barras horizontales apiladas */
 .stackedBar {
   display: flex;
   height: 24px;
-  background-color: var(--bg-subtle, #e2e8f0); /* Canal de la barra  */
+  background-color: var(--bg-subtle); /* Canal de la barra  */
   border-radius: 6px;
   overflow: hidden;
 }
@@ -82,7 +82,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: var(--c-white);
   font-size: 0.72rem;
   font-weight: 700;
   transition: width 0.3s ease;

@@ -3,12 +3,12 @@
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
-  background-color: var(--bg-card, #ffffff);
+  background-color: var(--bg-card);
   padding: 16px;
   border-radius: 10px;
-  border: 1px solid var(--border-color, #e2e8f0);
+  border: 1px solid var(--border-color);
   margin-bottom: 24px;
-  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.05));
+  box-shadow: var(--shadow, 0 1px 3px color-mix(in srgb, var(--c-black) 5%, transparent));
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -22,15 +22,14 @@
 
 .label {
   font-size: 0.75rem;
-  color: var(--text-secondary, #475569);
-  text-transform: uppercase;
+  color: var(--text-secondary);
   font-weight: 700;
 }
 
 .select {
-  background-color: var(--bg-subtle, #f8fafc);
-  color: var(--text-primary, #0f172a);
-  border: 1px solid var(--border-color, #cbd5e1);
+  background-color: var(--bg-subtle);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   padding: 8px 12px;
   border-radius: 6px;
   outline: none;
@@ -42,7 +41,7 @@
 }
 
 .select:focus {
-  border-color: #007A33;
+  border-color: var(--c-unahur);
 }
 
 /* ── Responsive ───────────────────────────────────────────────────────── */

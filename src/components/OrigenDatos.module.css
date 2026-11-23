@@ -2,7 +2,7 @@
 .origen {
   margin: -4px 0 0;
   font-size: 0.78rem;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
 }
 
 .archivo {

@@ -280,7 +280,7 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
 
       {/* ── Footer ── */}
       <footer className={styles.footer}>
-        <span>© {new Date().getFullYear()} HurData · Proyecto Integrador de Programación · Universidad Nacional de Hurlingham</span>
+        <span>© {new Date().getFullYear()} HurData. Proyecto Integrador de Programación, Universidad Nacional de Hurlingham</span>
         <img src={logoGris} alt="Universidad Nacional de Hurlingham" className={styles.logoFooter} />
       </footer>
 
@@ -306,7 +306,7 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
             {notifError && <p className={styles.modalError}>{notifError}</p>}
 
             {loadingNotif ? (
-              <p className={styles.modalVacio}>Cargando solicitudes...</p>
+              <p className={styles.modalVacio}>Cargando solicitudes…</p>
             ) : solicitudes.length === 0 ? (
               hayRecuperaciones ? null : <p className={styles.modalVacio}>No hay solicitudes pendientes en este momento.</p>
             ) : (

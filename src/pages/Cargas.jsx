@@ -270,7 +270,7 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
             {archivo ? (
               <span>
                 <FileSpreadsheet size={16} className="icono-inline" aria-hidden="true" />
-                <strong>{archivo.name}</strong> — hacé clic para cambiarlo
+                <strong>{archivo.name}</strong>, hacé clic para cambiarlo
               </span>
             ) : (
               <span className={styles.dropzoneTexto}>

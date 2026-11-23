@@ -93,21 +93,21 @@ function Predicciones({
         }}
       >
         <KpiCard
-          titulo="RECURSANTES ESPERADOS"
+          titulo="Recursantes esperados"
           valor={recursantesEstimados}
           subtitulo={`Sobre ${libresActuales} libres actuales`}
           colorBorde="#6366f1"
         />
         <KpiCard
-          titulo="COMISIONES SUGERIDAS"
+          titulo="Comisiones sugeridas"
           valor={comisionesNecesarias}
           subtitulo={`Cupo estimado de ${cupoValido} alumnos/aula`}
         />
         <KpiCard
-          titulo="AULAS ADICIONALES"
+          titulo="Aulas adicionales"
           valor={aulasExtra > 0 ? `+${aulasExtra}` : 'Sin extra'}
           subtitulo={aulasExtra > 0 ? 'Apertura recomendada' : 'Capacidad suficiente'}
-          colorBorde={aulasExtra > 0 ? '#ef4444' : '#10b981'}
+          colorBorde={aulasExtra > 0 ? 'var(--c-red-500)' : 'var(--c-emerald-500)'}
         />
       </section>
 
@@ -190,7 +190,7 @@ function Predicciones({
               <span>Aulas Nuevas a Asignar:</span>
               <span
                 className={styles.resultValue}
-                style={{ color: aulasExtra > 0 ? '#ef4444' : '#10b981' }}
+                style={{ color: aulasExtra > 0 ? 'var(--c-red-500)' : 'var(--c-emerald-500)' }}
               >
                 {aulasExtra}
               </span>

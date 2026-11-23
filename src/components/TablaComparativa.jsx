@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowDown, ArrowUp, Minus, Search, TriangleAlert } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Minus, Search, TriangleAlert } from 'lucide-react';
 import styles from './TablaComparativa.module.css';
 import BotonesExportar from './BotonesExportar';
 import { slug } from '../utils/exportar';
@@ -202,7 +202,7 @@ export default function TablaComparativa({ filas, periodoA, periodoB, carrera = 
                       >
                         {contenido}
                         <span className={activa ? styles.sortIconActive : styles.sortIcon} aria-hidden="true">
-                          {activa ? (orden.direccion === 'asc' ? '▲' : '▼') : '↕'}
+                          {activa ? (orden.direccion === 'asc' ? <ArrowUp size={13} /> : <ArrowDown size={13} />) : <ArrowUpDown size={13} />}
                         </span>
                       </button>
                     )}

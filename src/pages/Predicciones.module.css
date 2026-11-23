@@ -17,14 +17,14 @@
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary);
   transition: color 0.3s ease;
 }
 
 .subtitle {
   font-size: 0.8rem;
   margin: 0;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
   transition: color 0.3s ease;
 }
 
@@ -36,18 +36,18 @@
 }
 
 .card {
-  background-color: var(--bg-card, #ffffff);
-  border: 1px solid var(--border-color, #e2e8f0);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 16px;
-  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.05));
+  box-shadow: var(--shadow, 0 1px 3px color-mix(in srgb, var(--c-black) 5%, transparent));
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .cardTitle {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary);
   margin-bottom: 12px;
 }
 
@@ -60,14 +60,14 @@
 
 .label {
   font-size: 0.8rem;
-  color: var(--text-secondary, #334155);
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
 .select, .input {
-  background-color: var(--bg-subtle, #f8fafc);
-  border: 1px solid var(--border-color, #cbd5e1);
-  color: var(--text-primary, #0f172a);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   padding: 8px 10px;
   border-radius: 6px;
   font-size: 0.82rem;
@@ -77,19 +77,21 @@
 }
 
 .select:focus, .input:focus {
-  border-color: #007A33;
+  outline: 2px solid var(--c-unahur);
+  outline-offset: 1px;
+  border-color: var(--c-unahur);
 }
 
 .rangeInput {
   width: 100%;
   margin: 6px 0;
   cursor: pointer;
-  accent-color: #007A33;
+  accent-color: var(--c-unahur);
 }
 
 .resultsBox {
-  background-color: var(--bg-subtle, #f8fafc);
-  border: 1px solid var(--border-color, #e2e8f0);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   padding: 12px;
   display: flex;
@@ -103,9 +105,9 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.82rem;
-  color: var(--text-secondary, #334155);
+  color: var(--text-secondary);
   padding-bottom: 6px;
-  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .resultItem:last-child {
@@ -116,11 +118,11 @@
 .resultValue {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary);
 }
 
 .highlight {
-  color: #007A33;
+  color: var(--c-unahur);
 }
 
 /* ── Responsive ───────────────────────────────────────────────────────── */

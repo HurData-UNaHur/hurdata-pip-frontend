@@ -18,13 +18,13 @@
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary);
 }
 
 .subtitle {
   font-size: 0.8rem;
   margin: 0;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
 }
 
 /* ── Filtros ──────────────────────────────────────────────────────────── */
@@ -34,9 +34,9 @@
   gap: 12px;
   padding: 16px;
   border-radius: 8px;
-  background-color: var(--bg-card, #ffffff);
-  border: 1px solid var(--border-color, #e2e8f0);
-  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.05));
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow, 0 1px 3px color-mix(in srgb, var(--c-black) 5%, transparent));
 }
 
 .filtro {
@@ -49,8 +49,7 @@
 .filtroInline label {
   font-size: 0.72rem;
   font-weight: 600;
-  text-transform: uppercase;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
 }
 
 .filtros select,
@@ -58,9 +57,9 @@
 .comparar select {
   padding: 8px 10px;
   border-radius: 6px;
-  border: 1px solid var(--border-color, #cbd5e1);
-  background-color: var(--bg-subtle, #f1f5f9);
-  color: var(--text-primary, #0f172a);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-subtle);
+  color: var(--text-primary);
   font-size: 0.85rem;
 }
 
@@ -76,11 +75,11 @@
 
 /* ── Tarjetas ─────────────────────────────────────────────────────────── */
 .card {
-  background-color: var(--bg-card, #ffffff);
-  border: 1px solid var(--border-color, #e2e8f0);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 16px 20px 20px;
-  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.05));
+  box-shadow: var(--shadow, 0 1px 3px color-mix(in srgb, var(--c-black) 5%, transparent));
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -102,7 +101,7 @@
   margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary);
 }
 
 .comparar {
@@ -111,19 +110,19 @@
   gap: 8px;
   flex-wrap: wrap;
   font-size: 0.8rem;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
 }
 
 .aviso {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
 }
 
 .error {
   margin: 0;
   font-size: 0.85rem;
-  color: #ef4444;
+  color: var(--c-red-500);
 }
 
 .skGrafico {
