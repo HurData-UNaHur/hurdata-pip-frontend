@@ -5,6 +5,7 @@ import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
 import EstadoVacio from '../components/EstadoVacio';
 import BotonesExportar from '../components/BotonesExportar';
+import Tooltip from '../components/Tooltip';
 import { formatearPeriodo } from '../utils/texto';
 import { slug } from '../utils/exportar';
 // Los umbrales de % de libres (Indicador, colores de tarjetas, comparación de períodos) están en un solo lugar
@@ -147,17 +148,20 @@ function Materias({
       >
         <KpiCard
           titulo="Total materias evaluadas"
+          ayuda="Materias con comisiones en el período y la carrera elegidos."
           valor={materiasFuente.length}
           subtitulo={periodo ? formatearPeriodo(periodo) : 'Sin período seleccionado'}
         />
         <KpiCard
           titulo="Promedio general libres"
+          ayuda="Promedio simple del porcentaje de libres de cada materia: todas pesan igual, tengan pocos o muchos alumnos."
           valor={hayMaterias ? `${promedioLibres}%` : '—'}
           subtitulo="Tasa media de abandono"
           colorBorde={hayMaterias ? COLOR_POR_NIVEL[nivelPorLibres(promedioLibres)] : undefined}
         />
         <KpiCard
           titulo="Materia más crítica"
+          ayuda="La materia con mayor porcentaje de libres en el período elegido."
           valor={materiaMasCritica ? `${materiaMasCritica.pctLibre}%` : '—'}
           subtitulo={materiaMasCritica ? materiaMasCritica.nombre : 'Sin datos'}
           subtituloCompleto={materiaMasCritica?.nombre}
@@ -181,17 +185,18 @@ function Materias({
                     key={col.clave}
                     aria-sort={activa ? (orden.direccion === 'asc' ? 'ascending' : 'descending') : 'none'}
                   >
-                    <button
-                      type="button"
-                      className={styles.sortBtn}
-                      onClick={() => ordenarPor(col.clave)}
-                      title={`Ordenar por ${col.titulo}${col.ayuda ? `. ${col.ayuda}` : ''}`}
-                    >
-                      {col.titulo}
-                      <span className={activa ? styles.sortIconActive : styles.sortIcon} aria-hidden="true">
-                        {activa ? (orden.direccion === 'asc' ? <ArrowUp size={13} /> : <ArrowDown size={13} />) : <ArrowUpDown size={13} />}
-                      </span>
-                    </button>
+                    <Tooltip texto={`Ordenar por ${col.titulo}${col.ayuda ? `. ${col.ayuda}` : ''}`}>
+                      <button
+                        type="button"
+                        className={styles.sortBtn}
+                        onClick={() => ordenarPor(col.clave)}
+                      >
+                        {col.titulo}
+                        <span className={activa ? styles.sortIconActive : styles.sortIcon} aria-hidden="true">
+                          {activa ? (orden.direccion === 'asc' ? <ArrowUp size={13} /> : <ArrowDown size={13} />) : <ArrowUpDown size={13} />}
+                        </span>
+                      </button>
+                    </Tooltip>
                   </th>
                 );
               })}

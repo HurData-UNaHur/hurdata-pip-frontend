@@ -94,17 +94,20 @@ function Predicciones({
       >
         <KpiCard
           titulo="Recursantes esperados"
+          ayuda="Alumnos libres de la materia por la tasa de recursado que elegiste: cuántos van a volver a cursarla."
           valor={recursantesEstimados}
           subtitulo={`Sobre ${libresActuales} libres actuales`}
-          colorBorde="#6366f1"
+          colorBorde="var(--c-indigo-500)"
         />
         <KpiCard
           titulo="Comisiones sugeridas"
+          ayuda="Recursantes esperados divididos por el cupo por comisión, redondeado hacia arriba."
           valor={comisionesNecesarias}
           subtitulo={`Cupo estimado de ${cupoValido} alumnos/aula`}
         />
         <KpiCard
           titulo="Aulas adicionales"
+          ayuda="Comisiones sugeridas menos las que tiene hoy la materia. Si da cero, la capacidad actual alcanza."
           valor={aulasExtra > 0 ? `+${aulasExtra}` : 'Sin extra'}
           subtitulo={aulasExtra > 0 ? 'Apertura recomendada' : 'Capacidad suficiente'}
           colorBorde={aulasExtra > 0 ? 'var(--c-red-500)' : 'var(--c-emerald-500)'}

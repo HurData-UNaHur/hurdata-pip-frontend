@@ -4,6 +4,7 @@ import {
 } from 'recharts';
 import { ArrowDown, ArrowUp, Minus } from 'lucide-react';
 import styles from './GraficoEvolucion.module.css';
+import Pp from './Pp';
 import { ubicarEtiquetas, variacionReciente } from '../utils/evolucion';
 import { formatearNumero, formatearPeriodo, formatearPeriodoCorto } from '../utils/texto';
 
@@ -105,7 +106,7 @@ function Variacion({ delta, bueno, contra }) {
   return (
     <span className={esBueno ? styles.buena : styles.mala}>
       <Icono size={13} className="icono-inline" aria-hidden="true" />
-      {Math.abs(delta)} pp vs {contra}
+      {Math.abs(delta)}&nbsp;<Pp /> vs {contra}
     </span>
   );
 }

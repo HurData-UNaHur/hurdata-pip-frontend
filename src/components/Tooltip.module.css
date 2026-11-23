@@ -1,0 +1,40 @@
+.globo {
+  position: fixed;
+  z-index: 1000;
+  max-width: 18rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background-color: var(--c-slate-900);
+  color: var(--c-slate-50);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: left;
+  pointer-events: none;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--c-black) 25%, transparent);
+  animation: aparecer 0.12s ease-out;
+}
+/* Con el mouse espera un instante antes de mostrarse, para no aparecer al pasar de largo */
+.conDemora {
+  animation-delay: 0.35s;
+  animation-fill-mode: backwards;
+}
+/* En modo oscuro el globo es claro, para despegarse del fondo */
+:global([data-theme='dark']) .globo {
+  background-color: var(--c-slate-100);
+  color: var(--c-slate-900);
+}
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .globo {
+    animation: none;
+  }
+}

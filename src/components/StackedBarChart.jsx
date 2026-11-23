@@ -1,4 +1,5 @@
 import styles from './StackedBarChart.module.css';
+import Tooltip from './Tooltip';
 import { plural } from '../utils/texto';
 
 function StackedBarChart({ comisiones }) {
@@ -51,34 +52,26 @@ function StackedBarChart({ comisiones }) {
               </span>
             </div>
             <div className={styles.stackedBar}>
-              <div
-                className={styles.barSeg}
-                style={{ width: `${numPromo}%`, background: 'var(--c-emerald-500)' }}
-                title={`Promo: ${c.promo} (${pctPromo}%)`}
-              >
-                {numPromo > 10 ? `${pctPromo}%` : ''}
-              </div>
-              <div
-                className={styles.barSeg}
-                style={{ width: `${numReg}%`, background: 'var(--c-blue-500)' }}
-                title={`Regulares: ${c.reg} (${pctReg}%)`}
-              >
-                {numReg > 10 ? `${pctReg}%` : ''}
-              </div>
-              <div
-                className={styles.barSeg}
-                style={{ width: `${numDesap}%`, background: 'var(--c-amber-500)' }}
-                title={`Desaprobados / Sin Condición: ${c.desap} (${pctDesap}%)`}
-              >
-                {numDesap > 10 ? `${pctDesap}%` : ''}
-              </div>
-              <div
-                className={styles.barSeg}
-                style={{ width: `${numLibre}%`, background: 'var(--c-red-500)' }}
-                title={`Libres: ${c.libre} (${pctLibre}%)`}
-              >
-                {numLibre > 10 ? `${pctLibre}%` : ''}
-              </div>
+              <Tooltip texto={`Promo: ${c.promo} (${pctPromo}%)`} enfocable>
+                <div className={styles.barSeg} style={{ width: `${numPromo}%`, background: 'var(--c-emerald-500)' }}>
+                  {numPromo > 10 ? `${pctPromo}%` : ''}
+                </div>
+              </Tooltip>
+              <Tooltip texto={`Regulares: ${c.reg} (${pctReg}%)`} enfocable>
+                <div className={styles.barSeg} style={{ width: `${numReg}%`, background: 'var(--c-blue-500)' }}>
+                  {numReg > 10 ? `${pctReg}%` : ''}
+                </div>
+              </Tooltip>
+              <Tooltip texto={`Desaprobados / Sin Condición: ${c.desap} (${pctDesap}%)`} enfocable>
+                <div className={styles.barSeg} style={{ width: `${numDesap}%`, background: 'var(--c-amber-500)' }}>
+                  {numDesap > 10 ? `${pctDesap}%` : ''}
+                </div>
+              </Tooltip>
+              <Tooltip texto={`Libres: ${c.libre} (${pctLibre}%)`} enfocable>
+                <div className={styles.barSeg} style={{ width: `${numLibre}%`, background: 'var(--c-red-500)' }}>
+                  {numLibre > 10 ? `${pctLibre}%` : ''}
+                </div>
+              </Tooltip>
             </div>
           </div>
         );

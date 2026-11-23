@@ -1,6 +1,7 @@
 import { RotateCcw } from 'lucide-react';
 import styles from './FiltroPeriodos.module.css';
 import Segmentado from './Segmentado';
+import Tooltip from './Tooltip';
 import { formatearPeriodoCorto } from '../utils/texto';
 
 const RANGOS = [
@@ -63,15 +64,16 @@ export default function FiltroPeriodos({
           <span className={styles.etiqueta}>Cuatrimestre</span>
           <Segmentado etiqueta="Cuatrimestre" opciones={cuatrimestres} valor={cuatrimestre} onChange={onCuatrimestre} />
           {hayCambios && (
-            <button
-              type="button"
-              className={styles.restablecer}
-              onClick={onRestablecer}
-              title="Restablecer filtros"
-              aria-label="Restablecer filtros"
-            >
-              <RotateCcw size={16} aria-hidden="true" />
-            </button>
+            <Tooltip texto="Restablecer filtros">
+              <button
+                type="button"
+                className={styles.restablecer}
+                onClick={onRestablecer}
+                aria-label="Restablecer filtros"
+              >
+                <RotateCcw size={16} aria-hidden="true" />
+              </button>
+            </Tooltip>
           )}
         </div>
       </div>

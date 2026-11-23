@@ -1,5 +1,6 @@
 import logoUnahur from '../assets/logo-hurlingham.png';
 import IconoTema from './IconoTema';
+import Tooltip from './Tooltip';
 import styles from '../pages/Login.module.css';
 
 /*
@@ -12,15 +13,16 @@ export default function AuthLayout({ theme, toggleTheme, children }) {
       {/* Barra institucional con los cuatro colores de la UNaHur */}
       <div className={styles.barra} aria-hidden="true" />
 
-      <button
-        type="button"
-        className={styles.temaBtn}
-        onClick={toggleTheme}
-        title="Cambiar tema"
-        aria-label="Cambiar tema"
-      >
-        <IconoTema theme={theme} />
-      </button>
+      <Tooltip texto="Cambiar tema">
+        <button
+          type="button"
+          className={styles.temaBtn}
+          onClick={toggleTheme}
+          aria-label="Cambiar tema"
+        >
+          <IconoTema theme={theme} />
+        </button>
+      </Tooltip>
 
       <aside className={styles.identidad}>
         {/* Sin sesión, el logo recarga la página y vuelve al inicio de sesión */}

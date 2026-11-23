@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FileDown, FileSpreadsheet } from 'lucide-react';
 import styles from './BotonesExportar.module.css';
+import Tooltip from './Tooltip';
 import { exportarCSV, exportarPDF } from '../utils/exportar';
 
 /*
@@ -26,14 +27,16 @@ function BotonesExportar({ obtener, deshabilitado = false }) {
 
   return (
     <div className={styles.grupo}>
-      <button type="button" disabled={deshabilitado} onClick={() => exportarCSV(obtener())}
-        title="Descargar la tabla como CSV (se abre en Excel)">
-        <FileSpreadsheet size={14} aria-hidden="true" /> CSV
-      </button>
-      <button type="button" disabled={deshabilitado || generando} onClick={pdf}
-        title="Descargar la tabla como PDF">
-        <FileDown size={14} aria-hidden="true" /> {generando ? 'Generando…' : 'PDF'}
-      </button>
+      <Tooltip texto="Descargar la tabla como CSV (se abre en Excel)">
+        <button type="button" disabled={deshabilitado} onClick={() => exportarCSV(obtener())}>
+          <FileSpreadsheet size={14} aria-hidden="true" /> CSV
+        </button>
+      </Tooltip>
+      <Tooltip texto="Descargar la tabla como PDF">
+        <button type="button" disabled={deshabilitado || generando} onClick={pdf}>
+          <FileDown size={14} aria-hidden="true" /> {generando ? 'Generando…' : 'PDF'}
+        </button>
+      </Tooltip>
       {error && <span role="alert" className={styles.error}>{error}</span>}
     </div>
   );

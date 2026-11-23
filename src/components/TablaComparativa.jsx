@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, ArrowUpDown, Minus, Search, TriangleAlert } from 'lucide-react';
 import styles from './TablaComparativa.module.css';
 import BotonesExportar from './BotonesExportar';
+import Tooltip from './Tooltip';
+import Pp from './Pp';
 import { slug } from '../utils/exportar';
 import { formatearNumero, formatearPeriodoCorto, plural } from '../utils/texto';
 import { UMBRAL_RIESGO_ALTO, UMBRAL_SALTO_LIBRES } from '../utils/umbrales';
@@ -31,7 +33,7 @@ function Delta({ valor, unidad, subeEsBueno }) {
   return (
     <span className={`${styles.delta} ${sube === subeEsBueno ? styles.bueno : styles.malo}`}>
       <Icono size={12} className="icono-inline" aria-hidden="true" />
-      {Math.abs(valor)}{unidad}
+      {Math.abs(valor)}{unidad === ' pp' ? <>&nbsp;<Pp /></> : unidad}
     </span>
   );
 }
@@ -41,11 +43,13 @@ function Barra({ dist, etiqueta }) {
   if (!dist) return <span className={styles.barraVacia} aria-hidden="true" />;
   const detalle = SEGMENTOS.map((s) => `${s.nombre} ${dist[s.clave]} %`).join(', ');
   return (
-    <span className={styles.barra} role="img" aria-label={`${etiqueta}: ${detalle}`} title={`${etiqueta}: ${detalle}`}>
-      {SEGMENTOS.map((s) => dist[s.clave] > 0 && (
-        <span key={s.clave} style={{ flexGrow: dist[s.clave], background: s.color }} />
-      ))}
-    </span>
+    <Tooltip texto={`${etiqueta}: ${detalle}`} enfocable>
+      <span className={styles.barra} role="img" aria-label={`${etiqueta}: ${detalle}`}>
+        {SEGMENTOS.map((s) => dist[s.clave] > 0 && (
+          <span key={s.clave} style={{ flexGrow: dist[s.clave], background: s.color }} />
+        ))}
+      </span>
+    </Tooltip>
   );
 }
 
@@ -138,8 +142,8 @@ export default function TablaComparativa({ filas, periodoA, periodoB, carrera = 
       {/* Resumen de lo que cambió */}
       <div className={styles.resumen}>
         <span>{plural(resumen.ambas, 'materia', 'materias')} en ambos períodos</span>
-        {resumen.empeoran > 0 && <span className={styles.malo}>{resumen.empeoran} con +{UMBRAL_SALTO_LIBRES} pp de libres o más</span>}
-        {resumen.mejoran > 0 && <span className={styles.bueno}>{resumen.mejoran} con −{UMBRAL_SALTO_LIBRES} pp o menos</span>}
+        {resumen.empeoran > 0 && <span className={styles.malo}>{resumen.empeoran} con +{UMBRAL_SALTO_LIBRES} <Pp /> de libres o más</span>}
+        {resumen.mejoran > 0 && <span className={styles.bueno}>{resumen.mejoran} con −{UMBRAL_SALTO_LIBRES} <Pp /> o menos</span>}
         {resumen.nuevas > 0 && <span>{plural(resumen.nuevas, 'nueva', 'nuevas')}</span>}
         {resumen.discontinuadas > 0 && (
           <span>{plural(resumen.discontinuadas, 'dejó de dictarse', 'dejaron de dictarse')}</span>
@@ -194,17 +198,18 @@ export default function TablaComparativa({ filas, periodoA, periodoB, carrera = 
                     {col.clave === null ? (
                       <div className={styles.thFijo}>{contenido}</div>
                     ) : (
-                      <button
-                        type="button"
-                        className={`${styles.sortBtn} ${col.numerica ? styles.sortBtnDerecha : ''}`}
-                        onClick={() => ordenarPor(col.clave)}
-                        title={`Ordenar por ${col.titulo}${col.ayuda ? `. ${col.ayuda}` : ''}`}
-                      >
-                        {contenido}
-                        <span className={activa ? styles.sortIconActive : styles.sortIcon} aria-hidden="true">
-                          {activa ? (orden.direccion === 'asc' ? <ArrowUp size={13} /> : <ArrowDown size={13} />) : <ArrowUpDown size={13} />}
-                        </span>
-                      </button>
+                      <Tooltip texto={`Ordenar por ${col.titulo}${col.ayuda ? `. ${col.ayuda}` : ''}`}>
+                        <button
+                          type="button"
+                          className={`${styles.sortBtn} ${col.numerica ? styles.sortBtnDerecha : ''}`}
+                          onClick={() => ordenarPor(col.clave)}
+                        >
+                          {contenido}
+                          <span className={activa ? styles.sortIconActive : styles.sortIcon} aria-hidden="true">
+                            {activa ? (orden.direccion === 'asc' ? <ArrowUp size={13} /> : <ArrowDown size={13} />) : <ArrowUpDown size={13} />}
+                          </span>
+                        </button>
+                      </Tooltip>
                     )}
                   </th>
                 );
@@ -245,14 +250,15 @@ export default function TablaComparativa({ filas, periodoA, periodoB, carrera = 
                   </td>
                   <td className={styles.centro}>
                     {motivos.length > 0 && (
-                      <span
-                        className={critico ? styles.alertaCritica : styles.alerta}
-                        role="img"
-                        aria-label={motivos.join('. ')}
-                        title={motivos.join(' · ')}
-                      >
-                        <TriangleAlert size={17} aria-hidden="true" />
-                      </span>
+                      <Tooltip texto={motivos.join('. ')} enfocable>
+                        <span
+                          className={critico ? styles.alertaCritica : styles.alerta}
+                          role="img"
+                          aria-label={motivos.join('. ')}
+                        >
+                          <TriangleAlert size={17} aria-hidden="true" />
+                        </span>
+                      </Tooltip>
                     )}
                   </td>
                 </tr>

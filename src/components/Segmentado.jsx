@@ -1,4 +1,5 @@
 import styles from './Segmentado.module.css';
+import Tooltip from './Tooltip';
 
 /*
  * Control segmentado: un grupo de botones pegados donde uno solo está activo.
@@ -14,17 +15,17 @@ export default function Segmentado({ etiqueta, opciones, valor, onChange }) {
         const activa = o.valor === valor;
         const bloqueada = Boolean(o.deshabilitada) && !activa;
         return (
-          <button
-            key={o.valor}
-            type="button"
-            className={activa ? `${styles.boton} ${styles.activo}` : styles.boton}
-            aria-pressed={activa}
-            title={bloqueada ? (o.motivo ?? o.ayuda) : o.ayuda}
-            aria-disabled={bloqueada || undefined}
-            onClick={() => { if (!bloqueada) onChange(o.valor); }}
-          >
-            {o.texto}
-          </button>
+          <Tooltip key={o.valor} texto={bloqueada ? (o.motivo ?? o.ayuda) : o.ayuda}>
+            <button
+              type="button"
+              className={activa ? `${styles.boton} ${styles.activo}` : styles.boton}
+              aria-pressed={activa}
+              aria-disabled={bloqueada || undefined}
+              onClick={() => { if (!bloqueada) onChange(o.valor); }}
+            >
+              {o.texto}
+            </button>
+          </Tooltip>
         );
       })}
     </div>

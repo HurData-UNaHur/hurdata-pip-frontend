@@ -86,26 +86,30 @@ function Dashboard({
       <section className={styles.kpiSection}>
         <KpiCard
           titulo="Total inscriptos"
+          ayuda="Alumnos inscriptos en las comisiones del período, la carrera, la materia y la modalidad elegidos."
           valor={totalAlumnos}
           subtitulo={plural(comisiones.length, 'comisión', 'comisiones')}
         />
         <KpiCard
           titulo="Promocionados"
+          ayuda="Alumnos que aprobaron la materia por promoción, sin necesidad de rendir final."
           valor={pctPromo}
           subtitulo={plural(totalPromo, 'alumno', 'alumnos')}
-          colorBorde="#10b981"
+          colorBorde="var(--c-emerald-500)"
         />
         <KpiCard
           titulo="Regulares"
+          ayuda="Alumnos que regularizaron la cursada pero todavía tienen que rendir el final."
           valor={pctReg}
           subtitulo={plural(totalReg, 'alumno', 'alumnos')}
-          colorBorde="#3b82f6"
+          colorBorde="var(--c-blue-500)"
         />
         <KpiCard
           titulo="Libres / abandono"
+          ayuda="Alumnos que quedaron libres: no cumplieron con la cursada. El reporte del SIU junta los abandonos y los desaprobados en esta categoría, así que no se pueden separar."
           valor={pctLibre}
           subtitulo={plural(totalLibre, 'alumno', 'alumnos')}
-          colorBorde="#ef4444"
+          colorBorde="var(--c-red-500)"
         />
       </section>
 

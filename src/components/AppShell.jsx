@@ -7,6 +7,7 @@ import styles from './AppShell.module.css';
 import logo from '../assets/logo-hurlingham.png';
 import logoGris from '../assets/logo-hurlingham-grisado.png';
 import IconoTema from './IconoTema';
+import Tooltip from './Tooltip';
 import {
   PERMISOS,
   tienePermiso,
@@ -174,38 +175,40 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
       {/* ── Barra lateral ── */}
       <aside className={`${styles.sidebar} ${menuAbierto ? styles.sidebarAbierta : ''}`} aria-label="Secciones">
         {/* Botón sobre el borde de la barra (solo escritorio) */}
-        <button
-          type="button"
-          className={styles.colapsar}
-          onClick={alternarCompresion}
-          aria-label={comprimida ? 'Expandir la barra lateral' : 'Comprimir la barra lateral'}
-          title={comprimida ? 'Expandir' : 'Comprimir'}
-        >
-          {comprimida
-            ? <ChevronRight size={16} aria-hidden="true" />
-            : <ChevronLeft size={16} aria-hidden="true" />}
-        </button>
+        <Tooltip texto={comprimida ? 'Expandir' : 'Comprimir'}>
+          <button
+            type="button"
+            className={styles.colapsar}
+            onClick={alternarCompresion}
+            aria-label={comprimida ? 'Expandir la barra lateral' : 'Comprimir la barra lateral'}
+          >
+            {comprimida
+              ? <ChevronRight size={16} aria-hidden="true" />
+              : <ChevronLeft size={16} aria-hidden="true" />}
+          </button>
+        </Tooltip>
 
         <div className={styles.interior}>
           <nav className={styles.menu}>
             {secciones.map(({ to, texto, Icono, end }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={end}
-                onClick={() => setMenuAbierto(false)}
-                title={comprimida ? texto : undefined}
-                className={({ isActive }) => (isActive ? `${styles.item} ${styles.itemActivo}` : styles.item)}
-              >
-                <Icono size={19} aria-hidden="true" />
-                <span className={styles.textoItem}>{texto}</span>
-              </NavLink>
+              <Tooltip key={to} texto={comprimida ? texto : undefined}>
+                <NavLink
+                  to={to}
+                  end={end}
+                  onClick={() => setMenuAbierto(false)}
+                  className={({ isActive }) => (isActive ? `${styles.item} ${styles.itemActivo}` : styles.item)}
+                >
+                  <Icono size={19} aria-hidden="true" />
+                  <span className={styles.textoItem}>{texto}</span>
+                </NavLink>
+              </Tooltip>
             ))}
           </nav>
 
           <div className={styles.pie}>
             {usuario && (
-              <div className={styles.perfil} title={usuario.cargo || usuario.nombre}>
+              <Tooltip texto={comprimida ? `${usuario.nombre}${usuario.cargo ? `, ${usuario.cargo}` : ''}` : undefined} enfocable>
+              <div className={styles.perfil}>
                 <span className={styles.avatar}>
                   {esAutorizado
                     ? <GraduationCap size={17} aria-hidden="true" />
@@ -216,51 +219,47 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
                   {usuario.cargo && <small>{usuario.cargo}</small>}
                 </span>
               </div>
+              </Tooltip>
             )}
 
             {puedeAprobar && (
-              <button
-                type="button"
-                className={styles.item}
-                onClick={() => {
-                  setMenuAbierto(false);
-                  setLoadingNotif(true);
-                  setIsNotifOpen(true);
-                }}
-                title="Solicitudes de registro pendientes"
-              >
-                <span className={styles.campanaWrap}>
-                  <Bell size={19} aria-hidden="true" />
-                  {pendientes > 0 && (
-                    <span className={styles.badgeNotif}>{pendientes}</span>
-                  )}
-                </span>
-                <span className={styles.textoItem}>
-                  Solicitudes{pendientes > 0 ? ` (${pendientes})` : ''}
-                </span>
-              </button>
+              <Tooltip texto="Solicitudes de registro y de recuperación de contraseña pendientes">
+                <button
+                  type="button"
+                  className={styles.item}
+                  onClick={() => {
+                    setMenuAbierto(false);
+                    setLoadingNotif(true);
+                    setIsNotifOpen(true);
+                  }}
+                >
+                  <span className={styles.campanaWrap}>
+                    <Bell size={19} aria-hidden="true" />
+                    {pendientes > 0 && (
+                      <span className={styles.badgeNotif}>{pendientes}</span>
+                    )}
+                  </span>
+                  <span className={styles.textoItem}>
+                    Solicitudes{pendientes > 0 ? ` (${pendientes})` : ''}
+                  </span>
+                </button>
+              </Tooltip>
             )}
 
-            <button
-              type="button"
-              className={styles.item}
-              onClick={toggleTheme}
-              title={comprimida ? textoTema : undefined}
-            >
-              <IconoTema theme={theme} size={19} sobreVerde />
-              <span className={styles.textoItem}>{textoTema}</span>
-            </button>
+            <Tooltip texto={comprimida ? textoTema : undefined}>
+              <button type="button" className={styles.item} onClick={toggleTheme}>
+                <IconoTema theme={theme} size={19} sobreVerde />
+                <span className={styles.textoItem}>{textoTema}</span>
+              </button>
+            </Tooltip>
 
             {onLogout && (
-              <button
-                type="button"
-                className={`${styles.item} ${styles.cerrar}`}
-                onClick={onLogout}
-                title={comprimida ? 'Cerrar sesión' : undefined}
-              >
-                <LogOut size={19} aria-hidden="true" />
-                <span className={styles.textoItem}>Cerrar sesión</span>
-              </button>
+              <Tooltip texto={comprimida ? 'Cerrar sesión' : undefined}>
+                <button type="button" className={`${styles.item} ${styles.cerrar}`} onClick={onLogout}>
+                  <LogOut size={19} aria-hidden="true" />
+                  <span className={styles.textoItem}>Cerrar sesión</span>
+                </button>
+              </Tooltip>
             )}
           </div>
         </div>
@@ -288,15 +287,16 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
       {puedeAprobar && isNotifOpen && (
         <div className={styles.modalOverlay} onClick={() => setIsNotifOpen(false)}>
           <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className={styles.modalCerrar}
-              onClick={() => setIsNotifOpen(false)}
-              title="Cerrar"
-              aria-label="Cerrar"
-            >
-              <X size={20} aria-hidden="true" />
-            </button>
+            <Tooltip texto="Cerrar">
+              <button
+                type="button"
+                className={styles.modalCerrar}
+                onClick={() => setIsNotifOpen(false)}
+                aria-label="Cerrar"
+              >
+                <X size={20} aria-hidden="true" />
+              </button>
+            </Tooltip>
 
             <h3 className={styles.modalTitulo}>Solicitudes de registro pendientes</h3>
             <p className={styles.modalSubtitulo}>

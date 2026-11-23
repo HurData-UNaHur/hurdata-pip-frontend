@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { CircleCheck, CloudUpload, FileSpreadsheet, Info, TriangleAlert } from 'lucide-react';
 import styles from './Cargas.module.css';
+import Tooltip from '../components/Tooltip';
 import {
   getCargas, uploadSiuExcel, deletePeriodo, resetDatabase, PERMISOS, tienePermiso,
 } from '../services/api';
@@ -408,25 +409,27 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
                         {c.puede_borrar && (
                           <div className={styles.accionesFila}>
                             {puedeCargar && (
+                              <Tooltip texto="Subir un Excel corregido de este mismo período y carrera">
+                                <button
+                                  type="button"
+                                  className={styles.btnAccion}
+                                  onClick={() => elegirNuevaVersion(c)}
+                                  disabled={ocupado || procesando}
+                                >
+                                  Nueva versión
+                                </button>
+                              </Tooltip>
+                            )}
+                            <Tooltip texto="Borrar estos datos del dashboard">
                               <button
                                 type="button"
-                                className={styles.btnAccion}
-                                onClick={() => elegirNuevaVersion(c)}
+                                className={`${styles.btnAccion} ${styles.btnBorrar}`}
+                                onClick={() => handleBorrar(c)}
                                 disabled={ocupado || procesando}
-                                title="Subir un Excel corregido de este mismo período y carrera"
                               >
-                                Nueva versión
+                                Borrar
                               </button>
-                            )}
-                            <button
-                              type="button"
-                              className={`${styles.btnAccion} ${styles.btnBorrar}`}
-                              onClick={() => handleBorrar(c)}
-                              disabled={ocupado || procesando}
-                              title="Borrar estos datos del dashboard"
-                            >
-                              Borrar
-                            </button>
+                            </Tooltip>
                           </div>
                         )}
                       </td>
