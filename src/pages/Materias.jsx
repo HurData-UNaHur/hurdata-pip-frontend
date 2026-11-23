@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import styles from './Materias.module.css';
+import AyudaPantalla from '../components/AyudaPantalla';
 import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
 import EstadoVacio from '../components/EstadoVacio';
@@ -116,6 +117,8 @@ function Materias({
           Identificación de cuellos de botella académicos y materias con mayor tasa de deserción
         </p>
       </header>
+
+      {estadoDatos === 'ok' && <AyudaPantalla pantalla="materias" />}
 
       {estadoDatos !== 'ok' ? (
         <EstadoVacio estado={estadoDatos} puedeCargar={puedeCargar} onReintentar={onReintentar} />

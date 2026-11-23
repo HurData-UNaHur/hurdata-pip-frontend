@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styles from './Predicciones.module.css';
+import AyudaPantalla from '../components/AyudaPantalla';
 import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
 import EstadoVacio from '../components/EstadoVacio';
@@ -64,6 +65,8 @@ function Predicciones({
           Proyección de recursantes y cálculo estimado de comisiones necesarias para el próximo período
         </p>
       </header>
+
+      {estadoDatos === 'ok' && <AyudaPantalla pantalla="predicciones" />}
 
       {estadoDatos !== 'ok' ? (
         <EstadoVacio estado={estadoDatos} puedeCargar={puedeCargar} onReintentar={onReintentar} />

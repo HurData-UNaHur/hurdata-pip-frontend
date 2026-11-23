@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styles from './Dashboard.module.css';
+import AyudaPantalla from '../components/AyudaPantalla';
 import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
 import StackedBarChart from '../components/StackedBarChart';
@@ -61,6 +62,8 @@ function Dashboard({
         <h1 className={styles.title}>Estadísticas generales</h1>
         <p className={styles.subtitle}>Panel de control académico y gestión de comisiones</p>
       </header>
+
+      {estadoDatos === 'ok' && <AyudaPantalla pantalla="dashboard" />}
 
       {estadoDatos !== 'ok' ? (
         <EstadoVacio estado={estadoDatos} puedeCargar={puedeCargar} onReintentar={onReintentar} />

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import styles from './Evolucion.module.css';
+import AyudaPantalla from '../components/AyudaPantalla';
 import EstadoVacio from '../components/EstadoVacio';
 import GraficoEvolucion from '../components/GraficoEvolucion';
 import TablaComparativa from '../components/TablaComparativa';
@@ -197,6 +198,8 @@ function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, the
           Cómo cambian la promoción y los libres de una carrera o materia a lo largo de los períodos
         </p>
       </header>
+
+      {estadoDatos === 'ok' && <AyudaPantalla pantalla="evolucion" />}
 
       {estadoDatos !== 'ok' ? (
         <EstadoVacio estado={estadoDatos} puedeCargar={puedeCargar} onReintentar={onReintentar} />

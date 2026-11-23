@@ -1,12 +1,13 @@
 import { TriangleAlert } from 'lucide-react';
 import styles from './AlertsPanel.module.css';
 import { plural } from '../utils/texto';
+import { UMBRAL_ALERTA_COMISION } from '../utils/umbrales';
 
 function AlertsPanel({ comisiones }) {
   // Filtramos las comisiones con deserción >= 40%
   const alertas = comisiones.filter((c) => {
     const pctLibre = (c.libre / c.total) * 100;
-    return pctLibre >= 40;
+    return pctLibre >= UMBRAL_ALERTA_COMISION;
   });
 
   return (
