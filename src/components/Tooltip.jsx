@@ -84,7 +84,9 @@ export default function Tooltip({ texto, children, enfocable = false }) {
         >
           {texto}
         </div>,
-        document.body,
+        // Dentro de una ventana modal el globo tiene que estar en la propia ventana: lo que está fuera
+        // de ella queda tapado por el fondo, porque el <dialog> abierto va en la capa superior.
+        objetivo.closest('dialog') ?? document.body,
       )}
     </>
   );

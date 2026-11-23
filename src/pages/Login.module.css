@@ -167,7 +167,7 @@
   width: 100%;
   height: 46px;
   padding: 0 14px;
-  border: 1px solid var(--borde);
+  border: 1px solid var(--border-input);
   border-radius: 6px;
   background-color: var(--fondo-form);
   color: var(--texto);
@@ -176,7 +176,7 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .campo input::placeholder {
-  color: var(--c-placeholder);
+  color: var(--c-slate-500);
 }
 .campo input:focus {
   outline: 2px solid var(--verde);
@@ -465,7 +465,7 @@
   width: 100%;
   height: 46px;
   padding: 0 12px;
-  border: 1px solid var(--borde);
+  border: 1px solid var(--border-input);
   border-radius: 6px;
   background-color: var(--fondo-form);
   color: var(--texto);
@@ -473,7 +473,8 @@
   font-size: 1rem;
 }
 .select:focus {
-  outline: none;
+  outline: 2px solid var(--verde);
+  outline-offset: 1px;
   border-color: var(--verde);
   box-shadow: 0 0 0 3px var(--foco);
 }
@@ -512,4 +513,7 @@
   .dosColumnas {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+:global([data-theme='dark']) .campo input::placeholder {
+  color: var(--c-slate-400);
 }

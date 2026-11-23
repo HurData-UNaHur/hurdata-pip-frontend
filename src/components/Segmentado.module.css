@@ -26,6 +26,9 @@
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
+:global([data-theme='dark']) .boton {
+  color: var(--c-slate-300);
+}
 .boton:hover:not([aria-disabled='true']):not(.activo) {
   background-color: color-mix(in srgb, var(--text-primary) 8%, transparent);
   color: var(--text-primary);

@@ -345,7 +345,7 @@ a.logoCaja:focus-visible {
 .selectRol {
   background-color: var(--bg-main);
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-input);
   border-radius: 6px;
   padding: 3px 8px;
   font-family: inherit;
@@ -541,4 +541,28 @@ a.logoCaja:focus-visible {
   font-weight: 700;
   letter-spacing: 0.12em;
   user-select: all;
+}
+/* Enlace para saltar al contenido: invisible hasta que recibe foco con el teclado */
+.saltar {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2000;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background-color: var(--c-unahur);
+  color: var(--c-white);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+.saltar:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--c-white);
+  outline-offset: 2px;
+}
+
+/* El contenido recibe el foco al saltar hasta él; no hace falta marcarlo con un contorno */
+.contenido:focus {
+  outline: none;
 }

@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import styles from './Filters.module.css';
 
 function Filters({ 
@@ -15,6 +16,7 @@ function Filters({
     showMateria = true,
     showModalidad = true
 }) {
+    const id = useId();
     // Solo las carreras cargadas en la DB (sin valores por defecto inventados)
     const carrerasAMostrar = listaCarreras || [];
 
@@ -25,8 +27,8 @@ function Filters({
         <section className={styles.filtersContainer}>
             {/* Período */}
             <div className={styles.filterGroup}>
-                <label className={styles.label}>Período</label>
-                <select 
+                <label htmlFor={`${id}-periodo`} className={styles.label}>Período</label>
+                <select id={`${id}-periodo`} 
                     className={styles.select} 
                     value={periodo} 
                     onChange={(e) => setPeriodo(e.target.value)}
@@ -45,8 +47,8 @@ function Filters({
 
             {/* Carrera Dinámica */}
             <div className={styles.filterGroup}>
-                <label className={styles.label}>Carrera</label>
-                <select 
+                <label htmlFor={`${id}-carrera`} className={styles.label}>Carrera</label>
+                <select id={`${id}-carrera`} 
                     className={styles.select} 
                     value={valorCarreraSeleccionada} 
                     onChange={(e) => setCarrera && setCarrera(e.target.value)}
@@ -63,8 +65,8 @@ function Filters({
             {/* Materia */}
             {showMateria && (
             <div className={styles.filterGroup}>
-                <label className={styles.label}>Materia</label>
-                <select 
+                <label htmlFor={`${id}-materia`} className={styles.label}>Materia</label>
+                <select id={`${id}-materia`} 
                     className={styles.select} 
                     value={materia} 
                     onChange={(m) => setMateria(m.target.value)}
@@ -82,8 +84,8 @@ function Filters({
             {/* Modalidad */}
             {showModalidad && (
             <div className={styles.filterGroup}>
-                <label className={styles.label}>Modalidad</label>
-                <select 
+                <label htmlFor={`${id}-modalidad`} className={styles.label}>Modalidad</label>
+                <select id={`${id}-modalidad`} 
                     className={styles.select} 
                     value={modalidad} 
                     onChange={(mo) => setModalidad(mo.target.value)}

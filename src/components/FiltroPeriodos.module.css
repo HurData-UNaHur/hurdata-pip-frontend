@@ -34,7 +34,7 @@
   min-width: 12rem;
   max-width: 20rem;
   padding: 0 10px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   background-color: var(--bg-card);
   color: var(--text-primary);
@@ -82,7 +82,7 @@
   min-height: 36px;
   min-width: 11rem;
   padding: 0 10px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-input);
   border-radius: 6px;
   background-color: var(--bg-card);
   color: var(--text-primary);

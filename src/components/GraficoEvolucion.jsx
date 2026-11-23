@@ -184,7 +184,8 @@ export default function GraficoEvolucion({ puntos, theme }) {
         })}
       </div>
 
-      <div style={{ width: '100%', height: ALTO }}>
+      {/* El dibujo no se puede leer con lector de pantalla: sus datos van en la tabla de abajo */}
+      <div style={{ width: '100%', height: ALTO }} aria-hidden="true">
         <ResponsiveContainer initialDimension={{ width: 820, height: ALTO }}>
           <ComposedChart data={datos} margin={{ top: 12, right: 64, bottom: 4, left: 0 }}>
             <defs>
@@ -245,6 +246,31 @@ export default function GraficoEvolucion({ puntos, theme }) {
         </ResponsiveContainer>
       </div>
 
+      <table className="sr-only">
+        <caption>Datos del gráfico: porcentaje de cada resultado por período</caption>
+        <thead>
+          <tr>
+            <th scope="col">Período</th>
+            <th scope="col">Inscriptos</th>
+            <th scope="col">Promoción</th>
+            <th scope="col">Libres</th>
+            <th scope="col">Regulares</th>
+            <th scope="col">Desaprobados</th>
+          </tr>
+        </thead>
+        <tbody>
+          {puntos.map((p) => (
+            <tr key={p.label}>
+              <th scope="row">{formatearPeriodo(p.label)}{p.parcial ? ' (datos parciales)' : ''}</th>
+              <td>{formatearNumero(p.inscriptos)}</td>
+              <td>{p.pctPromo} %</td>
+              <td>{p.pctLibre} %</td>
+              <td>{p.pctReg} %</td>
+              <td>{p.pctDesap} %</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       {hayParcial && (
         <p className={styles.nota}>
           <span className={styles.notaPunto} aria-hidden="true" />

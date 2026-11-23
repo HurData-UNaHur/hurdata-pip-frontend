@@ -18,6 +18,9 @@
 .info {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
   margin-left: 4px;
   padding: 0;
   border: none;
@@ -45,6 +48,8 @@
 
 /* El valor numérico */
 .valor {
+  /* En modo claro el color del indicador se oscurece para que el número llegue a 3:1 (texto grande) */
+  color: color-mix(in srgb, var(--kpi-color) 72%, var(--c-black));
   font-size: 1.8rem;
   margin: 0;
   color: var(--c-unahur); /* Verde destacado UNaHur */
@@ -60,4 +65,7 @@
   -webkit-box-orient: vertical;
   line-clamp: 2;
   overflow: hidden;
+}
+:global([data-theme='dark']) .valor {
+  color: var(--kpi-color);
 }

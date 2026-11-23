@@ -1,0 +1,16 @@
+/* El <dialog> es solo el soporte: la tarjeta visual la dibuja el contenido */
+.dialogo {
+  /* El reset global (* { margin: 0 }) le saca al <dialog> el margin: auto con el que se centra */
+  margin: auto;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  width: calc(100% - 32px);
+  max-width: 620px;
+  max-height: none;
+  overflow: visible;
+}
+.dialogo::backdrop {
+  background-color: color-mix(in srgb, var(--c-slate-900) 65%, transparent);
+}

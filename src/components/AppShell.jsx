@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { useEffect, useId, useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import {
   Bell, BookOpen, Calculator, ChartLine, Check, ChevronLeft, ChevronRight, GraduationCap, House, KeyRound, LogOut, Menu, Upload, User, X,
 } from 'lucide-react';
@@ -8,6 +8,7 @@ import logo from '../assets/logo-hurlingham.png';
 import logoGris from '../assets/logo-hurlingham-grisado.png';
 import IconoTema from './IconoTema';
 import Tooltip from './Tooltip';
+import Dialogo from './Dialogo';
 import { useToast } from './contextoToast';
 import {
   PERMISOS,
@@ -30,8 +31,24 @@ const ROLES_DISPONIBLES = [
  * el usuario, el tema y cerrar sesión), contenido y footer. En pantallas chicas la barra lateral
  * es un menú deslizable; en escritorio se puede comprimir a solo íconos.
  */
+// Título de la pestaña según la sección: cada pantalla tiene que tener el suyo (WCAG 2.4.2)
+const TITULOS = {
+  '/': 'Inicio',
+  '/materias': 'Materias',
+  '/evolucion': 'Evolución',
+  '/predicciones': 'Predicciones',
+  '/cargas': 'Cargas',
+};
+
 function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    const seccion = TITULOS[pathname];
+    document.title = seccion ? `${seccion} - HurData Académico` : 'HurData Académico';
+  }, [pathname]);
+
   const { avisar } = useToast();
+  const idTituloSolicitudes = useId();
   const [menuAbierto, setMenuAbierto] = useState(false); // barra lateral (celular)
   // Barra lateral comprimida (solo íconos, en escritorio). Se recuerda entre sesiones.
   const [comprimida, setComprimida] = useState(() => localStorage.getItem('hurdata_sidebar_comprimida') === '1');
@@ -167,6 +184,9 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
 
   return (
     <div className={comprimida ? `${styles.shell} ${styles.comprimido}` : styles.shell}>
+      {/* Primer elemento de la página: con Tab aparece y salta la cabecera y el menú */}
+      <a href="#contenido" className={styles.saltar}>Saltar al contenido</a>
+
       {/* ── Cabecera ── */}
       <header className={styles.header}>
         <button
@@ -288,7 +308,7 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
       )}
 
       {/* ── Contenido ── */}
-      <main className={styles.contenido}>{children}</main>
+      <main id="contenido" tabIndex={-1} className={styles.contenido}>{children}</main>
 
       {/* ── Footer ── */}
       <footer className={styles.footer}>
@@ -298,8 +318,8 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
 
       {/* ── Modal de aprobación de solicitudes de registro ── */}
       {puedeAprobar && isNotifOpen && (
-        <div className={styles.modalOverlay} onClick={() => setIsNotifOpen(false)}>
-          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+        <Dialogo labelledBy={idTituloSolicitudes} onCerrar={() => setIsNotifOpen(false)}>
+          <div className={styles.modalCard}>
             <Tooltip texto="Cerrar">
               <button
                 type="button"
@@ -311,7 +331,7 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
               </button>
             </Tooltip>
 
-            <h3 className={styles.modalTitulo}>Solicitudes de registro pendientes</h3>
+            <h2 id={idTituloSolicitudes} className={styles.modalTitulo}>Solicitudes pendientes</h2>
             <p className={styles.modalSubtitulo}>
               Revisá los datos, modificá el rol asignado si corresponde y aprobá o rechazá la solicitud.
             </p>
@@ -453,7 +473,7 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
               </section>
             )}
           </div>
-        </div>
+        </Dialogo>
       )}
     </div>
   );

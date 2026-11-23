@@ -16,6 +16,7 @@ body {
   --c-emerald-500: #10b981;
   --c-indigo-500: #6366f1;
   --c-blue-500: #3b82f6;
+  --c-blue-600: #2563eb;
   --c-green-200: #bbf7d0;
   --c-green-400: #4ade80;
   --c-green-50: #f0fdf4;
@@ -71,6 +72,7 @@ body {
   --skeleton-brillo: var(--c-slate-100);
   --bg-track: var(--c-slate-200);      /* pista de los controles segmentados */
   --border-strong: var(--c-slate-300);
+  --border-input: var(--c-placeholder); /* borde de campos de formulario: 3,5:1 sobre blanco (WCAG 1.4.11) */
   --bg-franja: var(--c-slate-100);     /* franja de filtros dentro de una tarjeta */
 }
 
@@ -88,6 +90,7 @@ body {
   --skeleton-brillo: var(--c-slate-600);
   --bg-track: var(--c-slate-700);
   --border-strong: var(--c-slate-700);
+  --border-input: var(--c-slate-500);
   --bg-franja: color-mix(in srgb, var(--c-slate-700) 55%, var(--c-slate-800));
 }
 
@@ -126,5 +129,30 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .skeleton {
     animation: none;
+  }
+}
+
+/* Texto que solo leen los lectores de pantalla (por ejemplo, la tabla de datos de un gráfico) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Quien pide menos movimiento no recibe animaciones ni transiciones, en toda la app */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

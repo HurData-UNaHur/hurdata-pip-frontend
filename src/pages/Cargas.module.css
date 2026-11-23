@@ -76,7 +76,10 @@
 .dropzone:hover,
 .dropzone:focus-visible {
   border-color: var(--c-unahur);
-  outline: none;
+}
+.dropzone:focus-visible {
+  outline: 2px solid var(--c-unahur);
+  outline-offset: 2px;
 }
 
 .dropzoneActiva {
@@ -184,7 +187,7 @@
 .select {
   padding: 6px 10px;
   border-radius: 6px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-input);
   background-color: var(--bg-card);
   color: var(--text-primary);
   font-size: 0.82rem;
@@ -270,51 +273,30 @@
 
 /* Ícono (i) con tooltip: quién y cuándo se reemplazó o borró la carga */
 .info {
-  position: relative;
   display: inline-flex;
   align-items: center;
-  margin-left: 6px;
+  justify-content: center;
+  /* El botón mide al menos 24 px: es el tamaño mínimo de un objetivo táctil (WCAG 2.5.8) */
+  min-width: 24px;
+  min-height: 24px;
+  margin-left: 2px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
   color: var(--text-secondary);
   cursor: help;
   vertical-align: middle;
-  border-radius: 50%;
 }
-
-.info:hover,
-.info:focus-visible {
+.info:hover {
   color: var(--text-primary);
-  outline: none;
 }
-
 .info:focus-visible {
-  box-shadow: 0 0 0 2px var(--c-unahur);
+  outline: 2px solid var(--c-unahur);
+  outline-offset: 1px;
 }
-
-.info::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: calc(100% + 6px);
-  right: 0;
-  z-index: 10;
-  padding: 4px 8px;
-  border-radius: 4px;
-  background-color: var(--c-slate-900);
-  color: var(--c-slate-50);
-  border: 1px solid var(--c-slate-700);
-  font-family: inherit;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 0.72rem;
-  white-space: nowrap;
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--c-black) 25%, transparent);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s ease;
-}
-
-.info:hover::after,
-.info:focus-visible::after {
-  opacity: 1;
+:global([data-theme='dark']) .info:focus-visible {
+  outline-color: var(--c-green-500);
 }
 
 /* Acciones por fila: discretas en la tabla */

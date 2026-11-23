@@ -6,6 +6,13 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  left: auto;
+  bottom: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
   width: 24rem;
   max-width: calc(100% - 32px); /* en un elemento fixed, el 100% es el ancho de la ventana */
   pointer-events: none; /* solo los avisos reciben clics, no el espacio entre ellos */

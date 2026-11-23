@@ -43,6 +43,7 @@ function Aviso({ aviso, onCerrar }) {
 export default function ToastProvider({ children }) {
   const [avisos, setAvisos] = useState([]);
   const siguiente = useRef(1);
+  const contenedor = useRef(null);
 
   const cerrar = useCallback((id) => setAvisos((lista) => lista.filter((a) => a.id !== id)), []);
 
@@ -55,11 +56,25 @@ export default function ToastProvider({ children }) {
 
   const valor = useMemo(() => ({ avisar, cerrar }), [avisar, cerrar]);
 
+  // Los avisos van en la capa superior del navegador (popover), como las ventanas modales. Cada vez
+  // que cambia la lista se vuelve a abrir, así queda por encima de una ventana que se abrió después
+  // (por ejemplo, el aviso de "solicitud aprobada" con la ventana de solicitudes todavía abierta).
+  useEffect(() => {
+    const el = contenedor.current;
+    if (!el || typeof el.showPopover !== 'function') return;
+    try {
+      if (el.matches(':popover-open')) el.hidePopover();
+      if (avisos.length > 0) el.showPopover();
+    } catch {
+      // Sin soporte de popover el contenedor se ve igual, con posición fija
+    }
+  }, [avisos]);
+
   return (
     <ContextoToast.Provider value={valor}>
       {children}
       {createPortal(
-        <div className={styles.contenedor}>
+        <div ref={contenedor} popover="manual" className={styles.contenedor}>
           {avisos.map((a) => (
             <Aviso key={a.id} aviso={a} onCerrar={() => cerrar(a.id)} />
           ))}

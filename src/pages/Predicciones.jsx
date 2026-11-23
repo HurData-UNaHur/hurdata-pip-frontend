@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import styles from './Predicciones.module.css';
 import AyudaPantalla from '../components/AyudaPantalla';
 import KpiCard from '../components/KpiCard';
@@ -19,6 +19,7 @@ function Predicciones({
   setCarrera,
   listaCarreras
 }) {
+  const idCampos = useId();
   const [modalidad, setModalidad] = useState('todas');
   const [tasaRecursado, setTasaRecursado] = useState(65);
   const [cupoPorAula, setCupoPorAula] = useState('35');
@@ -124,8 +125,9 @@ function Predicciones({
           <h2 className={styles.cardTitle}>Parámetros de Simulación</h2>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Seleccionar Materia</label>
+            <label htmlFor={`${idCampos}-materia`} className={styles.label}>Seleccionar Materia</label>
             <select
+              id={`${idCampos}-materia`}
               className={styles.select}
               value={materiaData?.id || ''}
               onChange={(e) => setMateriaSeleccionada(e.target.value)}
@@ -140,10 +142,11 @@ function Predicciones({
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>
+            <label htmlFor={`${idCampos}-tasa`} className={styles.label}>
               Tasa estimada de re-inscripción: <strong>{tasaRecursado}%</strong>
             </label>
             <input
+              id={`${idCampos}-tasa`}
               type="range"
               min="20"
               max="100"
@@ -154,8 +157,9 @@ function Predicciones({
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Cupo máximo por comisión (alumnos)</label>
+            <label htmlFor={`${idCampos}-cupo`} className={styles.label}>Cupo máximo por comisión (alumnos)</label>
             <input
+              id={`${idCampos}-cupo`}
               type="number"
               min="1"
               max="99999"

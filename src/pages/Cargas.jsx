@@ -274,7 +274,7 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
             }}
             role="button"
             tabIndex={0}
-            aria-label="Elegir archivo .xlsx"
+            aria-label={archivo ? `Archivo elegido: ${archivo.name}. Elegir otro archivo` : 'Elegir archivo .xlsx'}
           >
             {archivo ? (
               <span>
@@ -408,9 +408,11 @@ function Cargas({ usuario, onUploadSuccess, onDatosBorrados }) {
                       <td className={styles.sinCorte}>
                         <span className={badge.clase}>{badge.texto}</span>
                         {infoBaja && (
-                          <span className={styles.info} tabIndex={0} aria-label={infoBaja} data-tooltip={infoBaja}>
-                            <Info size={15} aria-hidden="true" />
-                          </span>
+                          <Tooltip texto={infoBaja}>
+                            <button type="button" className={styles.info} aria-label={infoBaja}>
+                              <Info size={15} aria-hidden="true" />
+                            </button>
+                          </Tooltip>
                         )}
                       </td>
                       <td className={styles.sinCorte}>

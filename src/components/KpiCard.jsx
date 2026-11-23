@@ -18,7 +18,7 @@ function KpiCard({ titulo, valor, subtitulo, subtituloCompleto, colorBorde, ayud
   const color = colorBorde || COLOR_NEUTRO;
 
   return (
-    <div className={styles.card} style={{ borderTopColor: color }}>
+    <div className={styles.card} style={{ borderTopColor: color, '--kpi-color': color }}>
       <span className={styles.titulo}>
         {titulo}
         {ayuda && (
@@ -29,7 +29,7 @@ function KpiCard({ titulo, valor, subtitulo, subtituloCompleto, colorBorde, ayud
           </Tooltip>
         )}
       </span>
-      <h2 className={styles.valor} style={{ color }}>{valor}</h2>
+      <p className={styles.valor}>{valor}</p>
       {subtitulo && (
         <Tooltip texto={subtituloCompleto || undefined} enfocable>
           <span className={styles.subtitulo}>{subtitulo}</span>
