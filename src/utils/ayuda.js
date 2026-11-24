@@ -73,13 +73,14 @@ export const AYUDA = {
         items: [
           'Recursantes esperados = alumnos libres de la materia × tasa de recursado.',
           'Comisiones sugeridas = recursantes esperados ÷ cupo por comisión, redondeado hacia arriba.',
-          'Aulas adicionales = comisiones sugeridas − comisiones que la materia tiene hoy (nunca menos de cero).',
+          'Comisiones adicionales = comisiones sugeridas − comisiones que la materia tiene hoy (nunca menos de cero).',
         ],
       },
       {
         titulo: 'Tené en cuenta',
         items: [
           'Es una estimación con los datos que elegís, no un pronóstico estadístico: la tasa de recursado no sale de los datos, la define quien usa la pantalla.',
+          'Tope de seguridad: la tasa va de 20 % a 100 % y el cupo de 10 a 100 alumnos por comisión. Si se escribe un cupo fuera de ese rango, el cálculo usa el límite más cercano; así un error de tipeo no pide cientos de comisiones.',
         ],
       },
     ],

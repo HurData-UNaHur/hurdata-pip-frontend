@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Materias from './pages/Materias';
 import Predicciones from './pages/Predicciones';
 import Cargas from './pages/Cargas';
+import Cuenta from './pages/Cuenta';
 import EstadoVacio from './components/EstadoVacio';
 // Evolución usa Recharts (pesado): se descarga recién cuando alguien entra a la página
 const Evolucion = lazy(() => import('./pages/Evolucion'));
@@ -408,6 +409,7 @@ function App() {
               </Suspense>
             }
           />
+          <Route path="/cuenta" element={<Cuenta />} />
           {tienePermiso(usuario, PERMISOS.VER_CARGAS) && (
             <Route
               path="/cargas"

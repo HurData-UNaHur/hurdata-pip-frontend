@@ -326,6 +326,25 @@ export const resolverSolicitudRecuperacion = (idSolicitud, accion) =>
 
 /*
  * ============================================================================
+ * MI CUENTA (usuario con sesión iniciada)
+ * ============================================================================
+ */
+/* Datos de la cuenta: { usuario, nombre, cargo, role, instituto } (instituto puede ser null) */
+export const getPerfil = () =>
+  fetchProtegido(`${API_URL}/api/perfil`, { method: 'GET' }, 'No se pudieron cargar los datos de la cuenta.');
+
+export const cambiarPassword = (passwordActual, passwordNueva) =>
+  fetchProtegido(
+    `${API_URL}/api/perfil/cambiar-password`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password_actual: passwordActual, password_nueva: passwordNueva }),
+    },
+    'No se pudo cambiar la contraseña. Probá de nuevo.',
+  );
+/*
+ * ============================================================================
  * INSTITUTOS
  * ============================================================================
  */

@@ -170,6 +170,18 @@ a.logoCaja:focus-visible {
   gap: 12px;
   padding: 6px 14px 10px;
   color: var(--c-white);
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.perfil:hover,
+.perfilActivo {
+  background-color: color-mix(in srgb, var(--c-white) 10%, transparent);
+}
+
+.perfil:focus-visible {
+  outline: 2px solid var(--c-white);
+  outline-offset: -2px;
 }
 .avatar {
   flex-shrink: 0;

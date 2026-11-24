@@ -1,5 +1,6 @@
 import { useId, useState } from 'react';
 import styles from './Predicciones.module.css';
+import { acotar, CUPO_MAX, CUPO_MIN, TASA_MAX, TASA_MIN } from '../utils/simulador';
 import AyudaPantalla from '../components/AyudaPantalla';
 import KpiCard from '../components/KpiCard';
 import Filters from '../components/Filters';
@@ -35,15 +36,18 @@ function Predicciones({
 
   // Evitar divisiones por cero o valores nulos
   const cupoNumerico = Number(cupoPorAula);
-  const cupoValido = cupoNumerico > 0 ? cupoNumerico : 1;
+  // Los cálculos usan siempre valores dentro de los topes (utils/simulador.js)
+  const cupoValido = acotar(cupoNumerico || CUPO_MIN, CUPO_MIN, CUPO_MAX);
+  const cupoFueraDeRango = cupoPorAula !== '' && (cupoNumerico < CUPO_MIN || cupoNumerico > CUPO_MAX);
+  const tasaValida = acotar(tasaRecursado, TASA_MIN, TASA_MAX);
 
   const libresActuales = materiaData?.libresActuales ?? materiaData?.libre ?? 0;
   const comisionesActuales = materiaData?.comisionesActuales ?? materiaData?.comisiones ?? 0;
 
   // Cálculos proyectados
-  const recursantesEstimados = Math.round(libresActuales * (tasaRecursado / 100));
+  const recursantesEstimados = Math.round(libresActuales * (tasaValida / 100));
   const comisionesNecesarias = Math.ceil(recursantesEstimados / cupoValido);
-  const aulasExtra = Math.max(0, comisionesNecesarias - comisionesActuales);
+  const comisionesExtra = Math.max(0, comisionesNecesarias - comisionesActuales);
 
   // Manejador del cupo con validaciones de longitud
   const handleCupoChange = (e) => {
@@ -61,7 +65,7 @@ function Predicciones({
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Simulador de vacantes y planificación de aulas</h1>
+        <h1 className={styles.title}>Simulador de comisiones</h1>
         <p className={styles.subtitle}>
           Proyección de recursantes y cálculo estimado de comisiones necesarias para el próximo período
         </p>
@@ -107,14 +111,14 @@ function Predicciones({
           titulo="Comisiones sugeridas"
           ayuda="Recursantes esperados divididos por el cupo por comisión, redondeado hacia arriba."
           valor={comisionesNecesarias}
-          subtitulo={`Cupo estimado de ${cupoValido} alumnos/aula`}
+          subtitulo={`Cupo estimado de ${cupoValido} alumnos/comisión`}
         />
         <KpiCard
-          titulo="Aulas adicionales"
+          titulo="Comisiones adicionales"
           ayuda="Comisiones sugeridas menos las que tiene hoy la materia. Si da cero, la capacidad actual alcanza."
-          valor={aulasExtra > 0 ? `+${aulasExtra}` : 'Sin extra'}
-          subtitulo={aulasExtra > 0 ? 'Apertura recomendada' : 'Capacidad suficiente'}
-          colorBorde={aulasExtra > 0 ? 'var(--c-red-500)' : 'var(--c-emerald-500)'}
+          valor={comisionesExtra > 0 ? `+${comisionesExtra}` : 'Sin extra'}
+          subtitulo={comisionesExtra > 0 ? 'Apertura recomendada' : 'Capacidad suficiente'}
+          colorBorde={comisionesExtra > 0 ? 'var(--c-red-500)' : 'var(--c-emerald-500)'}
         />
       </section>
 
@@ -148,8 +152,8 @@ function Predicciones({
             <input
               id={`${idCampos}-tasa`}
               type="range"
-              min="20"
-              max="100"
+              min={TASA_MIN}
+              max={TASA_MAX}
               value={tasaRecursado}
               onChange={(e) => setTasaRecursado(Number(e.target.value))}
               className={styles.rangeInput}
@@ -161,13 +165,19 @@ function Predicciones({
             <input
               id={`${idCampos}-cupo`}
               type="number"
-              min="1"
-              max="99999"
+              min={CUPO_MIN}
+              max={CUPO_MAX}
               value={cupoPorAula}
               onChange={handleCupoChange}
               placeholder="Ej. 35"
               className={styles.input}
+              aria-describedby={cupoFueraDeRango ? `${idCampos}-cupo-aviso` : undefined}
             />
+            {cupoFueraDeRango && (
+              <p id={`${idCampos}-cupo-aviso`} className={styles.aviso} role="status">
+                El cupo tiene que estar entre {CUPO_MIN} y {CUPO_MAX}. El cálculo usa {cupoValido}.
+              </p>
+            )}
           </div>
         </div>
 
@@ -197,12 +207,12 @@ function Predicciones({
               </span>
             </div>
             <div className={styles.resultItem}>
-              <span>Aulas nuevas a asignar:</span>
+              <span>Comisiones nuevas a asignar:</span>
               <span
                 className={styles.resultValue}
-                style={{ color: aulasExtra > 0 ? 'var(--c-red-500)' : 'var(--c-emerald-500)' }}
+                style={{ color: comisionesExtra > 0 ? 'var(--c-red-500)' : 'var(--c-emerald-500)' }}
               >
-                {aulasExtra}
+                {comisionesExtra}
               </span>
             </div>
           </div>

@@ -36,7 +36,8 @@ const TITULOS = {
   '/': 'Inicio',
   '/materias': 'Materias',
   '/evolucion': 'Evolución',
-  '/predicciones': 'Predicciones',
+  '/predicciones': 'Simulador de comisiones',
+  '/cuenta': 'Mi cuenta',
   '/cargas': 'Cargas',
 };
 
@@ -79,7 +80,7 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
     { to: '/', texto: 'Inicio', Icono: House, end: true },
     { to: '/materias', texto: 'Materias', Icono: BookOpen },
     { to: '/evolucion', texto: 'Evolución', Icono: ChartLine },
-    { to: '/predicciones', texto: 'Predicciones', Icono: Calculator },
+    { to: '/predicciones', texto: 'Simulador de comisiones', Icono: Calculator },
     ...(puedeVerCargas ? [{ to: '/cargas', texto: 'Cargas', Icono: Upload }] : []),
   ];
 
@@ -240,8 +241,13 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
 
           <div className={styles.pie}>
             {usuario && (
-              <Tooltip texto={comprimida ? `${usuario.nombre}${usuario.cargo ? `, ${usuario.cargo}` : ''}` : undefined} enfocable>
-              <div className={styles.perfil}>
+              <Tooltip texto={comprimida ? `${usuario.nombre}${usuario.cargo ? `, ${usuario.cargo}` : ''}` : undefined}>
+              <NavLink
+                  to="/cuenta"
+                  onClick={() => setMenuAbierto(false)}
+                  aria-label={`Mi cuenta: ${usuario.nombre}`}
+                  className={({ isActive }) => (isActive ? [styles.perfil, styles.perfilActivo].join(' ') : styles.perfil)}
+                >
                 <span className={styles.avatar}>
                   {esAutorizado
                     ? <GraduationCap size={17} aria-hidden="true" />
@@ -251,7 +257,7 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
                   <strong>{usuario.nombre}</strong>
                   {usuario.cargo && <small>{usuario.cargo}</small>}
                 </span>
-              </div>
+              </NavLink>
               </Tooltip>
             )}
 
