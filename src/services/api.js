@@ -39,6 +39,7 @@ export const PERMISOS = {
   VER_CARGAS: 'cargas:ver',
   VER_TODAS_LAS_CARGAS: 'cargas:ver_todas',
   APROBAR_REGISTROS: 'registros:aprobar',
+  GESTIONAR_USUARIOS: 'usuarios:gestionar',
 };
 
 export const tienePermiso = (usuario, permiso) =>
@@ -249,7 +250,8 @@ export const loginUnahur = async (usuario, password) => {
     throw new Error('No se pudo conectar con el servidor.');
   }
 
-  if (response.status === 401) {
+  // 401: credenciales incorrectas. 403: la cuenta existe pero un administrador revocó su acceso.
+  if (response.status === 401 || response.status === 403) {
     const errData = await response.json().catch(() => ({}));
     throw new Error(errData.detail || 'Usuario o contraseña incorrectos.');
   }
@@ -343,6 +345,42 @@ export const cambiarPassword = (passwordActual, passwordNueva) =>
     },
     'No se pudo cambiar la contraseña. Probá de nuevo.',
   );
+/*
+ * ============================================================================
+ * GESTIÓN DE USUARIOS E HISTORIAL DE SOLICITUDES
+ * ============================================================================
+ */
+
+/* Solo Admin. Devuelve { usuarios: [{ usuario, nombre, cargo, role, activo, instituto }] } */
+export const getUsuarios = () =>
+  fetchProtegido(`${API_URL}/api/usuarios`, { method: 'GET' }, 'No se pudo obtener la lista de usuarios.');
+
+const postJson = (ruta, cuerpo, mensajeError) =>
+  fetchProtegido(
+    `${API_URL}${ruta}`,
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cuerpo) },
+    mensajeError,
+  );
+
+export const cambiarRolUsuario = (usuario, rol) =>
+  postJson(`/api/usuarios/${encodeURIComponent(usuario)}/rol`, { rol }, 'No se pudo cambiar el rol.');
+
+/* activo=false revoca el acceso; activo=true lo reactiva */
+export const cambiarEstadoUsuario = (usuario, activo) =>
+  postJson(
+    `/api/usuarios/${encodeURIComponent(usuario)}/estado`,
+    { activo },
+    activo ? 'No se pudo reactivar el acceso.' : 'No se pudo revocar el acceso.',
+  );
+
+/* Admin: todas las solicitudes resueltas. Directivo: las de su instituto. */
+export const getHistorialSolicitudes = () =>
+  fetchProtegido(
+    `${API_URL}/api/registro/historial`,
+    { method: 'GET' },
+    'No se pudo obtener el historial de solicitudes.',
+  );
+
 /*
  * ============================================================================
  * INSTITUTOS

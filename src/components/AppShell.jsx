@@ -1,7 +1,7 @@
 import { useEffect, useId, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import {
-  Bell, BookOpen, Calculator, ChartLine, Check, ChevronLeft, ChevronRight, GraduationCap, House, KeyRound, LogOut, Menu, Upload, User, X,
+  Bell, BookOpen, Calculator, ChartLine, Check, ChevronLeft, ChevronRight, GraduationCap, History, House, KeyRound, LogOut, Menu, Upload, User, Users, X,
 } from 'lucide-react';
 import styles from './AppShell.module.css';
 import logo from '../assets/logo-hurlingham.png';
@@ -38,6 +38,8 @@ const TITULOS = {
   '/evolucion': 'Evolución',
   '/predicciones': 'Simulador de comisiones',
   '/cuenta': 'Mi cuenta',
+  '/usuarios': 'Usuarios',
+  '/historial': 'Historial de solicitudes',
   '/cargas': 'Cargas',
 };
 
@@ -75,6 +77,7 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
   const esAutorizado = Boolean(usuario) && usuario.role !== 'invitado';
   const puedeVerCargas = tienePermiso(usuario, PERMISOS.VER_CARGAS);
   const puedeAprobar = tienePermiso(usuario, PERMISOS.APROBAR_REGISTROS);
+  const puedeGestionar = tienePermiso(usuario, PERMISOS.GESTIONAR_USUARIOS);
 
   const secciones = [
     { to: '/', texto: 'Inicio', Icono: House, end: true },
@@ -82,6 +85,8 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
     { to: '/evolucion', texto: 'Evolución', Icono: ChartLine },
     { to: '/predicciones', texto: 'Simulador de comisiones', Icono: Calculator },
     ...(puedeVerCargas ? [{ to: '/cargas', texto: 'Cargas', Icono: Upload }] : []),
+    ...(puedeGestionar ? [{ to: '/usuarios', texto: 'Usuarios', Icono: Users }] : []),
+    ...(puedeAprobar ? [{ to: '/historial', texto: 'Historial', Icono: History }] : []),
   ];
 
   // Cargar solicitudes pendientes cuando puedeAprobar es true y al abrir el modal

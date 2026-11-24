@@ -1,0 +1,210 @@
+/* Estilos compartidos por las pantallas Usuarios e Historial de solicitudes */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  font-size: 0.8rem;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.mensaje {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--c-red-200);
+  border-radius: 6px;
+  background-color: var(--c-red-50);
+  color: var(--c-red-700);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.error span {
+  flex: 1;
+}
+
+/* ── Tabla ── */
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+  min-width: 760px;
+}
+
+.table th {
+  background-color: var(--bg-subtle);
+  color: var(--text-primary);
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--border-color);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.persona strong {
+  display: block;
+  font-weight: 600;
+}
+
+.persona small,
+.detalle {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.inactiva td {
+  color: var(--text-secondary);
+}
+
+/* ── Etiquetas de estado ── */
+.etiqueta {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid;
+}
+
+.ok {
+  background-color: var(--c-green-50);
+  color: var(--c-green-800);
+  border-color: var(--c-green-200);
+}
+
+.no {
+  background-color: var(--c-red-50);
+  color: var(--c-red-800);
+  border-color: var(--c-red-200);
+}
+
+:global([data-theme='dark']) .ok {
+  background-color: color-mix(in srgb, var(--c-green-500) 18%, transparent);
+  color: var(--c-green-200);
+  border-color: color-mix(in srgb, var(--c-green-500) 45%, transparent);
+}
+
+:global([data-theme='dark']) .no {
+  background-color: color-mix(in srgb, var(--c-red-500) 18%, transparent);
+  color: var(--c-red-200);
+  border-color: color-mix(in srgb, var(--c-red-500) 45%, transparent);
+}
+
+/* ── Controles de la fila ── */
+.selectRol {
+  min-height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--border-input);
+  border-radius: 6px;
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+
+.selectRol:focus-visible,
+.boton:focus-visible {
+  outline: 2px solid var(--c-unahur);
+  outline-offset: 2px;
+}
+
+:global([data-theme='dark']) .selectRol:focus-visible,
+:global([data-theme='dark']) .boton:focus-visible {
+  outline-color: var(--c-green-500);
+}
+
+.selectRol:disabled,
+.boton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.boton:hover:not(:disabled) {
+  background-color: var(--bg-subtle);
+}
+
+.botonPeligro {
+  composes: boton;
+  color: var(--c-red-700);
+  border-color: var(--c-red-300);
+}
+
+:global([data-theme='dark']) .botonPeligro {
+  color: var(--c-red-300);
+  border-color: color-mix(in srgb, var(--c-red-500) 55%, transparent);
+}
+
+.tuCuenta {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
