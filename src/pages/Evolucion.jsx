@@ -303,7 +303,7 @@ function Evolucion({ estadoDatos, puedeCargar, onReintentar, carreraInicial, the
                     materia), así que no hay cambios para calcular.
                   </p>
                 )}
-                <TablaComparativa filas={filasComparativa} periodoA={periodoA} periodoB={periodoB} carrera={carrera} />
+                <TablaComparativa filas={filasComparativa} periodoA={periodoA} periodoB={periodoB} carrera={carrera} theme={theme} />
               </>
             )}
           </section>

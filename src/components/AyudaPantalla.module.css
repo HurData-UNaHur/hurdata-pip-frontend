@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
+  gap: 0;
 }
 
 .boton {
@@ -25,6 +25,9 @@
   background-color: var(--bg-subtle);
   color: var(--text-primary);
 }
+.botonAbierto {
+  margin-bottom: 10px;
+}
 .boton:focus-visible {
   outline: 2px solid var(--c-unahur);
   outline-offset: 2px;
@@ -33,15 +36,42 @@
   outline-color: var(--c-green-500);
 }
 
+.envoltorio {
+  display: grid;
+  grid-template-rows: 0fr;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  /* visibility espera a que termine el cierre para ocultarse */
+  transition: grid-template-rows 0.28s ease, opacity 0.2s ease, visibility 0s linear 0.28s;
+}
+
+.envoltorioAbierto {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition: grid-template-rows 0.28s ease, opacity 0.25s ease 0.05s, visibility 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .envoltorio,
+  .envoltorioAbierto {
+    transition: none;
+  }
+}
+
 .panel {
   position: relative;
+  min-height: 0;
   overflow: hidden;
-  width: 100%;
-  padding: 20px 20px 16px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   background-color: var(--bg-card);
   color: var(--text-primary);
+}
+
+.contenido {
+  padding: 20px 20px 16px;
 }
 /* Barra de los cuatro colores de la UNaHur, la misma del inicio de sesión */
 .panel::before {

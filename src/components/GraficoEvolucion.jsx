@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import {
   Area, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
@@ -6,15 +6,16 @@ import { ArrowDown, ArrowUp, Minus } from 'lucide-react';
 import styles from './GraficoEvolucion.module.css';
 import Pp from './Pp';
 import { ubicarEtiquetas, variacionReciente } from '../utils/evolucion';
+import { colorSerie, COLORES_SERIE } from '../utils/coloresSerie';
 import { formatearNumero, formatearPeriodo, formatearPeriodoCorto } from '../utils/texto';
 
 // Mismos colores que el resto de la app (KPIs y gráfico por comisión).
 // 'bueno' indica hacia dónde es buena la variación (los libres suben = malo).
-const SERIES = [
-  { clave: 'pctPromo', nombre: 'Promoción', color: '#10b981', relleno: true, bueno: 'sube' },
-  { clave: 'pctLibre', nombre: 'Libres', color: '#ef4444', relleno: true, bueno: 'baja' },
-  { clave: 'pctReg', nombre: 'Regulares', color: '#3b82f6', relleno: false },
-  { clave: 'pctDesap', nombre: 'Desaprobados', color: '#f59e0b', relleno: false },
+const SERIES_BASE = [
+  { clave: 'pctPromo', corta: 'promo', nombre: 'Promoción', pastilla: COLORES_SERIE.promo.pastilla, relleno: true, bueno: 'sube' },
+  { clave: 'pctLibre', corta: 'libre', nombre: 'Libres', pastilla: COLORES_SERIE.libre.pastilla, relleno: true, bueno: 'baja' },
+  { clave: 'pctReg', corta: 'reg', nombre: 'Regulares', pastilla: COLORES_SERIE.reg.pastilla, relleno: false },
+  { clave: 'pctDesap', corta: 'desap', nombre: 'Desaprobados', pastilla: COLORES_SERIE.desap.pastilla, relleno: false },
 ];
 const SERIES_POR_DEFECTO = ['pctPromo'];
 
@@ -43,7 +44,7 @@ function TickPeriodo({ x, y, payload, puntos, colores }) {
   );
 }
 
-function TooltipEvolucion({ active, payload, colores }) {
+function TooltipEvolucion({ active, payload, colores, series }) {
   if (!active || !payload?.length) return null;
   const p = payload[0].payload;
   return (
@@ -58,7 +59,7 @@ function TooltipEvolucion({ active, payload, colores }) {
         {formatearNumero(p.inscriptos)} inscriptos · {p.comisiones} {p.comisiones === 1 ? 'comisión' : 'comisiones'}
       </span>
       {p.parcial && <span style={{ display: 'block', color: colores.ambar }}>Datos parciales</span>}
-      {SERIES.map((s) => (
+      {series.map((s) => (
         <span key={s.clave} style={{ display: 'block', color: s.color }}>
           {s.nombre}: {p[s.clave]} %
         </span>
@@ -73,7 +74,7 @@ const etiquetaFinal = (serie, puntos, dy, indiceFinal) => (props) => {
   const ancho = 48;
   return (
     <g key={`fin-${serie.clave}`} transform={`translate(${props.x + 12}, ${props.y + (dy[serie.clave] || 0)})`}>
-      <rect x={0} y={-10} width={ancho} height={20} rx={10} fill={serie.color} />
+      <rect x={0} y={-10} width={ancho} height={20} rx={10} fill={serie.pastilla} />
       <text x={ancho / 2} y={4} textAnchor="middle" fontSize={11} fontWeight={700} fill="#0f172a">
         {puntos[indiceFinal][serie.clave]} %
       </text>
@@ -121,6 +122,8 @@ function Variacion({ delta, bueno, contra }) {
  */
 export default function GraficoEvolucion({ puntos, theme }) {
   const colores = COLORES_TEMA[theme] || COLORES_TEMA.light;
+  // Color de cada línea según el tema (ver utils/coloresSerie.js)
+  const SERIES = SERIES_BASE.map((s) => ({ ...s, color: colorSerie(s.corta, theme) }));
   const [visibles, setVisibles] = useState(SERIES_POR_DEFECTO);
 
   const alternar = (clave) => setVisibles((prev) => {
@@ -213,7 +216,7 @@ export default function GraficoEvolucion({ puntos, theme }) {
               tick={{ fill: colores.texto, fontSize: 12 }}
               stroke={colores.grilla}
             />
-            <Tooltip content={<TooltipEvolucion colores={colores} />} cursor={{ stroke: colores.texto, strokeDasharray: '3 3' }} />
+            <Tooltip content={<TooltipEvolucion colores={colores} series={SERIES} />} cursor={{ stroke: colores.texto, strokeDasharray: '3 3' }} />
             {seriesVisibles.map((s) => (
               <Area
                 key={s.clave}

@@ -5,7 +5,8 @@ import { AYUDA } from '../utils/ayuda';
 
 /*
  * "¿Cómo se lee?": un panel que se abre y se cierra con un botón, con una explicación corta
- * de la pantalla. Arranca siempre cerrado.
+ * de la pantalla. Arranca siempre cerrado. Se despliega con una transición de altura; cerrado
+ * queda con visibility:hidden, así que no se lee ni se enfoca.
  *   pantalla: 'dashboard' | 'materias' | 'predicciones' | 'evolucion' (ver utils/ayuda.js)
  */
 export default function AyudaPantalla({ pantalla }) {
@@ -28,21 +29,23 @@ export default function AyudaPantalla({ pantalla }) {
         ¿Cómo se lee?
       </button>
 
-      {abierto && (
+      <div className={abierto ? `${styles.envoltorio} ${styles.envoltorioAbierto}` : styles.envoltorio}>
         <section id={idPanel} className={styles.panel} aria-label="Cómo se lee esta pantalla">
-          <p className={styles.intro}>{contenido.intro}</p>
-          <div className={styles.bloques}>
-            {contenido.bloques.map((b) => (
-              <div key={b.titulo} className={styles.bloque}>
-                <h2 className={styles.titulo}>{b.titulo}</h2>
-                <ul>
-                  {b.items.map((item) => <li key={item}>{item}</li>)}
-                </ul>
-              </div>
-            ))}
+          <div className={styles.contenido}>
+            <p className={styles.intro}>{contenido.intro}</p>
+            <div className={styles.bloques}>
+              {contenido.bloques.map((b) => (
+                <div key={b.titulo} className={styles.bloque}>
+                  <h2 className={styles.titulo}>{b.titulo}</h2>
+                  <ul>
+                    {b.items.map((item) => <li key={item}>{item}</li>)}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
-      )}
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, ArrowUpDown, Minus, Search, TriangleAlert } from 'lucide-react';
 import styles from './TablaComparativa.module.css';
+import { colorSerie } from '../utils/coloresSerie';
 import BotonesExportar from './BotonesExportar';
 import Tooltip from './Tooltip';
 import Pp from './Pp';
@@ -10,10 +11,10 @@ import { UMBRAL_RIESGO_ALTO, UMBRAL_SALTO_LIBRES } from '../utils/umbrales';
 
 // Mismos colores que el resto de la app
 const SEGMENTOS = [
-  { clave: 'promo', nombre: 'Promoción', color: '#10b981' },
-  { clave: 'reg', nombre: 'Regulares', color: '#3b82f6' },
-  { clave: 'desap', nombre: 'Desaprobados', color: '#f59e0b' },
-  { clave: 'libre', nombre: 'Libres', color: '#ef4444' },
+  { clave: 'promo', nombre: 'Promoción' },
+  { clave: 'reg', nombre: 'Regulares' },
+  { clave: 'desap', nombre: 'Desaprobados' },
+  { clave: 'libre', nombre: 'Libres' },
 ];
 
 // Para buscar sin importar tildes ni mayúsculas
@@ -39,14 +40,14 @@ function Delta({ valor, unidad, subeEsBueno }) {
 }
 
 // Barra apilada con la distribución de un período (promoción, regulares, desaprobados, libres)
-function Barra({ dist, etiqueta }) {
+function Barra({ dist, etiqueta, theme }) {
   if (!dist) return <span className={styles.barraVacia} aria-hidden="true" />;
   const detalle = SEGMENTOS.map((s) => `${s.nombre} ${dist[s.clave]} %`).join(', ');
   return (
     <Tooltip texto={`${etiqueta}: ${detalle}`} enfocable>
       <span className={styles.barra} role="img" aria-label={`${etiqueta}: ${detalle}`}>
         {SEGMENTOS.map((s) => dist[s.clave] > 0 && (
-          <span key={s.clave} style={{ flexGrow: dist[s.clave], background: s.color }} />
+          <span key={s.clave} style={{ flexGrow: dist[s.clave], background: colorSerie(s.clave, theme) }} />
         ))}
       </span>
     </Tooltip>
@@ -68,7 +69,7 @@ const valorDeOrden = (f, clave) => (clave === 'nombre' ? f.nombre : f[clave]);
  * filas: resultado de compararMaterias (utils/comparar.js).
  * Por defecto: primero las materias cuyos libres más subieron.
  */
-export default function TablaComparativa({ filas, periodoA, periodoB, carrera = '' }) {
+export default function TablaComparativa({ filas, periodoA, periodoB, carrera = '', theme }) {
   const etiquetaA = formatearPeriodoCorto(periodoA);
   const etiquetaB = formatearPeriodoCorto(periodoB);
 
@@ -172,7 +173,7 @@ export default function TablaComparativa({ filas, periodoA, periodoB, carrera = 
       {/* Referencias de la distribución */}
       <div className={styles.referencias} aria-hidden="true">
         {SEGMENTOS.map((s) => (
-          <span key={s.clave}><i style={{ background: s.color }} />{s.nombre}</span>
+          <span key={s.clave}><i style={{ background: colorSerie(s.clave, theme) }} />{s.nombre}</span>
         ))}
         <span className={styles.periodos}>A = {etiquetaA} · B = {etiquetaB}</span>
       </div>
@@ -244,8 +245,8 @@ export default function TablaComparativa({ filas, periodoA, periodoB, carrera = 
                   </td>
                   <td>
                     <span className={styles.barras}>
-                      <span className={styles.filaBarra}><b>A</b><Barra dist={f.distA} etiqueta={`Período A (${etiquetaA})`} /></span>
-                      <span className={styles.filaBarra}><b>B</b><Barra dist={f.distB} etiqueta={`Período B (${etiquetaB})`} /></span>
+                      <span className={styles.filaBarra}><b>A</b><Barra dist={f.distA} etiqueta={`Período A (${etiquetaA})`} theme={theme} /></span>
+                      <span className={styles.filaBarra}><b>B</b><Barra dist={f.distB} etiqueta={`Período B (${etiquetaB})`} theme={theme} /></span>
                     </span>
                   </td>
                   <td className={styles.centro}>
