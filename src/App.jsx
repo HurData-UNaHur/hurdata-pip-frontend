@@ -7,8 +7,7 @@ import Materias from './pages/Materias';
 import Predicciones from './pages/Predicciones';
 import Cargas from './pages/Cargas';
 import Cuenta from './pages/Cuenta';
-import Usuarios from './pages/Usuarios';
-import Historial from './pages/Historial';
+import Accesos from './pages/Accesos';
 import EstadoVacio from './components/EstadoVacio';
 // Evolución usa Recharts (pesado): se descarga recién cuando alguien entra a la página
 const Evolucion = lazy(() => import('./pages/Evolucion'));
@@ -412,11 +411,8 @@ function App() {
             }
           />
           <Route path="/cuenta" element={<Cuenta />} />
-          {tienePermiso(usuario, PERMISOS.GESTIONAR_USUARIOS) && (
-            <Route path="/usuarios" element={<Usuarios usuario={usuario} />} />
-          )}
           {tienePermiso(usuario, PERMISOS.APROBAR_REGISTROS) && (
-            <Route path="/historial" element={<Historial usuario={usuario} />} />
+            <Route path="/accesos" element={<Accesos usuario={usuario} />} />
           )}
           {tienePermiso(usuario, PERMISOS.VER_CARGAS) && (
             <Route

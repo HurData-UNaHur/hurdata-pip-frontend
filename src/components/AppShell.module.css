@@ -29,6 +29,21 @@
   box-shadow: 0 2px 8px color-mix(in srgb, var(--c-slate-900) 8%, transparent);
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
+/* Barra de los cuatro colores de la UNaHur en el borde superior, la misma del inicio de sesión */
+.header::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--c-red-500) 0 25%,
+    var(--c-amber-500) 25% 50%,
+    var(--c-unahur) 50% 75%,
+    var(--c-blue-500) 75% 100%
+  );
+}
+
 /* El logo es gris oscuro sobre transparente */
 .logoCaja {
   display: inline-flex;
@@ -239,166 +254,7 @@ a.logoCaja:focus-visible {
   line-height: 1.2;
 }
 
-/* ── Modal de aprobación de solicitudes ───────────────────── */
-.modalOverlay {
-  position: fixed;
-  inset: 0;
-  background-color: color-mix(in srgb, var(--c-slate-900) 65%, transparent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 16px;
-}
-.modalCard {
-  background-color: var(--bg-card);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 14px;
-  padding: 24px;
-  width: 100%;
-  max-width: 620px;
-  max-height: 82vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 14px 36px color-mix(in srgb, var(--c-black) 35%, transparent);
-}
-.modalCerrar {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--text-secondary);
-  display: inline-flex;
-  align-items: center;
-  padding: 4px;
-  border-radius: 6px;
-}
-.modalCerrar:hover {
-  color: var(--text-primary);
-}
-.modalTitulo {
-  margin: 0 0 6px;
-  font-size: 1.15rem;
-  color: var(--text-primary);
-}
-.modalSubtitulo {
-  margin: 0 0 16px;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-}
-.modalError {
-  color: var(--c-red-500);
-  font-size: 0.88rem;
-  margin-bottom: 12px;
-}
-.modalVacio {
-  color: var(--text-secondary);
-  font-size: 0.92rem;
-}
-.listaSolicitudes {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.itemSolicitud {
-  background-color: var(--bg-main);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 14px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-[data-theme="dark"] .itemSolicitud {
-  background-color: color-mix(in srgb, var(--c-slate-900) 65%, transparent);
-}
-.infoSolicitud {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  flex: 1 1 240px;
-}
-.nombreSolicitud {
-  font-size: 0.96rem;
-  color: var(--text-primary);
-}
-.emailSolicitud {
-  font-size: 0.84rem;
-  color: var(--text-secondary);
-}
-.institutoSolicitud {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
 
-/* Bloquesito selector de rol */
-.bloqueRol {
-  margin-top: 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  align-self: flex-start;
-  padding: 4px 10px;
-  border-radius: 8px;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-}
-.labelRol {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-.selectRol {
-  background-color: var(--bg-main);
-  color: var(--text-primary);
-  border: 1px solid var(--border-input);
-  border-radius: 6px;
-  padding: 3px 8px;
-  font-family: inherit;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-[data-theme="dark"] .selectRol {
-  background-color: var(--c-ink-950);
-}
-
-.accionesSolicitud {
-  display: flex;
-  gap: 8px;
-}
-.btnAprobar,
-.btnRechazar {
-  color: var(--c-white);
-  border: none;
-  border-radius: 8px;
-  padding: 7px 12px;
-  font-family: inherit;
-  font-size: 0.84rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  transition: opacity 0.15s ease;
-}
-.btnAprobar {
-  background-color: var(--c-unahur);
-}
-.btnRechazar {
-  background-color: var(--c-red-500);
-}
-.btnAprobar:disabled,
-.btnRechazar:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
 
 /* ── Contenido ────────────────────────────────────────────── */
 .contenido {
@@ -510,50 +366,7 @@ a.logoCaja:focus-visible {
   }
 }
 
-/* ── Recuperación de contraseña en el modal de solicitudes ── */
-.seccionModal {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.modalSeccion {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  font-size: 0.95rem;
-  color: var(--text-primary);
-}
-.cajaCodigo {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 14px;
-  border: 1px solid var(--c-unahur);
-  border-radius: 8px;
-  background-color: color-mix(in srgb, var(--c-unahur) 8%, transparent);
-  color: var(--text-primary);
-  font-size: 0.85rem;
-  line-height: 1.4;
-}
-.cajaCodigo p {
-  margin: 0;
-}
-.codigoTexto {
-  padding: 8px 14px;
-  border-radius: 6px;
-  background-color: var(--bg-card);
-  border: 1px dashed var(--c-unahur);
-  font-family: var(--font-mono);
-  font-size: 1.6rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  user-select: all;
-}
+
 /* Enlace para saltar al contenido: invisible hasta que recibe foco con el teclado */
 .saltar {
   position: absolute;

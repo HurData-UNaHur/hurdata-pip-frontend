@@ -1,70 +1,54 @@
-import { useEffect, useId, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import {
-  Bell, BookOpen, Calculator, ChartLine, Check, ChevronLeft, ChevronRight, GraduationCap, History, House, KeyRound, LogOut, Menu, Upload, User, Users, X,
+  BookOpen, Calculator, ChartLine, ChevronLeft, ChevronRight, GraduationCap, House, LogOut, Menu,
+  ShieldCheck, Upload, User, X,
 } from 'lucide-react';
 import styles from './AppShell.module.css';
 import logo from '../assets/logo-hurlingham.png';
 import logoGris from '../assets/logo-hurlingham-grisado.png';
 import IconoTema from './IconoTema';
 import Tooltip from './Tooltip';
-import Dialogo from './Dialogo';
-import { useToast } from './contextoToast';
+import { ContextoPendientes } from './contextoPendientes';
 import {
   PERMISOS,
   tienePermiso,
   getSolicitudesRegistro,
-  aprobarSolicitudRegistro,
-  rechazarSolicitudRegistro,
   getSolicitudesRecuperacion,
-  resolverSolicitudRecuperacion,
 } from '../services/api';
-
-const ROLES_DISPONIBLES = [
-  { id: 'directivo', nombre: 'Directivo' },
-  { id: 'docente', nombre: 'Docente' },
-  { id: 'no_docente', nombre: 'No Docente' },
-];
 
 /*
  * Marco de la aplicación: cabecera con el logo, barra lateral con las secciones (y, al pie,
  * el usuario, el tema y cerrar sesión), contenido y footer. En pantallas chicas la barra lateral
  * es un menú deslizable; en escritorio se puede comprimir a solo íconos.
+ *
+ * También lleva la cuenta de solicitudes pendientes (registro y recuperación de contraseña) que se
+ * muestra junto a "Accesos". Las pantallas la actualizan con `refrescar` (contextoPendientes.js).
  */
+
 // Título de la pestaña según la sección: cada pantalla tiene que tener el suyo (WCAG 2.4.2)
 const TITULOS = {
   '/': 'Inicio',
   '/materias': 'Materias',
   '/evolucion': 'Evolución',
   '/predicciones': 'Simulador de comisiones',
-  '/cuenta': 'Mi cuenta',
-  '/usuarios': 'Usuarios',
-  '/historial': 'Historial de solicitudes',
   '/cargas': 'Cargas',
+  '/accesos': 'Accesos',
+  '/cuenta': 'Mi cuenta',
 };
 
 function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
   const { pathname } = useLocation();
+
   useEffect(() => {
     const seccion = TITULOS[pathname];
     document.title = seccion ? `${seccion} - HurData Académico` : 'HurData Académico';
   }, [pathname]);
 
-  const { avisar } = useToast();
-  const idTituloSolicitudes = useId();
   const [menuAbierto, setMenuAbierto] = useState(false); // barra lateral (celular)
   // Barra lateral comprimida (solo íconos, en escritorio). Se recuerda entre sesiones.
   const [comprimida, setComprimida] = useState(() => localStorage.getItem('hurdata_sidebar_comprimida') === '1');
-
-  // Estado para solicitudes de registro pendientes (Directivo / Admin)
-  const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [solicitudes, setSolicitudes] = useState([]);
-  const [recuperaciones, setRecuperaciones] = useState([]);     // pedidos de recuperación de contraseña
-  const [codigosGenerados, setCodigosGenerados] = useState([]); // códigos recién aprobados (se ven una sola vez)
-  const [rolesEditados, setRolesEditados] = useState({});
-  const [loadingNotif, setLoadingNotif] = useState(false);
-  const [procesandoId, setProcesandoId] = useState(null);
-  const [notifError, setNotifError] = useState(null);
+  const [pendientes, setPendientes] = useState(0);
 
   const alternarCompresion = () => {
     setComprimida((v) => {
@@ -77,7 +61,21 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
   const esAutorizado = Boolean(usuario) && usuario.role !== 'invitado';
   const puedeVerCargas = tienePermiso(usuario, PERMISOS.VER_CARGAS);
   const puedeAprobar = tienePermiso(usuario, PERMISOS.APROBAR_REGISTROS);
-  const puedeGestionar = tienePermiso(usuario, PERMISOS.GESTIONAR_USUARIOS);
+
+  // Solicitudes pendientes: se consultan al entrar y al cambiar de pantalla, y cuando Accesos las resuelve
+  const refrescar = useCallback(() => {
+    if (!puedeAprobar) return;
+    Promise.all([getSolicitudesRegistro(), getSolicitudesRecuperacion()])
+      .then(([altas, recuperacion]) => {
+        const lista = Array.isArray(altas) ? altas : altas.solicitudes || [];
+        setPendientes(lista.length + (recuperacion.solicitudes || []).length);
+      })
+      .catch(() => { /* sin conexión: queda el último número conocido */ });
+  }, [puedeAprobar]);
+
+  useEffect(() => { refrescar(); }, [refrescar, pathname]);
+
+  const contextoPendientes = useMemo(() => ({ pendientes, refrescar }), [pendientes, refrescar]);
 
   const secciones = [
     { to: '/', texto: 'Inicio', Icono: House, end: true },
@@ -85,102 +83,13 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
     { to: '/evolucion', texto: 'Evolución', Icono: ChartLine },
     { to: '/predicciones', texto: 'Simulador de comisiones', Icono: Calculator },
     ...(puedeVerCargas ? [{ to: '/cargas', texto: 'Cargas', Icono: Upload }] : []),
-    ...(puedeGestionar ? [{ to: '/usuarios', texto: 'Usuarios', Icono: Users }] : []),
-    ...(puedeAprobar ? [{ to: '/historial', texto: 'Historial', Icono: History }] : []),
+    ...(puedeAprobar ? [{ to: '/accesos', texto: 'Accesos', Icono: ShieldCheck, contador: pendientes }] : []),
   ];
 
-  // Cargar solicitudes pendientes cuando puedeAprobar es true y al abrir el modal
-  useEffect(() => {
-    if (!puedeAprobar) return;
-
-    let cancelado = false;
-
-    Promise.all([getSolicitudesRegistro(), getSolicitudesRecuperacion()])
-      .then(([altas, recuperacion]) => {
-        if (!cancelado) {
-          setSolicitudes(Array.isArray(altas) ? altas : altas.solicitudes || []);
-          setRecuperaciones(recuperacion.solicitudes || []);
-          setNotifError(null);
-        }
-      })
-      .catch((err) => {
-        if (!cancelado && isNotifOpen) {
-          setNotifError(err.message);
-        }
-      })
-      .finally(() => {
-        if (!cancelado) setLoadingNotif(false);
-      });
-
-    return () => {
-      cancelado = true;
-    };
-  }, [puedeAprobar, isNotifOpen]);
-
-  const handleAprobar = async (id, rolOriginal) => {
-    const rolFinal = rolesEditados[id] || rolOriginal;
-    setProcesandoId(id);
-    setNotifError(null);
-    try {
-      const sol = solicitudes.find((s) => (s.id ?? s.id_solicitud) === id);
-      await aprobarSolicitudRegistro(id, rolFinal);
-      setSolicitudes((prev) => prev.filter((s) => (s.id ?? s.id_solicitud) !== id));
-      const nombreRol = ROLES_DISPONIBLES.find((r) => r.id === rolFinal)?.nombre;
-      avisar({
-        tipo: 'exito',
-        texto: `Se aprobó el acceso de ${sol?.nombre ?? 'la persona'}${nombreRol ? ` como ${nombreRol}` : ''}.`,
-      });
-    } catch (err) {
-      setNotifError(err.message);
-    } finally {
-      setProcesandoId(null);
-    }
-  };
-
-  const handleRechazar = async (id) => {
-    setProcesandoId(id);
-    setNotifError(null);
-    try {
-      const sol = solicitudes.find((s) => (s.id ?? s.id_solicitud) === id);
-      await rechazarSolicitudRegistro(id);
-      setSolicitudes((prev) => prev.filter((s) => (s.id ?? s.id_solicitud) !== id));
-      avisar({ tipo: 'info', texto: `Se rechazó la solicitud de ${sol?.nombre ?? 'la persona'}.` });
-    } catch (err) {
-      setNotifError(err.message);
-    } finally {
-      setProcesandoId(null);
-    }
-  };
-
-  const handleRecuperacion = async (sol, accion) => {
-    setProcesandoId(`rec-${sol.id_solicitud}`);
-    setNotifError(null);
-    try {
-      const resp = await resolverSolicitudRecuperacion(sol.id_solicitud, accion);
-      setRecuperaciones((prev) => prev.filter((r) => r.id_solicitud !== sol.id_solicitud));
-      if (accion === 'aprobar') {
-        // El código se muestra en el propio panel y no se repite en un aviso
-        setCodigosGenerados((prev) => [...prev, { id: sol.id_solicitud, usuario: sol.usuario, codigo: resp.codigo }]);
-      } else {
-        avisar({ tipo: 'info', texto: `Se rechazó el pedido de recuperación de ${sol.usuario}.` });
-      }
-    } catch (err) {
-      setNotifError(err.message);
-    } finally {
-      setProcesandoId(null);
-    }
-  };
-
-  const pendientes = solicitudes.length + recuperaciones.length;
-  const hayRecuperaciones = recuperaciones.length > 0 || codigosGenerados.length > 0;
-
-  // Cerrar el menú del celular o el modal con Escape
+  // Cerrar el menú del celular con Escape
   useEffect(() => {
     const alTeclear = (e) => {
-      if (e.key === 'Escape') {
-        setMenuAbierto(false);
-        setIsNotifOpen(false);
-      }
+      if (e.key === 'Escape') setMenuAbierto(false);
     };
     document.addEventListener('keydown', alTeclear);
     return () => document.removeEventListener('keydown', alTeclear);
@@ -229,16 +138,26 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
 
         <div className={styles.interior}>
           <nav className={styles.menu}>
-            {secciones.map(({ to, texto, Icono, end }) => (
-              <Tooltip key={to} texto={comprimida ? texto : undefined}>
+            {secciones.map(({ to, texto, Icono, end, contador = 0 }) => (
+              <Tooltip key={to} texto={comprimida ? (contador > 0 ? `${texto} (${contador})` : texto) : undefined}>
                 <NavLink
                   to={to}
                   end={end}
                   onClick={() => setMenuAbierto(false)}
                   className={({ isActive }) => (isActive ? `${styles.item} ${styles.itemActivo}` : styles.item)}
                 >
-                  <Icono size={19} aria-hidden="true" />
-                  <span className={styles.textoItem}>{texto}</span>
+                  {contador > 0 ? (
+                    <span className={styles.campanaWrap}>
+                      <Icono size={19} aria-hidden="true" />
+                      <span className={styles.badgeNotif} aria-hidden="true">{contador}</span>
+                    </span>
+                  ) : (
+                    <Icono size={19} aria-hidden="true" />
+                  )}
+                  <span className={styles.textoItem}>
+                    {texto}
+                    {contador > 0 && <span className="sr-only"> ({contador} pendientes)</span>}
+                  </span>
                 </NavLink>
               </Tooltip>
             ))}
@@ -247,56 +166,30 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
           <div className={styles.pie}>
             {usuario && (
               <Tooltip texto={comprimida ? `${usuario.nombre}${usuario.cargo ? `, ${usuario.cargo}` : ''}` : undefined}>
-              <NavLink
+                <NavLink
                   to="/cuenta"
                   onClick={() => setMenuAbierto(false)}
                   aria-label={`Mi cuenta: ${usuario.nombre}`}
                   className={({ isActive }) => (isActive ? [styles.perfil, styles.perfilActivo].join(' ') : styles.perfil)}
                 >
-                <span className={styles.avatar}>
-                  {esAutorizado
-                    ? <GraduationCap size={17} aria-hidden="true" />
-                    : <User size={17} aria-hidden="true" />}
-                </span>
-                <span className={`${styles.textoItem} ${styles.datosPerfil}`}>
-                  <strong>{usuario.nombre}</strong>
-                  {usuario.cargo && <small>{usuario.cargo}</small>}
-                </span>
-              </NavLink>
+                  <span className={styles.avatar}>
+                    {esAutorizado
+                      ? <GraduationCap size={17} aria-hidden="true" />
+                      : <User size={17} aria-hidden="true" />}
+                  </span>
+                  <span className={`${styles.textoItem} ${styles.datosPerfil}`}>
+                    <strong>{usuario.nombre}</strong>
+                    {usuario.cargo && <small>{usuario.cargo}</small>}
+                  </span>
+                </NavLink>
               </Tooltip>
             )}
-
-            {puedeAprobar && (
-              <Tooltip texto="Solicitudes de registro y de recuperación de contraseña pendientes">
-                <button
-                  type="button"
-                  className={styles.item}
-                  onClick={() => {
-                    setMenuAbierto(false);
-                    setLoadingNotif(true);
-                    setIsNotifOpen(true);
-                  }}
-                >
-                  <span className={styles.campanaWrap}>
-                    <Bell size={19} aria-hidden="true" />
-                    {pendientes > 0 && (
-                      <span className={styles.badgeNotif}>{pendientes}</span>
-                    )}
-                  </span>
-                  <span className={styles.textoItem}>
-                    Solicitudes{pendientes > 0 ? ` (${pendientes})` : ''}
-                  </span>
-                </button>
-              </Tooltip>
-            )}
-
             <Tooltip texto={comprimida ? textoTema : undefined}>
               <button type="button" className={styles.item} onClick={toggleTheme}>
                 <IconoTema theme={theme} size={19} sobreVerde />
                 <span className={styles.textoItem}>{textoTema}</span>
               </button>
             </Tooltip>
-
             {onLogout && (
               <Tooltip texto={comprimida ? 'Cerrar sesión' : undefined}>
                 <button type="button" className={`${styles.item} ${styles.cerrar}`} onClick={onLogout}>
@@ -319,173 +212,15 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
       )}
 
       {/* ── Contenido ── */}
-      <main id="contenido" tabIndex={-1} className={styles.contenido}>{children}</main>
+      <main id="contenido" tabIndex={-1} className={styles.contenido}>
+        <ContextoPendientes.Provider value={contextoPendientes}>{children}</ContextoPendientes.Provider>
+      </main>
 
       {/* ── Footer ── */}
       <footer className={styles.footer}>
         <span>© {new Date().getFullYear()} HurData. Proyecto Integrador de Programación, Universidad Nacional de Hurlingham</span>
         <img src={logoGris} alt="Universidad Nacional de Hurlingham" className={styles.logoFooter} />
       </footer>
-
-      {/* ── Modal de aprobación de solicitudes de registro ── */}
-      {puedeAprobar && isNotifOpen && (
-        <Dialogo labelledBy={idTituloSolicitudes} onCerrar={() => setIsNotifOpen(false)}>
-          <div className={styles.modalCard}>
-            <Tooltip texto="Cerrar">
-              <button
-                type="button"
-                className={styles.modalCerrar}
-                onClick={() => setIsNotifOpen(false)}
-                aria-label="Cerrar"
-              >
-                <X size={20} aria-hidden="true" />
-              </button>
-            </Tooltip>
-
-            <h2 id={idTituloSolicitudes} className={styles.modalTitulo}>Solicitudes pendientes</h2>
-            <p className={styles.modalSubtitulo}>
-              Revisá los datos, modificá el rol asignado si corresponde y aprobá o rechazá la solicitud.
-            </p>
-
-            {notifError && <p className={styles.modalError}>{notifError}</p>}
-
-            {loadingNotif ? (
-              <p className={styles.modalVacio}>Cargando solicitudes…</p>
-            ) : solicitudes.length === 0 ? (
-              hayRecuperaciones ? null : <p className={styles.modalVacio}>No hay solicitudes pendientes en este momento.</p>
-            ) : (
-              <div className={styles.listaSolicitudes}>
-                {solicitudes.map((sol) => {
-                  const idSol = sol.id ?? sol.id_solicitud;
-                  const rolActual = rolesEditados[idSol] ?? sol.rol;
-                  const institutoNombre = sol.nombre_instituto || sol.instituto;
-
-                  return (
-                    <div key={idSol} className={styles.itemSolicitud}>
-                      <div className={styles.infoSolicitud}>
-                        <strong className={styles.nombreSolicitud}>{sol.nombre}</strong>
-                        <span className={styles.emailSolicitud}>{sol.email}</span>
-                        {institutoNombre && (
-                          <span className={styles.institutoSolicitud}>
-                            Instituto: {institutoNombre}
-                          </span>
-                        )}
-
-                        {/* Bloquesito para modificar el rol antes de aprobar */}
-                        <div className={styles.bloqueRol}>
-                          <label htmlFor={`rol-sol-${idSol}`} className={styles.labelRol}>
-                            Rol a asignar:
-                          </label>
-                          <select
-                            id={`rol-sol-${idSol}`}
-                            className={styles.selectRol}
-                            value={rolActual}
-                            disabled={procesandoId === idSol}
-                            onChange={(e) =>
-                              setRolesEditados((prev) => ({ ...prev, [idSol]: e.target.value }))
-                            }
-                          >
-                            {ROLES_DISPONIBLES.map((r) => (
-                              <option key={r.id} value={r.id}>
-                                {r.nombre}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className={styles.accionesSolicitud}>
-                        <button
-                          type="button"
-                          className={styles.btnAprobar}
-                          disabled={procesandoId === idSol}
-                          onClick={() => handleAprobar(idSol, sol.rol)}
-                        >
-                          <Check size={15} aria-hidden="true" />
-                          Aprobar
-                        </button>
-                        <button
-                          type="button"
-                          className={styles.btnRechazar}
-                          disabled={procesandoId === idSol}
-                          onClick={() => handleRechazar(idSol)}
-                        >
-                          <X size={15} aria-hidden="true" />
-                          Rechazar
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* ── Recuperación de contraseña: se aprueba y se le pasa el código a la persona ── */}
-            {!loadingNotif && hayRecuperaciones && (
-              <section className={styles.seccionModal} aria-label="Recuperación de contraseña">
-                <h4 className={styles.modalSeccion}>
-                  <KeyRound size={16} aria-hidden="true" />
-                  Recuperación de contraseña
-                </h4>
-
-                {codigosGenerados.map((c) => (
-                  <div key={c.id} className={styles.cajaCodigo} role="status">
-                    <p>
-                      Código para <strong>{c.usuario}</strong>. Pasáselo en persona o por un canal de confianza.
-                      Vale 60 minutos, se usa una sola vez y no se vuelve a mostrar.
-                    </p>
-                    <code className={styles.codigoTexto}>{c.codigo}</code>
-                    <button
-                      type="button"
-                      className={styles.btnRechazar}
-                      onClick={() => setCodigosGenerados((prev) => prev.filter((x) => x.id !== c.id))}
-                    >
-                      Listo, ya lo anoté
-                    </button>
-                  </div>
-                ))}
-
-                <div className={styles.listaSolicitudes}>
-                  {recuperaciones.map((sol) => {
-                    const ocupado = procesandoId === `rec-${sol.id_solicitud}`;
-                    return (
-                      <div key={sol.id_solicitud} className={styles.itemSolicitud}>
-                        <div className={styles.infoSolicitud}>
-                          <strong className={styles.nombreSolicitud}>{sol.nombre}</strong>
-                          <span className={styles.emailSolicitud}>{sol.usuario}</span>
-                          <span className={styles.institutoSolicitud}>
-                            Pide restablecer su contraseña. Confirmá que es la persona antes de aprobar.
-                          </span>
-                        </div>
-                        <div className={styles.accionesSolicitud}>
-                          <button
-                            type="button"
-                            className={styles.btnAprobar}
-                            disabled={ocupado}
-                            onClick={() => handleRecuperacion(sol, 'aprobar')}
-                          >
-                            <Check size={15} aria-hidden="true" />
-                            Aprobar
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.btnRechazar}
-                            disabled={ocupado}
-                            onClick={() => handleRecuperacion(sol, 'rechazar')}
-                          >
-                            <X size={15} aria-hidden="true" />
-                            Rechazar
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
-          </div>
-        </Dialogo>
-      )}
     </div>
   );
 }
