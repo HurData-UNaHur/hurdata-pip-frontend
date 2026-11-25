@@ -245,7 +245,7 @@ a.logoCaja:focus-visible {
   position: absolute;
   top: -6px;
   right: -8px;
-  background-color: var(--c-red-500);
+  background-color: var(--c-red-600);
   color: var(--c-white);
   border-radius: 999px;
   font-size: 0.75rem;
@@ -389,5 +389,9 @@ a.logoCaja:focus-visible {
 
 /* El contenido recibe el foco al saltar hasta él; no hace falta marcarlo con un contorno */
 .contenido:focus {
+  outline: none;
+}
+/* Al cambiar de pantalla el foco pasa al título: es solo un destino, no un control, así que no lleva contorno */
+.contenido h1:focus {
   outline: none;
 }

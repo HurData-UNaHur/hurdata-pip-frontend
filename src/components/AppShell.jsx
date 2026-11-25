@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import {
   BookOpen, Calculator, ChartLine, ChevronLeft, ChevronRight, GraduationCap, House, LogOut, Menu,
@@ -43,6 +43,31 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
   useEffect(() => {
     const seccion = TITULOS[pathname];
     document.title = seccion ? `${seccion} - HurData Académico` : 'HurData Académico';
+  }, [pathname]);
+
+  // Al cambiar de pantalla el foco pasa al título (h1) del contenido nuevo y la página vuelve arriba.
+  // Sin esto, quien navega con teclado o lector de pantalla queda en el menú y no se entera del cambio.
+  // La primera carga se omite: ahí el foco ya empieza en el principio de la página.
+  const refContenido = useRef(null);
+  const primeraCarga = useRef(true);
+  useEffect(() => {
+    if (primeraCarga.current) { primeraCarga.current = false; return undefined; }
+    const contenido = refContenido.current;
+    if (!contenido) return undefined;
+    window.scrollTo({ top: 0 });
+    const enfocar = () => {
+      const titulo = contenido.querySelector('h1');
+      if (!titulo) return false;
+      titulo.tabIndex = -1;
+      titulo.focus({ preventScroll: true });
+      return true;
+    };
+    if (enfocar()) return undefined;
+    // Pantallas que se descargan al entrar (Evolución): el título aparece un momento después
+    const observador = new MutationObserver(() => { if (enfocar()) observador.disconnect(); });
+    observador.observe(contenido, { childList: true, subtree: true });
+    const limite = setTimeout(() => observador.disconnect(), 3000);
+    return () => { observador.disconnect(); clearTimeout(limite); };
   }, [pathname]);
 
   const [menuAbierto, setMenuAbierto] = useState(false); // barra lateral (celular)
@@ -212,7 +237,7 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
       )}
 
       {/* ── Contenido ── */}
-      <main id="contenido" tabIndex={-1} className={styles.contenido}>
+      <main id="contenido" ref={refContenido} tabIndex={-1} className={styles.contenido}>
         <ContextoPendientes.Provider value={contextoPendientes}>{children}</ContextoPendientes.Provider>
       </main>
 
