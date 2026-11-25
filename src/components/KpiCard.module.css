@@ -2,7 +2,7 @@
 /* Contenedor de la tarjeta */
 .card {
   background-color: var(--bg-card); /* Fondo dinámico según el tema */
-  border: 1px solid var(--border-color); /* Borde adaptable */
+  border: 1px solid var(--border-card); /* Borde adaptable */
   /* Único acento: borde superior. El color lo pone KpiCard.jsx (verde UNaHur por defecto) */
   border-top: 4px solid var(--c-unahur);
   border-radius: 10px;

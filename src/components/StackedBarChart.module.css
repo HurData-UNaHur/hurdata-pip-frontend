@@ -1,7 +1,7 @@
 /* Panel contenedor del gráfico */
 .panel {
   background-color: var(--bg-card); /* Tarjeta con tema dinámico */
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-card);
   border-radius: 10px;
   padding: 20px;
   height: 100%;

@@ -47,6 +47,7 @@ body {
   --c-slate-100: #f1f5f9;
   --c-slate-200: #e2e8f0;
   --c-slate-300: #cbd5e1;
+  --c-slate-350: #b4c0cf;
   --c-slate-400: #94a3b8;
   --c-slate-50: #f8fafc;
   --c-slate-500: #64748b;
@@ -71,11 +72,12 @@ body {
   --text-secondary: var(--c-slate-600);
   --border-color: var(--c-slate-200);
   --navbar-bg: var(--c-unahur);
-  --shadow: 0 1px 3px color-mix(in srgb, var(--c-black) 5%, transparent);
+  --shadow: 0 1px 3px color-mix(in srgb, var(--c-black) 10%, transparent);
   --skeleton-base: var(--c-slate-200);
   --skeleton-brillo: var(--c-slate-100);
   --bg-track: var(--c-slate-200);      /* pista de los controles segmentados */
   --border-strong: var(--c-slate-300);
+  --border-card: var(--c-slate-350);   /* borde de tarjetas y paneles: 1,85:1 sobre la tarjeta (el fondo de p?gina y la tarjeta casi no se distinguen por tono) */
   --border-input: var(--c-placeholder); /* borde de campos de formulario: 3,5:1 sobre blanco (WCAG 1.4.11) */
   --bg-franja: var(--c-slate-100);     /* franja de filtros dentro de una tarjeta */
   /* Texto de estado: 4,5:1 sobre tarjeta y franja. Los tonos 500 son para rellenos, bordes e ?conos, no para texto */
@@ -101,6 +103,7 @@ body {
   --skeleton-brillo: var(--c-slate-600);
   --bg-track: var(--c-slate-700);
   --border-strong: var(--c-slate-700);
+  --border-card: var(--c-slate-600);   /* 1,9:1 sobre la tarjeta */
   --border-input: var(--c-slate-500);
   --bg-franja: color-mix(in srgb, var(--c-slate-700) 55%, var(--c-slate-800));
   --texto-exito: var(--c-green-400);

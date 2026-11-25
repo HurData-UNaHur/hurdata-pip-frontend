@@ -39,7 +39,7 @@
   --fondo-form: var(--bg-card);
   --foco: color-mix(in srgb, var(--c-unahur) 20%, transparent);
   background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-card);
   border-radius: 8px;
   padding: 20px;
   box-shadow: var(--shadow);
