@@ -88,7 +88,7 @@
   border: 1px solid color-mix(in srgb, var(--c-red-500) 40%, transparent);
   padding: 2px 6px;
   border-radius: 4px;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -99,7 +99,7 @@
   border: 1px solid color-mix(in srgb, var(--c-amber-500) 40%, transparent);
   padding: 2px 6px;
   border-radius: 4px;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -110,7 +110,7 @@
   border: 1px solid color-mix(in srgb, var(--c-green-500) 40%, transparent);
   padding: 2px 6px;
   border-radius: 4px;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -144,11 +144,11 @@
 }
 
 .sortIcon {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   opacity: 0.35;
 }
 
 .sortIconActive {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--texto-marca);
 }

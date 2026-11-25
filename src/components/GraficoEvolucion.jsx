@@ -39,7 +39,7 @@ function TickPeriodo({ x, y, payload, puntos, colores }) {
         {formatearPeriodoCorto(payload.value)}
       </text>
       {p && (
-        <text textAnchor="middle" dy={32} fill={p.parcial ? colores.ambar : colores.texto} fontSize={11} opacity={0.95}>
+        <text textAnchor="middle" dy={32} fill={p.parcial ? colores.ambar : colores.texto} fontSize={12}>
           {formatearNumero(p.inscriptos)} insc.{p.parcial ? ' *' : ''}
         </text>
       )}
@@ -77,11 +77,11 @@ const etiquetaFinal = (serie, puntos, dy, indiceFinal, conNombre) => (props) => 
   if (props.index !== indiceFinal || props.x == null || props.y == null) return null;
   // Con lugar suficiente la etiqueta lleva el nombre de la serie (etiquetado directo, sin ir a la leyenda)
   const texto = `${conNombre ? `${serie.nombre} ` : ''}${puntos[indiceFinal][serie.clave]} %`;
-  const ancho = Math.round(texto.length * 6.4) + 18;
+  const ancho = Math.round(texto.length * 7) + 18;
   return (
     <g key={`fin-${serie.clave}`} transform={`translate(${props.x + 12}, ${props.y + (dy[serie.clave] || 0)})`}>
       <rect x={0} y={-10} width={ancho} height={20} rx={10} fill={serie.pastilla} />
-      <text x={ancho / 2} y={4} textAnchor="middle" fontSize={11} fontWeight={700} fill="#0f172a">
+      <text x={ancho / 2} y={4} textAnchor="middle" fontSize={12} fontWeight={700} fill="#0f172a">
         {texto}
       </text>
     </g>
@@ -198,7 +198,7 @@ export default function GraficoEvolucion({ puntos, theme }) {
       {/* El dibujo no se puede leer con lector de pantalla: sus datos van en la tabla de abajo */}
       <div style={{ width: '100%', height: ALTO }} aria-hidden="true">
         <ResponsiveContainer initialDimension={{ width: 820, height: ALTO }} onResize={(ancho) => setAnchoGrafico(ancho)}>
-          <ComposedChart data={datos} margin={{ top: 12, right: conNombres ? 140 : 64, bottom: 4, left: 0 }}>
+          <ComposedChart data={datos} margin={{ top: 12, right: conNombres ? 156 : 70, bottom: 4, left: 0 }}>
             <defs>
               {SERIES.filter((s) => s.relleno).map((s) => (
                 <linearGradient key={s.clave} id={`relleno-${s.clave}`} x1="0" y1="0" x2="0" y2="1">

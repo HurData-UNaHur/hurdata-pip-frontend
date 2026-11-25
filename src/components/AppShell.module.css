@@ -222,7 +222,7 @@ a.logoCaja:focus-visible {
   white-space: nowrap;
 }
 .datosPerfil small {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   color: var(--c-slate-400);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -248,7 +248,7 @@ a.logoCaja:focus-visible {
   background-color: var(--c-red-500);
   color: var(--c-white);
   border-radius: 999px;
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 700;
   padding: 1px 5px;
   line-height: 1.2;
