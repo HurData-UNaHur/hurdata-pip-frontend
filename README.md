@@ -10,7 +10,12 @@ Este repositorio es el frontend: una aplicación React que consume la API del [b
 * **Evolución entre períodos:** gráfico de tendencia de una carrera o materia, con selector de períodos, y tabla comparativa de dos períodos con variaciones y alertas.
 * **Exportación:** las tablas de Materias y de la comparativa de Evolución se descargan como CSV (se abre en Excel) o PDF, respetando el filtro y el orden que se ven en pantalla.
 * **Carga de Excel e historial:** los usuarios con permiso suben los reportes del SIU y consultan quién cargó cada uno.
-* **Sesión y roles:** login con JWT; lo que se puede hacer depende del rol (ver más abajo). Hay que iniciar sesión para usar la aplicación. Las personas nuevas piden acceso y un directivo o administrador lo aprueba; para recuperar la contraseña piden un código que también aprueba un directivo o administrador.
+* **Simulador de comisiones:** estima cuántas comisiones abrir a partir de los libres, con la tasa de recursado y el cupo que elige quien lo usa. Tiene topes de seguridad (tasa de 20 % a 100 %, cupo de 10 a 100 alumnos).
+* **Sesión y roles:** login con JWT; lo que se puede hacer depende del rol (ver más abajo). Hay que iniciar sesión para usar la aplicación: no hay modo invitado. Las personas nuevas piden acceso y un directivo o administrador lo aprueba; para recuperar la contraseña piden un código que también entrega un directivo o administrador.
+* **Mi cuenta:** cada persona ve sus datos (nombre, correo, rol e instituto) y cambia su contraseña. Pide la actual y, tras 5 errores seguidos, bloquea el cambio 15 minutos.
+* **Accesos:** sección con tres pestañas. *Solicitudes* (registros y recuperaciones pendientes), *Historial* (solicitudes resueltas) y *Cuentas* (cambiar el rol, revocar y reactivar accesos, solo Admin). La barra lateral muestra cuántas solicitudes hay pendientes.
+* **Ayudas en pantalla:** cada pantalla tiene un panel «¿Cómo se lee?» y los indicadores explican qué miden.
+* **Accesibilidad:** título por pantalla, enlace para saltar al contenido, campos con etiqueta, navegación con teclado y contraste revisado.
 * **Tema claro y oscuro.**
 
 ---
@@ -21,8 +26,8 @@ Los permisos vienen en el token que entrega el backend y definen qué botones se
 
 | Rol | Qué puede hacer |
 |---|---|
-| Admin | Todo: cargar, borrar cualquier carga, ver todo el historial y vaciar la base |
-| Directivo | Cargar, borrar cualquier carga y ver todo el historial |
+| Admin | Todo: cargar, borrar cualquier carga, ver todo el historial, vaciar la base, aprobar solicitudes y gestionar cuentas |
+| Directivo | Cargar, borrar cualquier carga, ver todo el historial y aprobar solicitudes. Ve el historial de solicitudes de su instituto |
 | Docente | Cargar, y borrar o reemplazar solo lo que cargó él. Ve su propio historial |
 | No Docente | Solo consulta |
 
@@ -33,19 +38,23 @@ La definición completa está en `app/api/permisos.py` del backend.
 ```
 src/
 ├── components/         # Componentes reutilizables
-│   ├── Navbar, Filters, KpiCard, AlertsPanel, StackedBarChart, ProjectionSlider
-│   ├── GraficoEvolucion, SelectorPeriodos, TablaComparativa, AvisoParcial
+│   ├── AppShell        # Cabecera, barra lateral, contenido y footer
+│   ├── Filters, KpiCard, AlertsPanel, StackedBarChart
+│   ├── GraficoEvolucion, FiltroPeriodos, TablaComparativa, AvisoParcial
 │   ├── BotonesExportar # Botones CSV y PDF de las tablas
-│   └── EstadoVacio, OrigenDatos, IconoTema
+│   ├── Tooltip, Pp, AyudaPantalla, ModalConfirmar, ToastProvider, Segmentado
+│   └── Campo, AuthLayout, EstadoVacio, OrigenDatos, IconoTema
 ├── pages/              # Vistas principales
 │   ├── Dashboard.jsx   # KPIs, distribución por materia y filtros
 │   ├── Materias.jsx    # Análisis comparativo de materias filtro (exportable)
-│   ├── Predicciones.jsx# Proyección de recursantes y apertura de comisiones
+│   ├── Predicciones.jsx# Simulador de comisiones (recursantes y apertura de comisiones)
 │   ├── Evolucion.jsx   # Gráfico de tendencia y comparación de dos períodos
 │   ├── Cargas.jsx      # Subida de Excel e historial de cargas
+│   ├── Accesos.jsx     # Solicitudes, historial y cuentas (pestañas en pages/accesos/)
+│   ├── Cuenta.jsx      # Mi cuenta: datos y cambio de contraseña
 │   └── Login.jsx, Registro.jsx, RecuperarPassword.jsx
 ├── services/api.js     # Llamadas al backend, sesión (JWT) y permisos
-├── utils/              # transformData, comparar, evolucion, umbrales, texto, exportar
+├── utils/              # transformData, comparar, evolucion, umbrales, simulador, validaciones, ayuda, texto, exportar
 ├── App.jsx             # Enrutamiento (React Router) y estado general
 └── main.jsx            # Punto de entrada de la aplicación
 ```
@@ -89,9 +98,19 @@ El backend precarga cuatro usuarios, uno por rol: `admin@`, `directivo@`, `docen
 
 La sesión (token y datos del usuario) se guarda en `localStorage` y dura 8 horas. Al vencer, se vuelve al login.
 
-**Solicitudes de acceso y de recuperación.** Quien tiene permiso para aprobar registros (Directivo y Admin) ve una campana "Solicitudes" al pie de la barra lateral. Desde ahí aprueba o rechaza las altas (pudiendo cambiar el rol) y los pedidos de recuperación. Al aprobar una recuperación, la pantalla muestra un código de un solo uso que hay que pasarle a la persona; vale 60 minutos y no se vuelve a mostrar. Las cuentas Admin y Directivo solo las restablece un Admin, y nadie aprueba la propia solicitud.
+**Accesos.** Quien puede aprobar registros (Directivo y Admin) ve «Accesos» en la barra lateral, con el número de solicitudes pendientes. En la pestaña *Solicitudes* aprueba o rechaza las altas (pudiendo cambiar el rol) y los pedidos de recuperación. Al aprobar una recuperación, la pantalla muestra un código de un solo uso que hay que pasarle a la persona; vale 60 minutos y no se vuelve a mostrar, así que hay que anotarlo antes de salir de la pantalla. Las cuentas Admin y Directivo solo las restablece un Admin, y nadie aprueba la propia solicitud.
 
-**Reglas de los formularios.** El correo debe ser `nombre@unahur.edu.ar`. La contraseña nueva tiene al menos 8 caracteres, con mayúscula, minúscula, número y símbolo, y distinta de la anterior. Los errores aparecen al salir de un campo y se actualizan mientras se escribe; el ingreso solo pide que los campos no estén vacíos. Las reglas están en `src/utils/validaciones.js` y se repiten en el backend, que es quien las hace cumplir.
+*Historial* lista las solicitudes ya resueltas, aprobadas y rechazadas: el Admin ve todas y un Directivo, las de su instituto. *Cuentas* (solo Admin) permite cambiar el rol de otra persona y revocar o reactivar su acceso. Una cuenta revocada no puede iniciar sesión y su sesión abierta se cierra. Nadie puede modificar su propia cuenta.
+
+Las cuentas precargadas no tienen instituto, salvo directivo@, que pertenece a Tecnología e Ingeniería. Para ver el instituto en **Mi cuenta** hay que registrar una cuenta nueva y aprobarla.
+
+**Reglas de los formularios.** El correo debe ser `nombre@unahur.edu.ar`. La contraseña nueva tiene al menos 8 caracteres, con mayúscula, minúscula, número y símbolo, y distinta de la anterior. Los errores aparecen al salir de un campo y se actualizan mientras se escribe; el ingreso solo pide que los campos no estén vacíos. Las reglas están en `src/utils/validaciones.js` y se repiten en el backend, que es quien las hace cumplir. El cambio de contraseña desde **Mi cuenta** pide la contraseña actual y limita los intentos (5 errores seguidos bloquean el cambio 15 minutos).
+
+**Simulador de comisiones.** La tasa de recursado va de 20 % a 100 % y el cupo por comisión de 10 a 100 alumnos. Si se escribe un cupo fuera de rango, el cálculo usa el límite más cercano y la pantalla avisa. Los topes están en `src/utils/simulador.js`.
+
+## Pruebas
+
+El frontend se valida con `npm run lint` y `npm run build`. Las pruebas automáticas están en el backend: 35 tests con pytest que cubren login, permisos, carga y borrado de Excel, registro y recuperación de contraseña, Mi cuenta, límite de intentos, migración de la base, gestión de cuentas e historial de solicitudes (ver el README del backend).
 
 ## Scripts Disponibles
 
@@ -129,8 +148,11 @@ Todas las pantallas leen datos reales de la API: no quedan datos de ejemplo. Los
 | `DELETE /api/limpiar-db` | Vaciar la base (solo Admin) |
 | `GET /api/institutos` | Selector de instituto en el registro |
 | `POST /api/registro/solicitar` | Pedir acceso |
-| `GET /api/registro/solicitudes`, `POST /api/registro/solicitudes/{id}/{aprobar\|rechazar}` | Campana de solicitudes de alta (Directivo y Admin) |
+| `GET /api/registro/solicitudes`, `POST /api/registro/solicitudes/{id}/{aprobar\|rechazar}` | Accesos, pestaña Solicitudes: altas (Directivo y Admin) |
+| `GET /api/registro/historial` | Accesos, pestaña Historial (Admin: todas; Directivo: las de su instituto) |
 | `POST /api/recuperar-password/solicitar`, `POST /api/recuperar-password/canjear` | Recuperación de contraseña con código |
-| `GET /api/recuperacion/solicitudes`, `POST /api/recuperacion/solicitudes/{id}/{aprobar\|rechazar}` | Campana de solicitudes de recuperación (Directivo y Admin) |
+| `GET /api/recuperacion/solicitudes`, `POST /api/recuperacion/solicitudes/{id}/{aprobar\|rechazar}` | Accesos, pestaña Solicitudes: recuperaciones (Directivo y Admin) |
+| `GET /api/perfil`, `POST /api/perfil/cambiar-password` | Mi cuenta |
+| `GET /api/usuarios`, `POST /api/usuarios/{usuario}/rol`, `POST /api/usuarios/{usuario}/estado` | Accesos, pestaña Cuentas (solo Admin) |
 
 La documentación completa de la API está en el README del backend y en `http://localhost:8000/docs`.
