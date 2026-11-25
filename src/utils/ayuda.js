@@ -20,7 +20,7 @@ export const AYUDA = {
         titulo: 'Cómo leerlo',
         items: [
           'Las tarjetas dan el total de inscriptos y qué porcentaje terminó promocionado, regular o libre.',
-          'El gráfico "Rendimiento por comisión" reparte los alumnos de cada comisión: verde promocionó, azul regularizó, ámbar desaprobó y rojo quedó libre.',
+          'El gráfico "Rendimiento por comisión" reparte los alumnos de cada comisión: verde y liso promocionó, azul con diagonales regularizó, ámbar con puntos desaprobó y rojo con rayas quedó libre.',
           `Las alertas marcan las comisiones donde el ${UMBRAL_ALERTA_COMISION} % o más quedó libre.`,
           'Los filtros de arriba (período, carrera, materia y modalidad) cambian todo lo que ves.',
         ],
@@ -92,7 +92,7 @@ export const AYUDA = {
       {
         titulo: 'Cómo leerlo',
         items: [
-          'El gráfico muestra la promoción. Tocá la leyenda para sumar o sacar libres, regulares y desaprobados.',
+          'El gráfico muestra la promoción. Tocá la leyenda para sumar o sacar libres, regulares y desaprobados. Cada serie tiene su color, su tipo de línea y la forma de sus puntos, así se distinguen aunque no veas los colores.',
           'Las tarjetas muestran el último período y cuánto cambió contra el anterior, en puntos porcentuales (pp).',
           'Bajo cada período figura cuántos inscriptos hubo.',
           'Con los filtros elegís la materia, el rango de períodos (atajos o "Desde / Hasta") y el cuatrimestre.',

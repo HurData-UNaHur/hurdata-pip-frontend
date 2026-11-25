@@ -79,8 +79,8 @@
 
 .referencias i {
   display: inline-block;
-  width: 9px;
-  height: 9px;
+  width: 12px;
+  height: 12px;
   margin-right: 5px;
   border-radius: 2px;
 }
@@ -294,13 +294,17 @@
 .barraVacia {
   display: flex;
   flex: 1;
-  height: 7px;
+  height: 10px;               /* con menos altura no se alcanza a ver la trama */
   overflow: hidden;
   border-radius: 4px;
 }
 
 .barraVacia {
   background-color: color-mix(in srgb, var(--c-slate-400) 20%, transparent);
+}
+/* Una línea del color de la tarjeta entre tramos: separa colores contiguos aunque sean parecidos */
+.barra > span + span {
+  border-left: 1px solid var(--bg-card);
 }
 
 /* ── Alertas ──────────────────────────────────────────────────────────── */

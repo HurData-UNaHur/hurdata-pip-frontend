@@ -1,5 +1,6 @@
 import styles from './StackedBarChart.module.css';
 import Tooltip from './Tooltip';
+import { PATRON_ESTADO } from '../utils/patronesEstado';
 import { plural } from '../utils/texto';
 
 function StackedBarChart({ comisiones }) {
@@ -9,16 +10,16 @@ function StackedBarChart({ comisiones }) {
         <span>Rendimiento por comisión</span>
         <div className={styles.legend}>
           <span className={styles.legendItem}>
-            <i className={styles.dot} style={{ background: 'var(--c-emerald-500)' }}></i> Promocionados
+            <i className={styles.dot} style={{ backgroundColor: 'var(--c-emerald-500)', ...PATRON_ESTADO.promo }}></i> Promocionados
           </span>
           <span className={styles.legendItem}>
-            <i className={styles.dot} style={{ background: 'var(--c-blue-600)' }}></i> Regular
+            <i className={styles.dot} style={{ backgroundColor: 'var(--c-blue-600)', ...PATRON_ESTADO.reg }}></i> Regular
           </span>
           <span className={styles.legendItem}>
-            <i className={styles.dot} style={{ background: 'var(--c-amber-500)' }}></i> Desaprobado
+            <i className={styles.dot} style={{ backgroundColor: 'var(--c-amber-500)', ...PATRON_ESTADO.desap }}></i> Desaprobado
           </span>
           <span className={styles.legendItem}>
-            <i className={styles.dot} style={{ background: 'var(--c-red-600)' }}></i> Libre
+            <i className={styles.dot} style={{ backgroundColor: 'var(--c-red-600)', ...PATRON_ESTADO.libre }}></i> Libre
           </span>
         </div>
       </div>
@@ -53,22 +54,22 @@ function StackedBarChart({ comisiones }) {
             </div>
             <div className={styles.stackedBar}>
               <Tooltip texto={`Promo: ${c.promo} (${pctPromo}%)`} enfocable>
-                <div className={styles.barSeg} role="img" aria-label={`Promo: ${c.promo} (${pctPromo}%)`} style={{ width: `${numPromo}%`, background: 'var(--c-emerald-500)', color: 'var(--c-slate-900)' }}>
+                <div className={styles.barSeg} role="img" aria-label={`Promo: ${c.promo} (${pctPromo}%)`} style={{ width: `${numPromo}%`, backgroundColor: 'var(--c-emerald-500)', color: 'var(--c-slate-900)', ...PATRON_ESTADO.promo }}>
                   {numPromo > 10 ? `${pctPromo}%` : ''}
                 </div>
               </Tooltip>
               <Tooltip texto={`Regulares: ${c.reg} (${pctReg}%)`} enfocable>
-                <div className={styles.barSeg} role="img" aria-label={`Regulares: ${c.reg} (${pctReg}%)`} style={{ width: `${numReg}%`, background: 'var(--c-blue-600)' }}>
+                <div className={styles.barSeg} role="img" aria-label={`Regulares: ${c.reg} (${pctReg}%)`} style={{ width: `${numReg}%`, backgroundColor: 'var(--c-blue-600)', ...PATRON_ESTADO.reg }}>
                   {numReg > 10 ? `${pctReg}%` : ''}
                 </div>
               </Tooltip>
               <Tooltip texto={`Desaprobados / Sin condición: ${c.desap} (${pctDesap}%)`} enfocable>
-                <div className={styles.barSeg} role="img" aria-label={`Desaprobados / Sin condición: ${c.desap} (${pctDesap}%)`} style={{ width: `${numDesap}%`, background: 'var(--c-amber-500)', color: 'var(--c-slate-900)' }}>
+                <div className={styles.barSeg} role="img" aria-label={`Desaprobados / Sin condición: ${c.desap} (${pctDesap}%)`} style={{ width: `${numDesap}%`, backgroundColor: 'var(--c-amber-500)', color: 'var(--c-slate-900)', ...PATRON_ESTADO.desap }}>
                   {numDesap > 10 ? `${pctDesap}%` : ''}
                 </div>
               </Tooltip>
               <Tooltip texto={`Libres: ${c.libre} (${pctLibre}%)`} enfocable>
-                <div className={styles.barSeg} role="img" aria-label={`Libres: ${c.libre} (${pctLibre}%)`} style={{ width: `${numLibre}%`, background: 'var(--c-red-600)' }}>
+                <div className={styles.barSeg} role="img" aria-label={`Libres: ${c.libre} (${pctLibre}%)`} style={{ width: `${numLibre}%`, backgroundColor: 'var(--c-red-600)', ...PATRON_ESTADO.libre }}>
                   {numLibre > 10 ? `${pctLibre}%` : ''}
                 </div>
               </Tooltip>

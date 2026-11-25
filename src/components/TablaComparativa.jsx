@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, ArrowUpDown, Minus, Search, TriangleAlert } from 'lucide-react';
 import styles from './TablaComparativa.module.css';
-import { colorSerie } from '../utils/coloresSerie';
+import { colorRelleno } from '../utils/coloresSerie';
+import { PATRON_ESTADO } from '../utils/patronesEstado';
 import BotonesExportar from './BotonesExportar';
 import Tooltip from './Tooltip';
 import Pp from './Pp';
@@ -47,7 +48,7 @@ function Barra({ dist, etiqueta, theme }) {
     <Tooltip texto={`${etiqueta}: ${detalle}`} enfocable>
       <span className={styles.barra} role="img" aria-label={`${etiqueta}: ${detalle}`}>
         {SEGMENTOS.map((s) => dist[s.clave] > 0 && (
-          <span key={s.clave} style={{ flexGrow: dist[s.clave], background: colorSerie(s.clave, theme) }} />
+          <span key={s.clave} style={{ flexGrow: dist[s.clave], backgroundColor: colorRelleno(s.clave, theme), ...PATRON_ESTADO[s.clave] }} />
         ))}
       </span>
     </Tooltip>
@@ -173,7 +174,7 @@ export default function TablaComparativa({ filas, periodoA, periodoB, carrera = 
       {/* Referencias de la distribución */}
       <div className={styles.referencias} aria-hidden="true">
         {SEGMENTOS.map((s) => (
-          <span key={s.clave}><i style={{ background: colorSerie(s.clave, theme) }} />{s.nombre}</span>
+          <span key={s.clave}><i style={{ backgroundColor: colorRelleno(s.clave, theme), ...PATRON_ESTADO[s.clave] }} />{s.nombre}</span>
         ))}
         <span className={styles.periodos}>A = {etiquetaA} · B = {etiquetaB}</span>
       </div>

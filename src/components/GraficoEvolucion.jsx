@@ -5,17 +5,19 @@ import {
 import { ArrowDown, ArrowUp, Minus } from 'lucide-react';
 import styles from './GraficoEvolucion.module.css';
 import Pp from './Pp';
+import { Marcador, MuestraSerie } from './MarcadorSerie';
 import { ubicarEtiquetas, variacionReciente } from '../utils/evolucion';
 import { colorSerie, COLORES_SERIE } from '../utils/coloresSerie';
 import { formatearNumero, formatearPeriodo, formatearPeriodoCorto } from '../utils/texto';
 
+// Cada serie se distingue por color, trazo y forma de punto (no solo por el color).
 // Mismos colores que el resto de la app (KPIs y gráfico por comisión).
 // 'bueno' indica hacia dónde es buena la variación (los libres suben = malo).
 const SERIES_BASE = [
-  { clave: 'pctPromo', corta: 'promo', nombre: 'Promoción', pastilla: COLORES_SERIE.promo.pastilla, relleno: true, bueno: 'sube' },
-  { clave: 'pctLibre', corta: 'libre', nombre: 'Libres', pastilla: COLORES_SERIE.libre.pastilla, relleno: true, bueno: 'baja' },
-  { clave: 'pctReg', corta: 'reg', nombre: 'Regulares', pastilla: COLORES_SERIE.reg.pastilla, relleno: false },
-  { clave: 'pctDesap', corta: 'desap', nombre: 'Desaprobados', pastilla: COLORES_SERIE.desap.pastilla, relleno: false },
+  { clave: 'pctPromo', corta: 'promo', nombre: 'Promoción', pastilla: COLORES_SERIE.promo.pastilla, relleno: true, bueno: 'sube', trazo: undefined, forma: 'circulo' },
+  { clave: 'pctLibre', corta: 'libre', nombre: 'Libres', pastilla: COLORES_SERIE.libre.pastilla, relleno: true, bueno: 'baja', trazo: '8 5', forma: 'cuadrado' },
+  { clave: 'pctReg', corta: 'reg', nombre: 'Regulares', pastilla: COLORES_SERIE.reg.pastilla, relleno: false, trazo: '1 6', forma: 'triangulo' },
+  { clave: 'pctDesap', corta: 'desap', nombre: 'Desaprobados', pastilla: COLORES_SERIE.desap.pastilla, relleno: false, trazo: '12 4 2 4', forma: 'rombo' },
 ];
 const SERIES_POR_DEFECTO = ['pctPromo'];
 
@@ -26,6 +28,7 @@ const COLORES_TEMA = {
   dark: { texto: '#94a3b8', grilla: '#334155', fondo: '#1e293b', borde: '#334155', ambar: '#f59e0b' },
 };
 const ALTO = 340;
+const ANCHO_CON_NOMBRES = 640; // por debajo, la etiqueta final muestra solo el valor
 
 // Eje X: período arriba e inscriptos abajo (el parcial va en ámbar y con asterisco)
 function TickPeriodo({ x, y, payload, puntos, colores }) {
@@ -60,7 +63,8 @@ function TooltipEvolucion({ active, payload, colores, series }) {
       </span>
       {p.parcial && <span style={{ display: 'block', color: colores.ambar }}>Datos parciales</span>}
       {series.map((s) => (
-        <span key={s.clave} style={{ display: 'block', color: s.color }}>
+        <span key={s.clave} style={{ display: 'flex', alignItems: 'center', gap: 6, color: s.color }}>
+          <MuestraSerie serie={s} />
           {s.nombre}: {p[s.clave]} %
         </span>
       ))}
@@ -69,31 +73,33 @@ function TooltipEvolucion({ active, payload, colores, series }) {
 }
 
 // Etiqueta con el valor, a la derecha del último punto COMPLETO de cada línea
-const etiquetaFinal = (serie, puntos, dy, indiceFinal) => (props) => {
+const etiquetaFinal = (serie, puntos, dy, indiceFinal, conNombre) => (props) => {
   if (props.index !== indiceFinal || props.x == null || props.y == null) return null;
-  const ancho = 48;
+  // Con lugar suficiente la etiqueta lleva el nombre de la serie (etiquetado directo, sin ir a la leyenda)
+  const texto = `${conNombre ? `${serie.nombre} ` : ''}${puntos[indiceFinal][serie.clave]} %`;
+  const ancho = Math.round(texto.length * 6.4) + 18;
   return (
     <g key={`fin-${serie.clave}`} transform={`translate(${props.x + 12}, ${props.y + (dy[serie.clave] || 0)})`}>
       <rect x={0} y={-10} width={ancho} height={20} rx={10} fill={serie.pastilla} />
       <text x={ancho / 2} y={4} textAnchor="middle" fontSize={11} fontWeight={700} fill="#0f172a">
-        {puntos[indiceFinal][serie.clave]} %
+        {texto}
       </text>
     </g>
   );
 };
 
 // Punto de la línea (períodos completos)
-const puntoDe = (color) => (props) => {
+const puntoDe = (serie) => (props) => {
   const { cx, cy, index } = props;
   if (cx == null || cy == null) return null;
-  return <circle key={`p-${index}`} cx={cx} cy={cy} r={4} fill={color} stroke={color} strokeWidth={2} />;
+  return <Marcador key={`p-${index}`} forma={serie.forma} cx={cx} cy={cy} r={4.5} fill={serie.color} stroke={serie.color} strokeWidth={1.5} />;
 };
 
 // Período parcial: punto hueco con borde punteado, suelto (la línea no pasa por él)
-const puntoParcialDe = (color, colores) => (props) => {
+const puntoParcialDe = (serie, colores) => (props) => {
   const { cx, cy, index } = props;
   if (cx == null || cy == null) return null;
-  return <circle key={`h-${index}`} cx={cx} cy={cy} r={5} fill={colores.fondo} stroke={color} strokeWidth={2} strokeDasharray="2 2" />;
+  return <Marcador key={`h-${index}`} forma={serie.forma} cx={cx} cy={cy} r={5} fill={colores.fondo} stroke={serie.color} strokeWidth={2} strokeDasharray="2 2" />;
 };
 
 // Variación contra el período anterior: el color depende de si el cambio es bueno o malo
@@ -125,6 +131,8 @@ export default function GraficoEvolucion({ puntos, theme }) {
   // Color de cada línea según el tema (ver utils/coloresSerie.js)
   const SERIES = SERIES_BASE.map((s) => ({ ...s, color: colorSerie(s.corta, theme) }));
   const [visibles, setVisibles] = useState(SERIES_POR_DEFECTO);
+  const [anchoGrafico, setAnchoGrafico] = useState(820);
+  const conNombres = anchoGrafico >= ANCHO_CON_NOMBRES;
 
   const alternar = (clave) => setVisibles((prev) => {
     if (prev.includes(clave)) return prev.length > 1 ? prev.filter((c) => c !== clave) : prev; // siempre queda una
@@ -180,7 +188,7 @@ export default function GraficoEvolucion({ puntos, theme }) {
               className={`${styles.chip} ${activa ? '' : styles.chipOff}`}
               onClick={() => alternar(s.clave)}
             >
-              <span className={styles.punto} style={{ background: s.color }} />
+              <MuestraSerie serie={s} />
               {s.nombre}
             </button>
           );
@@ -189,8 +197,8 @@ export default function GraficoEvolucion({ puntos, theme }) {
 
       {/* El dibujo no se puede leer con lector de pantalla: sus datos van en la tabla de abajo */}
       <div style={{ width: '100%', height: ALTO }} aria-hidden="true">
-        <ResponsiveContainer initialDimension={{ width: 820, height: ALTO }}>
-          <ComposedChart data={datos} margin={{ top: 12, right: 64, bottom: 4, left: 0 }}>
+        <ResponsiveContainer initialDimension={{ width: 820, height: ALTO }} onResize={(ancho) => setAnchoGrafico(ancho)}>
+          <ComposedChart data={datos} margin={{ top: 12, right: conNombres ? 140 : 64, bottom: 4, left: 0 }}>
             <defs>
               {SERIES.filter((s) => s.relleno).map((s) => (
                 <linearGradient key={s.clave} id={`relleno-${s.clave}`} x1="0" y1="0" x2="0" y2="1">
@@ -225,11 +233,13 @@ export default function GraficoEvolucion({ puntos, theme }) {
                 name={s.nombre}
                 stroke={s.color}
                 strokeWidth={2.5}
+                strokeLinecap="round"
+                strokeDasharray={s.trazo}
                 fill={s.relleno ? `url(#relleno-${s.clave})` : 'none'}
                 connectNulls
-                dot={puntoDe(s.color)}
+                dot={puntoDe(s)}
                 activeDot={{ r: 6 }}
-                label={etiquetaFinal(s, puntos, dy, indiceFinal)}
+                label={etiquetaFinal(s, puntos, dy, indiceFinal, conNombres)}
                 isAnimationActive={false}
               />
             ))}
@@ -239,7 +249,7 @@ export default function GraficoEvolucion({ puntos, theme }) {
                 dataKey={`${s.clave}Parcial`}
                 name={`${s.nombre} (parcial)`}
                 stroke="none"
-                dot={puntoParcialDe(s.color, colores)}
+                dot={puntoParcialDe(s, colores)}
                 activeDot={false}
                 legendType="none"
                 isAnimationActive={false}
