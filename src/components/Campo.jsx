@@ -5,8 +5,8 @@ import { REGLAS_PASSWORD } from '../utils/validaciones';
 
 /*
  * Campo de formulario de acceso: etiqueta, input y mensaje de error.
- * El error se muestra solo si el campo ya se tocó (salió del campo o se intentó enviar);
- * desde ahí se actualiza mientras se escribe. Si tipo es "password", suma el ojo para ver la clave.
+ * El error se muestra solo si el campo ya se tocó (salió del campo con algo escrito, o se intentó enviar
+ * el formulario); desde ahí se actualiza mientras se escribe. Salir de un campo vacío no marca error. Si tipo es "password", suma el ojo para ver la clave.
  */
 export default function Campo({
   id, etiqueta, valor, onChange, onBlur, error, tocado, tipo = 'text', ayuda, children, ...resto
@@ -15,6 +15,11 @@ export default function Campo({
   const esPassword = tipo === 'password';
   const mensaje = tocado && error ? error : '';
   const idMensaje = `${id}-mensaje`;
+  // Salir de un campo vacío no es un error: el aviso de "falta completarlo" llega al enviar el formulario
+  // (el formulario marca todos los campos como tocados). Un campo con algo escrito sí se valida al salir.
+  const alSalir = (e) => {
+    if (valor !== '') onBlur?.(e);
+  };
 
   return (
     <div className={styles.campo}>
@@ -25,7 +30,7 @@ export default function Campo({
           type={esPassword && visible ? 'text' : tipo}
           value={valor}
           onChange={(e) => onChange(e.target.value)}
-          onBlur={onBlur}
+          onBlur={alSalir}
           aria-invalid={mensaje ? 'true' : undefined}
           aria-describedby={mensaje ? idMensaje : undefined}
           className={mensaje ? styles.inputError : undefined}
