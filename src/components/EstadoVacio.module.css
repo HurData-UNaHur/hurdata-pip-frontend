@@ -58,7 +58,7 @@
 
 .btnSecundario:hover {
   border-color: var(--c-unahur);
-  color: var(--c-unahur);
+  color: var(--texto-marca);
 }
 
 .iconoVacio {
@@ -66,7 +66,7 @@
 }
 
 .iconoError {
-  color: var(--c-red-500);
+  color: var(--texto-peligro);
 }
 
 /* ── Skeleton de página (estado 'cargando') ───────────────────────────── */

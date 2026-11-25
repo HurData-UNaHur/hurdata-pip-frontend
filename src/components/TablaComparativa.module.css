@@ -200,7 +200,7 @@
 
 .sortIconActive {
   font-size: 0.7rem;
-  color: var(--c-unahur);
+  color: var(--texto-marca);
 }
 
 /* ── Cambios (color según sea bueno o malo) ───────────────────────────── */
@@ -225,11 +225,11 @@
 }
 
 .bueno {
-  color: var(--c-green-600);
+  color: var(--texto-exito);
 }
 
 .malo {
-  color: var(--c-red-500);
+  color: var(--texto-peligro);
 }
 
 .delta.bueno {
@@ -258,7 +258,7 @@
 }
 
 .etiquetaNueva {
-  color: var(--c-blue-500);
+  color: var(--texto-info);
   background-color: color-mix(in srgb, var(--c-blue-500) 14%, transparent);
   border: 1px solid color-mix(in srgb, var(--c-blue-500) 40%, transparent);
 }
@@ -311,9 +311,9 @@
 }
 
 .alerta {
-  color: var(--c-amber-500);
+  color: var(--texto-aviso);
 }
 
 .alertaCritica {
-  color: var(--c-red-500);
+  color: var(--texto-peligro);
 }

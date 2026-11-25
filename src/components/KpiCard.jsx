@@ -4,7 +4,7 @@ import styles from './KpiCard.module.css';
 import Tooltip from './Tooltip';
 
 // Verde UNaHur: acento de las tarjetas sin un color con significado propio
-const COLOR_NEUTRO = 'var(--c-unahur)';
+const COLOR_NEUTRO = 'var(--acento)';
 
 /*
  * Tarjeta de indicador. Un solo acento por tarjeta: el borde superior y el

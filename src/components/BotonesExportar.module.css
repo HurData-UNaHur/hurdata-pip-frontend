@@ -25,5 +25,5 @@
 }
 .error {
   font-size: 0.75rem;
-  color: var(--c-red-500);
+  color: var(--texto-peligro);
 }

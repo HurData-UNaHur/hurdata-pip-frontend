@@ -42,11 +42,11 @@
 }
 
 .buena {
-  color: var(--c-green-600);
+  color: var(--texto-exito);
 }
 
 .mala {
-  color: var(--c-red-500);
+  color: var(--texto-peligro);
 }
 
 .igual {

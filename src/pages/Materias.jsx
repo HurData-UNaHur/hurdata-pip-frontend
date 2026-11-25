@@ -218,8 +218,8 @@ function Materias({
                 <td><strong>{m.nombre}</strong></td>
                 <td>{m.comisiones}</td>
                 <td>{m.inscriptos}</td>
-                <td style={{ color: 'var(--c-emerald-500)' }}>{m.pctPromo}% ({m.promo})</td>
-                <td style={{ color: 'var(--c-red-500)' }}>{m.pctLibre}% ({m.libre})</td>
+                <td style={{ color: 'var(--texto-exito)' }}>{m.pctPromo}% ({m.promo})</td>
+                <td style={{ color: 'var(--texto-peligro)' }}>{m.pctLibre}% ({m.libre})</td>
                 <td>
                   {nivelPorLibres(m.pctLibre) === 'riesgo' ? (
                     <span className={styles.badgeCritico}>Riesgo alto</span>

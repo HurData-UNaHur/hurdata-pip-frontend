@@ -210,7 +210,7 @@ function Predicciones({
               <span>Comisiones nuevas a asignar:</span>
               <span
                 className={styles.resultValue}
-                style={{ color: comisionesExtra > 0 ? 'var(--c-red-500)' : 'var(--c-emerald-500)' }}
+                style={{ color: comisionesExtra > 0 ? 'var(--texto-peligro)' : 'var(--texto-exito)' }}
               >
                 {comisionesExtra}
               </span>

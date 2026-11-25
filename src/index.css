@@ -11,12 +11,16 @@ body {
 /* Variables por defecto: MODO CLARO */
 :root {
   /* Paleta primitiva: la única parte del proyecto que escribe colores a mano. Todo lo demás usa var(--c-...) o los tokens semánticos de abajo. */
+  --c-amber-400: #fbbf24;
   --c-amber-500: #f59e0b;
+  --c-amber-700: #b45309;
   --c-black: #000000;
   --c-emerald-500: #10b981;
   --c-indigo-500: #6366f1;
+  --c-blue-400: #60a5fa;
   --c-blue-500: #3b82f6;
   --c-blue-600: #2563eb;
+  --c-blue-700: #1d4ed8;
   --c-green-200: #bbf7d0;
   --c-green-400: #4ade80;
   --c-green-50: #f0fdf4;
@@ -74,6 +78,13 @@ body {
   --border-strong: var(--c-slate-300);
   --border-input: var(--c-placeholder); /* borde de campos de formulario: 3,5:1 sobre blanco (WCAG 1.4.11) */
   --bg-franja: var(--c-slate-100);     /* franja de filtros dentro de una tarjeta */
+  /* Texto de estado: 4,5:1 sobre tarjeta y franja. Los tonos 500 son para rellenos, bordes e ?conos, no para texto */
+  --texto-exito: var(--c-green-700);
+  --texto-peligro: var(--c-red-700);
+  --texto-aviso: var(--c-amber-700);
+  --texto-info: var(--c-blue-700);
+  --texto-marca: var(--c-unahur);   /* verde UNaHur como texto o enlace */
+  --acento: var(--c-unahur);        /* verde UNaHur como borde o n?mero grande */
 }
 
 /* Override de variables: MODO OSCURO */
@@ -82,7 +93,7 @@ body {
   --bg-card: var(--c-slate-800);
   --bg-subtle: var(--c-slate-700);
   --text-primary: var(--c-slate-50);
-  --text-secondary: var(--c-slate-400);
+  --text-secondary: var(--c-slate-soft);
   --border-color: var(--c-slate-700);
   --navbar-bg: var(--c-green-950);
   --shadow: 0 1px 3px color-mix(in srgb, var(--c-black) 30%, transparent);
@@ -92,6 +103,12 @@ body {
   --border-strong: var(--c-slate-700);
   --border-input: var(--c-slate-500);
   --bg-franja: color-mix(in srgb, var(--c-slate-700) 55%, var(--c-slate-800));
+  --texto-exito: var(--c-green-400);
+  --texto-peligro: var(--c-red-300);
+  --texto-aviso: var(--c-amber-400);
+  --texto-info: var(--c-blue-400);
+  --texto-marca: var(--c-green-400);
+  --acento: var(--c-green-500);
 }
 
 body {

@@ -122,7 +122,7 @@
 .error {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--c-red-500);
+  color: var(--texto-peligro);
 }
 
 .skGrafico {

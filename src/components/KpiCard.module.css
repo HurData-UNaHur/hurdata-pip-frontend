@@ -52,7 +52,6 @@
   color: color-mix(in srgb, var(--kpi-color) 72%, var(--c-black));
   font-size: 1.8rem;
   margin: 0;
-  color: var(--c-unahur); /* Verde destacado UNaHur */
   font-weight: 700;
 }
 

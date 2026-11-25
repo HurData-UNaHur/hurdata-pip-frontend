@@ -247,22 +247,22 @@
 
 .badgeActiva {
   composes: badge;
-  background-color: color-mix(in srgb, var(--c-green-500) 20%, transparent);
-  color: var(--c-green-500);
+  background-color: color-mix(in srgb, var(--c-green-500) 12%, transparent);
+  color: var(--texto-exito);
   border-color: color-mix(in srgb, var(--c-green-500) 40%, transparent);
 }
 
 .badgeReemplazada {
   composes: badge;
-  background-color: color-mix(in srgb, var(--c-blue-500) 20%, transparent);
-  color: var(--c-blue-500);
+  background-color: color-mix(in srgb, var(--c-blue-500) 12%, transparent);
+  color: var(--texto-info);
   border-color: color-mix(in srgb, var(--c-blue-500) 40%, transparent);
 }
 
 .badgeBorrada {
   composes: badge;
-  background-color: color-mix(in srgb, var(--c-red-500) 20%, transparent);
-  color: var(--c-red-500);
+  background-color: color-mix(in srgb, var(--c-red-500) 12%, transparent);
+  color: var(--texto-peligro);
   border-color: color-mix(in srgb, var(--c-red-500) 40%, transparent);
 }
 
@@ -319,7 +319,7 @@
 
 .btnAccion:hover:not(:disabled) {
   border-color: var(--c-unahur);
-  color: var(--c-unahur);
+  color: var(--texto-marca);
 }
 
 .btnAccion:disabled {
@@ -330,11 +330,11 @@
 /* Borrar: igual de discreto, pero rojo al pasar el mouse */
 .btnBorrar:hover:not(:disabled) {
   border-color: var(--c-red-500);
-  color: var(--c-red-500);
+  color: var(--texto-peligro);
 }
 
 .error {
-  color: var(--c-red-500);
+  color: var(--texto-peligro);
   font-size: 0.85rem;
   margin: 0;
 }
@@ -345,7 +345,7 @@
 }
 
 .zonaPeligro .cardTitle {
-  color: var(--c-red-500);
+  color: var(--texto-peligro);
 }
 
 .btnPeligro {

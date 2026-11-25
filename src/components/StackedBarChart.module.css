@@ -66,7 +66,7 @@
 }
 
 .comisionHeader strong {
-  color: var(--c-unahur); /* Resalta el nombre de la comisión en verde UNaHur */
+  color: var(--texto-marca);
 }
 
 /* Las barras horizontales apiladas */
