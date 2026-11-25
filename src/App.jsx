@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AppShell from './components/AppShell';
 import ToastProvider from './components/ToastProvider';
 import Dashboard from './pages/Dashboard';
@@ -426,6 +426,9 @@ function App() {
               }
             />
           )}
+          {/* Una dirección que no existe para este rol (por ejemplo /accesos para un No Docente que entra después
+              de otra persona) vuelve al inicio, en lugar de dejar la pantalla en blanco */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AppShell>
     </BrowserRouter>
