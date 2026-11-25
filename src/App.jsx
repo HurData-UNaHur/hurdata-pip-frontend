@@ -67,6 +67,9 @@ function App() {
   };
 
   const handleLogout = () => {
+    // El Login no cambia la dirección por sí solo: se deja en la raíz para que la próxima persona
+    // entre por el Inicio y no por la sección donde estaba la anterior
+    window.history.replaceState(null, '', '/');
     setUsuario(null);
     localStorage.removeItem('hurdata_usuario');
     localStorage.removeItem('hurdata_token');
