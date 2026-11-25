@@ -31,7 +31,7 @@ const TITULOS = {
   '/': 'Inicio',
   '/materias': 'Materias',
   '/evolucion': 'Evolución',
-  '/predicciones': 'Simulador de comisiones',
+  '/simulador': 'Simulador de comisiones',
   '/cargas': 'Cargas',
   '/accesos': 'Accesos',
   '/cuenta': 'Mi cuenta',
@@ -106,7 +106,7 @@ function AppShell({ theme, toggleTheme, usuario, onLogout, children }) {
     { to: '/', texto: 'Inicio', Icono: House, end: true },
     { to: '/materias', texto: 'Materias', Icono: BookOpen },
     { to: '/evolucion', texto: 'Evolución', Icono: ChartLine },
-    { to: '/predicciones', texto: 'Simulador de comisiones', Icono: Calculator },
+    { to: '/simulador', texto: 'Simulador de comisiones', Icono: Calculator },
     ...(puedeVerCargas ? [{ to: '/cargas', texto: 'Cargas', Icono: Upload }] : []),
     ...(puedeAprobar ? [{ to: '/accesos', texto: 'Accesos', Icono: ShieldCheck, contador: pendientes }] : []),
   ];

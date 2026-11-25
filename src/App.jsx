@@ -381,7 +381,7 @@ function App() {
             }
           />
           <Route
-            path="/predicciones"
+            path="/simulador"
             element={
               <Predicciones
                 estadoDatos={estadoDatos}
@@ -431,6 +431,8 @@ function App() {
           )}
           {/* Una dirección que no existe para este rol (por ejemplo /accesos para un No Docente que entra después
               de otra persona) vuelve al inicio, en lugar de dejar la pantalla en blanco */}
+          {/* La dirección anterior del simulador: se conserva para que los favoritos y enlaces viejos sigan funcionando */}
+          <Route path="/predicciones" element={<Navigate to="/simulador" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AppShell>

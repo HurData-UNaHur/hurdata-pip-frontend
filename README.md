@@ -139,7 +139,7 @@ Todas las pantallas leen datos reales de la API: no quedan datos de ejemplo. Los
 | Endpoint | Uso |
 |---|---|
 | `POST /api/login` | Inicio de sesión |
-| `GET /api/periodos`, `/api/carreras`, `/api/datos` | Dashboard, Materias y Predicciones |
+| `GET /api/periodos`, `/api/carreras`, `/api/datos` | Dashboard, Materias y Simulador de comisiones |
 | `GET /api/evolucion` | Página Evolución |
 | `GET /api/periodos-carreras`, `/api/carga-activa` | Origen de los datos (requiere sesión) |
 | `GET /api/cargas` | Historial en Cargas |
